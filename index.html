@@ -22,11 +22,14 @@
     };
     
     // Inicialización prevenida si no hay API Key real para evitar errores en consola
-    if(firebaseConfig.apiKey !== "API_KEY_NUEVO_PROYECTO") {
-        firebase.initializeApp(firebaseConfig);
-    } else {
-        console.warn("MODO DESARROLLO: Esperando configuración real de Firebase.");
-    }
+  const firebaseConfig = {
+  apiKey: "AIzaSyCDsFpMnAq6s8uiuXway3gpLUHjf1P0JtU",
+  authDomain: "pinkitosshop-d896d.firebaseapp.com",
+  projectId: "pinkitosshop-d896d",
+  storageBucket: "pinkitosshop-d896d.firebasestorage.app",
+  messagingSenderId: "175361844009",
+  appId: "1:175361844009:web:ef944790482463e4548d38"
+};
     
     // Evitamos error de bd si no está inicializado
     const db = firebase.apps.length ? firebase.firestore() : { collection: () => ({ orderBy: () => ({ onSnapshot: () => {} }), doc: () => ({ onSnapshot: () => {} }) }) };
