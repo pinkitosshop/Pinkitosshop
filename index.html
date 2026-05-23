@@ -376,7 +376,7 @@
         let carrito = []; let wishlist = []; let currentModalImages = [];
         let currentImageIndex = 0; let hasCheckedUrlParams = false; 
         let productQuantity = 1; let touchStartX = 0; let touchEndX = 0;
-        let currentCategory = 'all';
+        let currentCategory = 'all'; let currentProduct = null;
 
         function esPreventaActiva(prod) { if (!prod.isPresale) return false; if (!prod.fechaLanzamiento) return true; const hoy = new Date(); hoy.setHours(0, 0, 0, 0); const partes = prod.fechaLanzamiento.split('-'); const fechaLanz = new Date(partes[0], partes[1] - 1, partes[2]); return fechaLanz > hoy; }
 
@@ -479,35 +479,4 @@
                 <div class="group cursor-pointer flex flex-col h-full bg-white border border-border rounded-3xl shadow-sm hover:shadow-glow transition-all duration-300 transform hover:-translate-y-1 ${isOut ? 'opacity-70' : ''}" onclick="openModalById('${prod.id}')">
                     <div class="relative aspect-square overflow-hidden rounded-t-3xl bg-light p-4 flex items-center justify-center border-b border-border">
                         ${badgesWrapper} ${btnFavHTML}
-                        <img src="${coverImg}" loading="lazy" alt="${prod.titulo}" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 drop-shadow-md ${isOut ? 'grayscale' : ''}">
-                    </div>
-                    <div class="p-4 flex-1 flex flex-col justify-between">
-                        <div class="mb-3">
-                            <p class="text-muted text-[10px] uppercase font-bold mb-1 tracking-wider">${prod.categoria || 'General'}</p>
-                            <h3 class="text-dark font-bold text-sm line-clamp-2 leading-tight">${prod.titulo}</h3>
-                        </div>
-                        <div class="flex justify-between items-center mt-auto pt-3 border-t border-light gap-2">
-                            <div class="min-w-0 flex-1">${priceHtml}</div>
-                            ${btnQuickAddHTML}
-                        </div>
-                    </div>
-                </div>`
-            }).join('');
-        }
-
-        function quickAdd(id, event) {
-            event.stopPropagation(); const p = inventario.find(x => x.id === id); if(!p || esPreventaActiva(p) || p.stock <= 0) return;
-            if (p.hasMeasures && p.tallas && p.tallas.length > 0) { openModalById(p.id); Toast.fire({ icon: 'info', title: 'Selecciona una variante' }); return; }
-            let t = "Única"; const idx = carrito.findIndex(i => i.id === p.id && i.talla === t);
-            if(idx !== -1) carrito[idx].cantidad++; else carrito.push({ id: p.id, titulo: p.titulo, talla: t, cantidad: 1, img: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : p.imagen });
-            Toast.fire({ icon: 'success', title: `Añadido` }); saveCart(); renderCarrito();
-            if(window.innerWidth > 768 && document.getElementById('cart-drawer').classList.contains('translate-x-full')) toggleCartDrawer();
-        }
-
-        function renderFilters() {
-            const cats = config.categories || []; const dT = document.getElementById('desktop-nav-categories');
-            if(dT) dT.innerHTML = `<button onclick="filterGallery('all')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors">Todo el catálogo</button>` + cats.map(c => `<button onclick="filterGallery('${c}')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors capitalize">${c}</button>`).join('');
-            const mT = document.getElementById('mobile-nav-categories');
-            if(mT) mT.innerHTML = `<button onclick="filterGallery('all'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all ${currentCategory === 'all' ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">Todos los artículos</button>` + cats.map(c => `<button onclick="filterGallery('${c}'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all capitalize ${currentCategory === c ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">${c}</button>`).join('');
-        }
-        function filterGallery(c) { currentCategory = c; renderFilters(); const g = document.getElementById('gallery-grid'); g.style.opacity = '0
+                        <img src="${coverImg}" loading="lazy" alt="${prod.titulo}" class="w-full h
