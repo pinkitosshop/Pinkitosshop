@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <!-- FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+    
+    <!-- EXCEL (SheetJS) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+    // =====================================================================
+    // ⚠️ MODO SEGURO: CONFIGURACIÓN FIREBASE PARA EL NUEVO PROYECTO (DEV)
+    // Reemplaza esto con las credenciales del NUEVO proyecto "Pinkitos Shop"
+    // =====================================================================
+    const firebaseConfig = {
+      apiKey: "API_KEY_NUEVO_PROYECTO",
+      authDomain: "pinkitos-shop-dev.firebaseapp.com",
+      projectId: "pinkitos-shop-dev",
+      storageBucket: "pinkitos-shop-dev.firebasestorage.app",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID",
+      measurementId: "MEASUREMENT_ID"
+    };
+
+    if(firebaseConfig.apiKey !== "API_KEY_NUEVO_PROYECTO") {
+        firebase.initializeApp(firebaseConfig);
+    } else {
+        console.warn("MODO DESARROLLO: Esperando configuración real de Firebase.");
+    }
+    
+    const db = firebase.apps.length ? firebase.firestore() : { collection: () => ({ orderBy: () => ({ onSnapshot: () => {} }), doc: () => ({ onSnapshot: () => {} }) }) };
+    const auth = firebase.apps.length ? firebase.auth() : { onAuthStateChanged: (cb) => cb(null), signInWithEmailAndPassword: () => Promise.reject() };
+    const storage = firebase.apps.length ? firebase.storage() : null;
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Pinkitos Shop</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: { 
+                extend: { 
+                    colors: { 
+                        primary: '#6EC1E4', // Accent Blue
+                        secondary: '#7A3B3B', // Red Brown
+                        dark: '#4B2A2A', // Dark Brown text
+                        light: '#F7F1EB', // Background Cream
+                        card: '#FFFFFF', // Card White
+                        border: '#EDE3DC', // Soft border
+                        muted: '#BFAAA2', // Muted text
+                        promo: '#A67C7C', // Soft Red
+                        success: '#6EC1E4' 
+                    }, 
+                    fontFamily: { 
+                        sans: ['"Poppins"', 'sans-serif'], 
+                        serif: ['"Poppins"', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(75, 42, 42, 0.05)',
+                        'float': '0 10px 30px -5px rgba(75, 42, 42, 0.1)'
+                    }
+                } 
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+        
+        body { background-color: #F7F1EB; color: #4B2A2A; }
+        
+        .section-fade { display: none; opacity: 0; transition: opacity 0.4s ease-in-out; }
+        .section-fade.active { display: block; opacity: 1; }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(75, 42, 42, 0.6); z-index: 200; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: #FFFFFF; border-radius: 24px; max-width: 450px; width: 100%; position: relative; box-shadow: 0 25px 50px -12px rgba(75, 42, 42, 0.25); }
+
+        /* Switches estilizados claros */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #EDE3DC; transition: .4s; border-radius: 24px; border: 1px solid #BFAAA2; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input:checked + .slider { background-color: #6EC1E4; border-color: #6EC1E4; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        .switch-promo input:checked + .slider { background-color: #A67C7C; border-color: #A67C7C; }
+
+        .tab-btn.active { border-bottom: 3px solid #6EC1E4; color: #6EC1E4; font-weight: bold; }
+        
+        /* Inputs limpios */
+        .admin-input { background: #FFFFFF; border: 1px solid #EDE3DC; padding: 10px 16px; color: #4B2A2A; outline: none; border-radius: 12px; transition: all 0.2s; font-size: 14px; }
+        .admin-input:focus { border-color: #6EC1E4; box-shadow: 0 0 0 3px rgba(110, 193, 228, 0.2); }
+
+        .loader { border: 3px solid rgba(110, 193, 228, 0.3); border-radius: 50%; border-top: 3px solid #6EC1E4; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .img-thumb-container { position: relative; width: 80px; height: 80px; border-radius: 12px; overflow: hidden; border: 1px solid #EDE3DC; background: #F7F1EB;}
+        .img-thumb-container img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-light text-dark font-sans antialiased selection:bg-primary selection:text-white min-h-screen flex flex-col">
+
+    <div id="printable-invoice"></div>
+
+    <header class="w-full z-[100] bg-white border-b border-border shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div id="header-title" class="font-bold text-2xl text-dark tracking-tight flex items-center gap-2">
+                <div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center text-primary text-sm"><i class="fas fa-cat"></i></div>
+                Pinkitos<span class="text-primary">.</span>
+            </div>
+            <nav class="flex items-center gap-4">
+                <span id="user-role-badge" class="hidden text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-full font-bold uppercase tracking-wider"></span>
+                <a href="pinkitos-shop.html" class="cursor-pointer text-xs font-bold text-muted hover:text-primary transition-colors border border-border px-4 py-2 rounded-xl flex items-center gap-2 bg-light"><i class="fas fa-store"></i> Ver Tienda</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- SELECTOR DE MODULO -->
+    <div id="selector-modal" class="modal-overlay active">
+        <div class="modal-content p-10 text-center shadow-float">
+            <div class="w-16 h-16 bg-primary/10 rounded-full mx-auto flex items-center justify-center text-primary text-3xl mb-4"><i class="fas fa-cat"></i></div>
+            <h2 class="font-bold text-3xl text-dark mb-2">Pinkitos<span class="text-primary">.</span></h2>
+            <p class="text-xs text-muted mb-8 font-medium">Panel de Administración</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div onclick="selectModule('POS')" class="bg-light border border-border p-6 rounded-2xl cursor-pointer hover:border-primary hover:shadow-soft transition-all group">
+                    <i class="fas fa-cash-register text-3xl text-primary mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h3 class="text-dark font-bold text-lg mb-1">Punto de Venta</h3>
+                    <p class="text-muted text-[10px] font-medium">Gestión de caja y tickets</p>
+                </div>
+                <div onclick="selectModule('ADMIN')" class="bg-light border border-border p-6 rounded-2xl cursor-pointer hover:border-primary hover:shadow-soft transition-all group">
+                    <i class="fas fa-boxes text-3xl text-primary mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h3 class="text-dark font-bold text-lg mb-1">Backoffice</h3>
+                    <p class="text-muted text-[10px] font-medium">Inventario y Configuración</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content p-10 text-center shadow-float">
+            <button onclick="goBackToSelector()" class="absolute top-4 left-4 text-muted hover:text-dark transition-colors w-8 h-8 flex items-center justify-center bg-light rounded-full"><i class="fas fa-arrow-left"></i></button>
+            <h2 class="font-bold text-2xl text-dark mb-2">Acceso Seguro</h2>
+            <p class="text-sm text-muted mb-6 font-medium">Ingresa tus credenciales</p>
+            <div class="space-y-4">
+                <input type="email" id="admin-email-input" placeholder="Correo electrónico" class="admin-input w-full text-center">
+                <input type="password" id="admin-pass-input" placeholder="Contraseña" class="admin-input w-full text-center" onkeyup="if(event.key === 'Enter') validateLogin()">
+                <button onclick="validateLogin()" class="w-full bg-primary text-white py-3.5 font-bold text-sm rounded-xl hover:bg-[#5eb1d4] transition-all shadow-md">Ingresar</button>
+                <p id="login-error" class="text-secondary text-xs font-bold hidden animate-pulse bg-secondary/10 py-2 rounded-lg">Credenciales Incorrectas</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin" class="section-fade py-8 bg-light flex-1">
+        <div class="max-w-7xl mx-auto px-6">
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-border mb-8 gap-4 bg-white p-2 px-4 rounded-2xl shadow-sm">
+                
+                <!-- GRUPO TABS: POS -->
+                <div id="nav-group-pos" class="hidden space-x-2 overflow-x-auto w-full md:w-auto scrollbar-hide">
+                    <button id="nav-pos" onclick="showAdminTab('pos', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-cash-register"></i> Terminal</button>
+                    <button id="nav-pedidos" onclick="showAdminTab('pedidos', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-bell"></i> Pedidos <span id="badge-pedidos" class="bg-secondary text-white px-2 py-0.5 rounded-full text-[10px] hidden">0</span></button>
+                </div>
+
+                <!-- GRUPO TABS: ADMIN -->
+                <div id="nav-group-admin" class="hidden space-x-2 overflow-x-auto w-full md:w-auto scrollbar-hide">
+                    <button id="nav-inventario" onclick="showAdminTab('inventario', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-box"></i> Inventario</button>
+                    <button id="nav-add-producto" onclick="showAdminTab('add-producto', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-plus-circle"></i> Producto</button>
+                    <button id="nav-config" onclick="showAdminTab('config', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-cog"></i> Ajustes</button>
+                </div>
+                
+                <button onclick="exitModule()" class="text-secondary text-sm font-bold hover:text-[#5c2a2a] transition-colors flex items-center gap-2 px-4 py-2 bg-light rounded-xl"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            </div>
+
+            <!-- TAB: INVENTARIO (Simplificado visualmente como ejemplo) -->
+            <div id="tab-inventario" class="admin-tab hidden">
+                <div class="mb-6 bg-white p-6 rounded-2xl shadow-soft border border-border">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-dark">Inventario Activo</h4>
+                            <span id="inventory-count" class="text-primary text-xs font-semibold">0 Productos</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <input type="text" id="search-inventory" placeholder="Buscar por Nombre o SKU..." class="admin-input w-64" oninput="invCurrentPage=1; renderAdminList()">
+                            <button onclick="exportarExcel()" class="bg-green-100 text-green-700 border border-green-200 px-4 py-2.5 font-bold text-xs hover:bg-green-200 transition-all rounded-xl flex items-center gap-2"><i class="fas fa-file-excel"></i> Exportar</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="admin-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <!-- PRODUCTOS DINAMICOS -->
+                    <div class="text-center py-10 col-span-full"><p class="text-muted font-medium text-sm">Cargando datos desde la base de datos DEV...</p></div>
+                </div>
+            </div>
+
+            <!-- TAB: CONFIGURACIÓN -->
+            <div id="tab-config" class="admin-tab hidden space-y-6">
+                <div class="bg-white p-8 border border-border rounded-2xl shadow-soft">
+                    <h3 class="text-dark font-bold text-lg mb-6 flex items-center gap-2"><i class="fas fa-image text-primary"></i> Textos Principales</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <div><label class="text-xs font-bold text-muted mb-1 block">Título Hero</label><input type="text" id="config-hero-title" class="admin-input w-full"></div>
+                            <div><label class="text-xs font-bold text-muted mb-1 block">Subtítulo Hero</label><input type="text" id="config-hero-subtitle" class="admin-input w-full"></div>
+                            <button onclick="saveHeroConfig()" id="btn-save-hero" class="w-full bg-primary text-white py-3 font-bold text-sm rounded-xl shadow-sm">Guardar Textos</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: POS (Ejemplo visual rápido) -->
+            <div id="tab-pos" class="admin-tab hidden">
+                 <div class="bg-white p-8 border border-border rounded-2xl shadow-soft text-center">
+                    <i class="fas fa-cash-register text-6xl text-border mb-4"></i>
+                    <h3 class="text-dark font-bold text-xl mb-2">Terminal de Punto de Venta</h3>
+                    <p class="text-muted text-sm">La lógica del POS está lista para inyectar datos desde Firestore DEV.</p>
+                 </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Lógica simplificada para la demo visual (Mantiene los mismos nombres de variables)
+        let inventario = []; 
+        let activeModule = null;
+
+        function init() {
+            // Bypass auth para demo visual segura sin BD real configurada
+            if(firebaseConfig.apiKey === "API_KEY_NUEVO_PROYECTO") {
+                 document.getElementById('selector-modal').classList.add('active');
+            }
+        }
+
+        function selectModule(module) {
+            document.getElementById('selector-modal').classList.remove('active');
+            document.getElementById('login-modal').classList.add('active');
+            document.getElementById('login-modal').dataset.targetModule = module;
+        }
+
+        function goBackToSelector() {
+            document.getElementById('login-modal').classList.remove('active');
+            document.getElementById('selector-modal').classList.add('active');
+        }
+
+        function validateLogin() {
+            // Fake login para demo segura
+            const module = document.getElementById('login-modal').dataset.targetModule;
+            document.getElementById('login-modal').classList.remove('active');
+            
+            document.getElementById('admin').style.display = 'block'; 
+            setTimeout(() => document.getElementById('admin').classList.add('active'), 50);
+
+            const navGroupPos = document.getElementById('nav-group-pos');
+            const navGroupAdmin = document.getElementById('nav-group-admin');
+
+            if (module === 'POS') {
+                navGroupPos.classList.remove('hidden'); navGroupPos.classList.add('flex');
+                navGroupAdmin.classList.add('hidden'); navGroupAdmin.classList.remove('flex');
+                showAdminTab('pos');
+            } else {
+                navGroupAdmin.classList.remove('hidden'); navGroupAdmin.classList.add('flex');
+                navGroupPos.classList.add('hidden'); navGroupPos.classList.remove('flex');
+                showAdminTab('inventario');
+            }
+        }
+        
+        function exitModule() {
+            document.getElementById('admin').classList.remove('active'); 
+            setTimeout(() => { document.getElementById('admin').style.display = 'none'; document.getElementById('selector-modal').classList.add('active'); }, 400);
+        }
+
+        function showAdminTab(tab, event) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden')); 
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            const targetEl = document.getElementById(`tab-${tab}`);
+            if(targetEl) targetEl.classList.remove('hidden'); 
+            
+            const targetBtn = document.getElementById(`nav-${tab}`);
+            if(targetBtn) targetBtn.classList.add('active');
+            else if(event && event.currentTarget) event.currentTarget.classList.add('active');
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
