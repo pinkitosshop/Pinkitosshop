@@ -7,31 +7,20 @@
 
     <script>
     // =====================================================================
-    // ⚠️ MODO SEGURO: CONFIGURACIÓN FIREBASE PARA EL NUEVO PROYECTO (DEV)
-    // Reemplaza esto con las credenciales del NUEVO proyecto "Pinkitos Shop"
-    // NO uses las del proyecto de streetwear aquí para no contaminar la DB original.
+    // 🔥 CONEXIÓN A FIREBASE (PRODUCCIÓN)
     // =====================================================================
-   const firebaseConfig = {
-  apiKey: "AIzaSyCDsFpMnAq6s8uiuXway3gpLUHjf1P0JtU",
-  authDomain: "pinkitosshop-d896d.firebaseapp.com",
-  projectId: "pinkitosshop-d896d",
-  storageBucket: "pinkitosshop-d896d.firebasestorage.app",
-  messagingSenderId: "175361844009",
-  appId: "1:175361844009:web:ef944790482463e4548d38"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyCDsFpMnAq6s8uiuXway3gpLUHjf1P0JtU",
+      authDomain: "pinkitosshop-d896d.firebaseapp.com",
+      projectId: "pinkitosshop-d896d",
+      storageBucket: "pinkitosshop-d896d.firebasestorage.app",
+      messagingSenderId: "175361844009",
+      appId: "1:175361844009:web:ef944790482463e4548d38"
+    };
     
-    // Inicialización prevenida si no hay API Key real para evitar errores en consola
-  const firebaseConfig = {
-  apiKey: "AIzaSyCDsFpMnAq6s8uiuXway3gpLUHjf1P0JtU",
-  authDomain: "pinkitosshop-d896d.firebaseapp.com",
-  projectId: "pinkitosshop-d896d",
-  storageBucket: "pinkitosshop-d896d.firebasestorage.app",
-  messagingSenderId: "175361844009",
-  appId: "1:175361844009:web:ef944790482463e4548d38"
-};
-    
-    // Evitamos error de bd si no está inicializado
-    const db = firebase.apps.length ? firebase.firestore() : { collection: () => ({ orderBy: () => ({ onSnapshot: () => {} }), doc: () => ({ onSnapshot: () => {} }) }) };
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
     </script>
     
     <meta charset="UTF-8">
@@ -60,7 +49,7 @@
                     fontFamily: { 
                         sans: ['"Poppins"', 'sans-serif'], 
                         serif: ['"Poppins"', 'sans-serif'], 
-                        cat: ['"Poppins"', 'sans-serif'] // Replaced graffiti with a clean font
+                        cat: ['"Poppins"', 'sans-serif'] 
                     },
                     boxShadow: {
                         'soft': '0 10px 40px -10px rgba(75, 42, 42, 0.08)',
@@ -109,7 +98,7 @@
             
             <!-- Logo Mix (Icon + Text) -->
             <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity shrink-0" onclick="showSection('inicio')">
-                <!-- Icono de Gatito (Reemplazo con FontAwesome temporal, puedes poner la imagen) -->
+                <!-- Icono de Gatito -->
                 <div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary text-xl">
                     <i class="fas fa-cat"></i>
                 </div>

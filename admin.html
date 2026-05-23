@@ -12,25 +12,22 @@
 
     <script>
     // =====================================================================
-    // ⚠️ MODO SEGURO: CONFIGURACIÓN FIREBASE PARA EL NUEVO PROYECTO (DEV)
-    // Reemplaza esto con las credenciales de tu proyecto final
+    // 🔥 CONEXIÓN A FIREBASE (PRODUCCIÓN)
     // =====================================================================
     const firebaseConfig = {
-  apiKey: "AIzaSyCDsFpMnAq6s8uiuXway3gpLUHjf1P0JtU",
-  authDomain: "pinkitosshop-d896d.firebaseapp.com",
-  projectId: "pinkitosshop-d896d",
-  storageBucket: "pinkitosshop-d896d.firebasestorage.app",
-  messagingSenderId: "175361844009",
-  appId: "1:175361844009:web:ef944790482463e4548d38"
-};
+      apiKey: "AIzaSyCDsFpMnAq6s8uiuXway3gpLUHjf1P0JtU",
+      authDomain: "pinkitosshop-d896d.firebaseapp.com",
+      projectId: "pinkitosshop-d896d",
+      storageBucket: "pinkitosshop-d896d.firebasestorage.app",
+      messagingSenderId: "175361844009",
+      appId: "1:175361844009:web:ef944790482463e4548d38"
+    };
 
-    // Prevenimos error si no se ha puesto la API Key real para que el UI siga cargando
-    if(firebaseConfig.apiKey !== "API_KEY_NUEVO_PROYECTO") {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.apps.length ? firebase.firestore() : { collection: () => ({ orderBy: () => ({ onSnapshot: () => {} }), doc: () => ({ onSnapshot: () => {} }) }) };
-    const auth = firebase.apps.length ? firebase.auth() : { onAuthStateChanged: (cb) => cb(null), signInWithEmailAndPassword: () => Promise.reject() };
-    const storage = firebase.apps.length ? firebase.storage() : null;
+    // Inicializar Firebase Completo para Admin
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const storage = firebase.storage();
     
     console.log("🌸 Pinkitos Shop: Panel Administrador Cargado");
     </script>
@@ -819,10 +816,6 @@
 
         function unlockSystem() {
             const pass = document.getElementById('lock-pass-input').value;
-            if(firebaseConfig.apiKey === "API_KEY_NUEVO_PROYECTO") { 
-                // Bypass si está en demo
-                systemLocked = false; sessionStorage.removeItem('pk_locked'); document.getElementById('lock-modal').classList.remove('active'); resetIdleTimer(); return;
-            }
             auth.signInWithEmailAndPassword(currentFirebaseUser.email, pass).then(() => {
                 systemLocked = false; sessionStorage.removeItem('pk_locked'); document.getElementById('lock-modal').classList.remove('active'); resetIdleTimer();
             }).catch(() => document.getElementById('lock-error').classList.remove('hidden') );
@@ -830,11 +823,6 @@
 
         // INICIALIZACIÓN Y AUTH
         function init() {
-            if(firebaseConfig.apiKey === "API_KEY_NUEVO_PROYECTO") { 
-                document.getElementById('selector-modal').classList.add('active');
-                document.getElementById('login-modal').classList.remove('active');
-                renderMedidasForm(); return; 
-            }
             auth.onAuthStateChanged((user) => {
                 currentFirebaseUser = user;
                 const loginModal = document.getElementById('login-modal');
@@ -855,7 +843,6 @@
         }
 
         function selectModule(module) {
-            if(firebaseConfig.apiKey === "API_KEY_NUEVO_PROYECTO") return enterModule(module);
             if (currentFirebaseUser) {
                 if (module === 'ADMIN' && currentFirebaseUser.email.toLowerCase().includes('pos')) return Toast.fire({ icon: 'error', title: 'Acceso denegado: Cuenta de Cajero' });
                 enterModule(module);
@@ -871,10 +858,6 @@
         }
 
         function validateLogin() {
-            if(firebaseConfig.apiKey === "API_KEY_NUEVO_PROYECTO") {
-                const target = document.getElementById('login-modal').dataset.targetModule || 'ADMIN';
-                document.getElementById('login-modal').classList.remove('active'); enterModule(target); return;
-            }
             const email = document.getElementById('admin-email-input').value.trim(); const pass = document.getElementById('admin-pass-input').value;
             if(!email || !pass) return;
             const target = document.getElementById('login-modal').dataset.targetModule || 'ADMIN';
@@ -891,8 +874,8 @@
             document.getElementById('admin').style.display = 'block'; setTimeout(() => document.getElementById('admin').classList.add('active'), 50);
             const title = document.getElementById('header-title');
 
-            if (!listenersInitialized.admin && firebaseConfig.apiKey !== "API_KEY_NUEVO_PROYECTO") { escucharFirebase(); escucharHero(); listenersInitialized.admin = true; }
-            if (!listenersInitialized.pos && firebaseConfig.apiKey !== "API_KEY_NUEVO_PROYECTO") { escucharPedidos(); listenersInitialized.pos = true; }
+            if (!listenersInitialized.admin) { escucharFirebase(); escucharHero(); listenersInitialized.admin = true; }
+            if (!listenersInitialized.pos) { escucharPedidos(); listenersInitialized.pos = true; }
 
             resetIdleTimer(); startIdleTimer();
 
@@ -907,7 +890,7 @@
         }
 
         function exitModule() {
-            if (currentFirebaseUser && firebaseConfig.apiKey !== "API_KEY_NUEVO_PROYECTO") auth.signOut();
+            if (currentFirebaseUser) auth.signOut();
             activeModule = null; systemLocked = false; sessionStorage.removeItem('pk_locked');
             if(idleInterval) clearInterval(idleInterval);
             document.getElementById('admin').classList.remove('active'); 
