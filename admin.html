@@ -1401,8 +1401,9 @@
                 else if(prod.stock <= 0) statusInfo += `<span class="bg-muted text-white text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-ban"></i> Agotado</span>`;
                 else statusInfo += `<span class="bg-[#20b858]/10 text-[#20b858] text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-check"></i> Stock: ${prod.stock}</span>`;
 
-                // C2: Mostrar la cantidad de Favoritos (siempre visible para monitorear)
-                const favCountInfo = `<span class="bg-promo/10 text-promo text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm flex items-center gap-1" title="Veces añadido a favoritos por clientes"><i class="fas fa-heart"></i> ${prod.favCount || 0}</span>`;
+                // REMODELACIÓN 5: Prevenir visualización negativa garantizando el máximo con 0
+                const safeFavCount = Math.max(0, prod.favCount || 0);
+                const favCountInfo = `<span class="bg-promo/10 text-promo text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm flex items-center gap-1" title="Veces añadido a favoritos por clientes"><i class="fas fa-heart"></i> ${safeFavCount}</span>`;
 
                 return `<div class="bg-white p-4 flex items-center justify-between border border-border rounded-2xl hover:shadow-soft hover:border-primary/40 transition-all">
                     <div class="flex items-center gap-4 truncate min-w-0 flex-1">
