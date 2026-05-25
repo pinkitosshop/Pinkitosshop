@@ -49,20 +49,21 @@
                         primary: '#B88645', // Luxury Gold / Camel
                         secondary: '#8C6239', // Warm Bronze
                         dark: '#2C2421', // Espresso Charcoal text
-                        light: '#FDFDFD', // Premium Clean White
-                        card: '#FFFFFF', // Card Pure White
-                        border: '#F0EBE6', // Soft elegant border
-                        muted: '#A09893', // Muted elegant grey-brown
-                        promo: '#CD7F6F', // Elegant Terracotta for promos
-                        success: '#729B79'  // Sophisticated Sage Green
+                        light: '#F3F4F6', // C6: Fondo gris suave para crear contraste con el blanco puro
+                        card: '#FFFFFF', // C6: Blanco puro para las tarjetas y ventanas
+                        border: '#E5E7EB', // Gris sutil para bordes
+                        muted: '#9CA3AF', // Gris para textos secundarios
+                        promo: '#E63946', // C8: Rojo vibrante para ofertas y alertas
+                        success: '#729B79', // Sophisticated Sage Green
+                        accent: '#6EC1E4'  // C8: Azul Pantone (ojo del logo gatito)
                     }, 
                     fontFamily: { 
                         sans: ['"Poppins"', 'sans-serif'], 
                         serif: ['"Poppins"', 'sans-serif']
                     },
                     boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(44, 36, 33, 0.05)',
-                        'float': '0 10px 30px -5px rgba(44, 36, 33, 0.1)'
+                        'soft': '0 4px 20px -2px rgba(44, 36, 33, 0.08)', // Sombra aumentada para contraste
+                        'float': '0 10px 30px -5px rgba(44, 36, 33, 0.15)'
                     }
                 } 
             }
@@ -71,7 +72,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
         
-        body { background-color: #FDFDFD; color: #2C2421; }
+        body { background-color: #F3F4F6; color: #2C2421; }
         
         .section-fade { display: none; opacity: 0; transition: opacity 0.4s ease-in-out; }
         .section-fade.active { display: block; opacity: 1; }
@@ -84,27 +85,28 @@
         /* Switches estilizados claros */
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #F0EBE6; transition: .4s; border-radius: 24px; border: 1px solid #A09893; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #E5E7EB; transition: .4s; border-radius: 24px; border: 1px solid #9CA3AF; }
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         input:checked + .slider { background-color: #B88645; border-color: #B88645; }
         input:checked + .slider:before { transform: translateX(20px); }
         
-        .switch-promo input:checked + .slider { background-color: #CD7F6F; border-color: #CD7F6F; }
+        .switch-promo input:checked + .slider { background-color: #E63946; border-color: #E63946; }
+        .switch-accent input:checked + .slider { background-color: #6EC1E4; border-color: #6EC1E4; } /* C8: Switch azul */
 
         .tab-btn.active { border-bottom: 3px solid #B88645; color: #B88645; font-weight: bold; }
         
-        /* Inputs limpios */
-        .admin-input { background: #FFFFFF; border: 1px solid #F0EBE6; padding: 10px 16px; color: #2C2421; outline: none; border-radius: 12px; transition: all 0.2s; font-size: 14px; width: 100%; }
+        /* Inputs limpios - forzados a blanco puro para resaltar sobre el fondo gris */
+        .admin-input { background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 16px; color: #2C2421; outline: none; border-radius: 12px; transition: all 0.2s; font-size: 14px; width: 100%; }
         .admin-input:focus { border-color: #B88645; box-shadow: 0 0 0 3px rgba(184, 134, 69, 0.2); }
-        .measure-input { width: 100%; background: #FDFDFD; border: 1px solid #F0EBE6; padding: 8px; text-align: center; font-size: 12px; color: #2C2421; border-radius: 8px; outline: none; }
+        .measure-input { width: 100%; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 8px; text-align: center; font-size: 12px; color: #2C2421; border-radius: 8px; outline: none; }
         .measure-input:focus { border-color: #B88645; }
 
         .editing-mode { border: 2px solid #B88645 !important; background: rgba(184, 134, 69, 0.05) !important; }
 
-        .loader { border: 3px solid rgba(184, 134, 69, 0.3); border-radius: 50%; border-top: 3px solid #B88645; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        .loader { border: 3px solid rgba(110, 193, 228, 0.3); border-radius: 50%; border-top: 3px solid #6EC1E4; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; } /* C8: Loader azul */
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .img-thumb-container { position: relative; width: 80px; height: 80px; border-radius: 12px; overflow: hidden; border: 1px solid #F0EBE6; background: #FDFDFD;}
+        .img-thumb-container { position: relative; width: 80px; height: 80px; border-radius: 12px; overflow: hidden; border: 1px solid #E5E7EB; background: #FFFFFF;}
         .img-thumb-container img { width: 100%; height: 100%; object-fit: cover; }
         
         .swal2-container { z-index: 9999 !important; }
@@ -127,30 +129,33 @@
     <header class="w-full z-[100] bg-white border-b border-border shadow-sm">
         <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
             <div id="header-title" class="font-bold text-2xl text-dark tracking-tight flex items-center gap-2">
-                <div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center text-primary text-sm"><i class="fas fa-cat"></i></div>
+                <!-- C9: Contenedor Dinámico Logo Tienda -->
+                <div id="admin-logo-container" class="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-accent text-xl">
+                    <i class="fas fa-cat"></i>
+                </div>
                 Pinkitos<span class="text-primary">.</span>
             </div>
             <nav class="flex items-center gap-4">
                 <span id="user-role-badge" class="hidden text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-full font-bold uppercase tracking-wider"></span>
-                <a href="pinkitos-shop.html" class="cursor-pointer text-xs font-bold text-muted hover:text-primary transition-colors border border-border px-4 py-2 rounded-xl flex items-center gap-2 bg-light"><i class="fas fa-store"></i> Ver Tienda</a>
+                <a href="pinkitos-shop.html" class="cursor-pointer text-xs font-bold text-muted hover:text-primary transition-colors border border-border px-4 py-2 rounded-xl flex items-center gap-2 bg-white"><i class="fas fa-store"></i> Ver Tienda</a>
             </nav>
         </div>
     </header>
 
     <!-- SELECTOR DE MODULO -->
     <div id="selector-modal" class="modal-overlay active">
-        <div class="modal-content p-10 text-center shadow-float">
-            <div class="w-16 h-16 bg-primary/10 rounded-full mx-auto flex items-center justify-center text-primary text-3xl mb-4"><i class="fas fa-cat"></i></div>
+        <div class="modal-content p-10 text-center shadow-float bg-white">
+            <div class="w-16 h-16 bg-accent/20 rounded-full mx-auto flex items-center justify-center text-accent text-3xl mb-4"><i class="fas fa-cat"></i></div>
             <h2 class="font-bold text-3xl text-dark mb-2">Pinkitos<span class="text-primary">.</span></h2>
             <p class="text-xs text-muted mb-8 font-medium">Panel de Administración</p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div onclick="selectModule('POS')" class="bg-light border border-border p-6 rounded-2xl cursor-pointer hover:border-primary hover:shadow-soft transition-all group">
+                <div onclick="selectModule('POS')" class="bg-white border border-border p-6 rounded-2xl cursor-pointer hover:border-primary hover:shadow-soft transition-all group">
                     <i class="fas fa-cash-register text-3xl text-primary mb-3 group-hover:scale-110 transition-transform"></i>
                     <h3 class="text-dark font-bold text-lg mb-1">Punto de Venta</h3>
                     <p class="text-muted text-[10px] font-medium">Gestión de caja y tickets</p>
                 </div>
-                <div onclick="selectModule('ADMIN')" class="bg-light border border-border p-6 rounded-2xl cursor-pointer hover:border-primary hover:shadow-soft transition-all group">
+                <div onclick="selectModule('ADMIN')" class="bg-white border border-border p-6 rounded-2xl cursor-pointer hover:border-primary hover:shadow-soft transition-all group">
                     <i class="fas fa-boxes text-3xl text-primary mb-3 group-hover:scale-110 transition-transform"></i>
                     <h3 class="text-dark font-bold text-lg mb-1">Backoffice</h3>
                     <p class="text-muted text-[10px] font-medium">Inventario y Configuración</p>
@@ -161,7 +166,7 @@
 
     <!-- LOGIN -->
     <div id="login-modal" class="modal-overlay">
-        <div class="modal-content p-10 text-center shadow-float">
+        <div class="modal-content p-10 text-center shadow-float bg-white">
             <button onclick="goBackToSelector()" class="absolute top-4 left-4 text-muted hover:text-dark transition-colors w-8 h-8 flex items-center justify-center bg-light rounded-full"><i class="fas fa-arrow-left"></i></button>
             <h2 class="font-bold text-2xl text-dark mb-2">Acceso Seguro</h2>
             <p class="text-sm text-muted mb-6 font-medium">Ingresa tus credenciales</p>
@@ -169,24 +174,24 @@
                 <input type="email" id="admin-email-input" autocomplete="new-password" placeholder="Correo electrónico" class="admin-input w-full text-center">
                 <input type="password" id="admin-pass-input" autocomplete="new-password" placeholder="Contraseña" class="admin-input w-full text-center" onkeyup="if(event.key === 'Enter') validateLogin()">
                 <button onclick="validateLogin()" class="w-full bg-primary text-white py-3.5 font-bold text-sm rounded-xl hover:bg-[#A6763A] transition-all shadow-md">Ingresar</button>
-                <p id="login-error" class="text-secondary text-xs font-bold hidden animate-pulse bg-secondary/10 py-2 rounded-lg mt-2">Credenciales Incorrectas</p>
+                <p id="login-error" class="text-promo text-xs font-bold hidden animate-pulse bg-promo/10 py-2 rounded-lg mt-2">Credenciales Incorrectas</p>
             </div>
         </div>
     </div>
 
     <!-- LOCK SCREEN MODAL (GLOBAL) -->
     <div id="lock-modal" class="modal-overlay z-[300]">
-        <div class="modal-content p-10 text-center shadow-float">
+        <div class="modal-content p-10 text-center shadow-float bg-white">
             <i class="fas fa-lock text-4xl text-primary mb-4"></i>
             <h2 class="font-bold text-2xl text-dark mb-2">Sesión Bloqueada</h2>
             <p class="text-xs text-muted mb-6">Ingresa tu contraseña para continuar en el POS.</p>
             <input type="password" id="lock-pass-input" autocomplete="new-password" placeholder="Contraseña de la cuenta" class="admin-input w-full text-center mb-4" onkeyup="if(event.key === 'Enter') unlockSystem()">
             <button onclick="unlockSystem()" class="w-full bg-primary text-white py-3.5 font-bold text-sm rounded-xl hover:bg-[#A6763A] transition-all shadow-md">Desbloquear POS</button>
-            <p id="lock-error" class="text-secondary text-xs font-bold hidden bg-secondary/10 py-2 rounded-lg mt-4 animate-pulse">Contraseña Incorrecta</p>
+            <p id="lock-error" class="text-promo text-xs font-bold hidden bg-promo/10 py-2 rounded-lg mt-4 animate-pulse">Contraseña Incorrecta</p>
         </div>
     </div>
 
-    <div id="admin" class="section-fade py-8 bg-light flex-1">
+    <div id="admin" class="section-fade py-8 flex-1">
         <div class="max-w-7xl mx-auto px-6">
             
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-border mb-8 gap-4 bg-white p-2 px-4 rounded-2xl shadow-sm">
@@ -194,7 +199,7 @@
                 <!-- GRUPO TABS: POS -->
                 <div id="nav-group-pos" class="hidden space-x-2 overflow-x-auto w-full md:w-auto scrollbar-hide">
                     <button id="nav-pos" onclick="showAdminTab('pos', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-cash-register"></i> Terminal POS</button>
-                    <button id="nav-pedidos" onclick="showAdminTab('pedidos', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-bell"></i> Pedidos <span id="badge-pedidos" class="bg-secondary text-white px-2 py-0.5 rounded-full text-[10px] hidden">0</span></button>
+                    <button id="nav-pedidos" onclick="showAdminTab('pedidos', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-bell"></i> Pedidos <span id="badge-pedidos" class="bg-promo text-white px-2 py-0.5 rounded-full text-[10px] hidden">0</span></button>
                     <button id="nav-facturas" onclick="showAdminTab('facturas', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-file-invoice"></i> Historial y Cierre</button>
                 </div>
 
@@ -217,7 +222,7 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
                             <h3 class="text-dark text-lg font-bold flex items-center gap-2 shrink-0"><i class="fas fa-search text-primary"></i> Catálogo Rápido</h3>
                             <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <input type="text" id="pos-search" oninput="posCurrentPage=1; renderPosInventory();" placeholder="Buscar producto o SKU..." class="admin-input flex-1 sm:w-64 rounded-xl">
+                                <input type="text" id="pos-search" oninput="posCurrentPage=1; renderPosInventory();" placeholder="Buscar producto o SKU..." class="admin-input flex-1 sm:w-64 rounded-xl bg-white">
                                 <div class="flex bg-light rounded-xl border border-border overflow-hidden shrink-0">
                                     <button onclick="changePosView('grid')" id="pos-view-grid" class="px-4 py-2.5 text-primary bg-white transition-colors" title="Cuadrícula"><i class="fas fa-th-large"></i></button>
                                     <button onclick="changePosView('list')" id="pos-view-list" class="px-4 py-2.5 text-muted hover:text-dark transition-colors" title="Lista"><i class="fas fa-list"></i></button>
@@ -231,15 +236,15 @@
 
                         <!-- Paginación POS -->
                         <div class="mt-4 pt-4 border-t border-border flex justify-between items-center" id="pos-pagination-controls">
-                            <button onclick="changePosPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-light border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-border transition-colors" id="pos-btn-prev">Anterior</button>
+                            <button onclick="changePosPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light transition-colors" id="pos-btn-prev">Anterior</button>
                             <span class="text-xs text-muted font-semibold">Pág <span id="pos-page-indicator" class="text-dark">1</span></span>
                             <div class="flex items-center gap-3">
-                                <select onchange="posCurrentPage=1; posItemsPerPage=parseInt(this.value); renderPosInventory();" class="admin-input text-xs py-2 w-auto hidden sm:block">
+                                <select onchange="posCurrentPage=1; posItemsPerPage=parseInt(this.value); renderPosInventory();" class="admin-input text-xs py-2 w-auto hidden sm:block bg-white">
                                     <option value="10" selected>10 items</option>
                                     <option value="20">20 items</option>
                                     <option value="50">50 items</option>
                                 </select>
-                                <button onclick="changePosPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-light border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-border transition-colors" id="pos-btn-next">Siguiente</button>
+                                <button onclick="changePosPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light transition-colors" id="pos-btn-next">Siguiente</button>
                             </div>
                         </div>
                     </div>
@@ -248,11 +253,11 @@
                     <div class="bg-white p-6 border border-border rounded-3xl shadow-soft flex flex-col lg:sticky lg:top-4 z-10">
                         <div class="flex justify-between items-center border-b border-border pb-4 mb-4">
                             <h3 class="text-primary text-lg font-bold" id="pos-ticket-title">Venta Nueva</h3>
-                            <button onclick="clearPosCart()" class="text-promo text-xs font-bold hover:text-secondary bg-promo/10 px-3 py-1.5 rounded-lg transition-colors"><i class="fas fa-trash"></i> Limpiar</button>
+                            <button onclick="clearPosCart()" class="text-promo text-xs font-bold hover:bg-promo hover:text-white bg-promo/10 px-3 py-1.5 rounded-lg transition-colors"><i class="fas fa-trash"></i> Limpiar</button>
                         </div>
                         
                         <div class="mb-4">
-                            <input type="text" id="pos-client-name" placeholder="Nombre del Cliente (Opcional)" class="admin-input rounded-xl">
+                            <input type="text" id="pos-client-name" placeholder="Nombre del Cliente (Opcional)" class="admin-input rounded-xl bg-white">
                         </div>
 
                         <div id="pos-cart-list" class="space-y-3 border-b border-border mb-4 pb-4 max-h-[300px] overflow-y-auto pr-2">
@@ -278,7 +283,7 @@
                             </div>
 
                             <div class="flex flex-col gap-3">
-                                <button onclick="savePosOrder('pendiente')" class="w-full bg-light border border-border text-dark py-3.5 font-bold text-sm hover:bg-border transition-all rounded-xl shadow-sm">Guardar Pedido</button>
+                                <button onclick="savePosOrder('pendiente')" class="w-full bg-white border border-border text-dark py-3.5 font-bold text-sm hover:bg-light transition-all rounded-xl shadow-sm">Guardar Pedido</button>
                                 <button onclick="savePosOrder('despachado')" class="w-full bg-primary text-white py-4 font-bold text-sm hover:bg-[#A6763A] transition-all rounded-xl shadow-md flex items-center justify-center gap-2"><i class="fas fa-check-double"></i> Cobrar y Despachar</button>
                             </div>
                         </div>
@@ -301,15 +306,15 @@
 
                     <!-- Paginación Pedidos -->
                     <div class="mt-6 pt-4 border-t border-border flex justify-between items-center" id="ped-pagination-controls">
-                        <button onclick="changePedPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-light border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed" id="ped-btn-prev">Anterior</button>
+                        <button onclick="changePedPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light" id="ped-btn-prev">Anterior</button>
                         <span class="text-xs text-muted font-semibold">Pág <span id="ped-page-indicator" class="text-dark">1</span></span>
                         <div class="flex items-center gap-3">
-                            <select onchange="pedCurrentPage=1; pedItemsPerPage=parseInt(this.value); renderPedidosList();" class="admin-input text-xs py-2 w-auto hidden sm:block">
+                            <select onchange="pedCurrentPage=1; pedItemsPerPage=parseInt(this.value); renderPedidosList();" class="admin-input text-xs py-2 w-auto hidden sm:block bg-white">
                                 <option value="10" selected>10 items</option>
                                 <option value="20">20 items</option>
                                 <option value="50">50 items</option>
                             </select>
-                            <button onclick="changePedPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-light border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed" id="ped-btn-next">Siguiente</button>
+                            <button onclick="changePedPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light" id="ped-btn-next">Siguiente</button>
                         </div>
                     </div>
                 </div>
@@ -322,14 +327,14 @@
                         <h3 class="text-dark text-xl font-bold flex items-center gap-2">
                             <i class="fas fa-archive text-primary"></i> Historial y Facturación
                         </h3>
-                        <div class="flex flex-wrap gap-3 items-center bg-light p-3 rounded-2xl border border-border">
+                        <div class="flex flex-wrap gap-3 items-center bg-white p-3 rounded-2xl border border-border">
                             <label class="text-xs text-muted font-bold ml-1">Desde:</label>
                             <input type="date" id="filter-date-start" onchange="facCurrentPage=1; renderFacturasList()" class="admin-input !py-1.5 !px-3 text-xs w-auto">
                             
                             <label class="text-xs text-muted font-bold ml-2">Hasta:</label>
                             <input type="date" id="filter-date-end" onchange="facCurrentPage=1; renderFacturasList()" class="admin-input !py-1.5 !px-3 text-xs w-auto">
                             
-                            <button onclick="limpiarFiltrosFacturas()" class="bg-white border border-border text-dark px-3 py-1.5 text-xs font-bold hover:bg-border transition-all rounded-lg ml-2 shadow-sm">Limpiar</button>
+                            <button onclick="limpiarFiltrosFacturas()" class="bg-light border border-border text-dark px-3 py-1.5 text-xs font-bold hover:bg-white transition-all rounded-lg ml-2 shadow-sm">Limpiar</button>
                             <button onclick="generarCierreCaja()" class="bg-primary text-white px-4 py-1.5 font-bold text-xs hover:bg-[#A6763A] transition-all rounded-lg shadow-sm xl:ml-4"><i class="fas fa-calculator mr-1"></i> Cierre de Caja</button>
                         </div>
                     </div>
@@ -340,15 +345,15 @@
 
                     <!-- Paginación Facturas -->
                     <div class="mt-6 pt-4 border-t border-border flex justify-between items-center" id="fac-pagination-controls">
-                        <button onclick="changeFacPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-light border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed" id="fac-btn-prev">Anterior</button>
+                        <button onclick="changeFacPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light" id="fac-btn-prev">Anterior</button>
                         <span class="text-xs text-muted font-semibold">Pág <span id="fac-page-indicator" class="text-dark">1</span></span>
                         <div class="flex items-center gap-3">
-                            <select onchange="facCurrentPage=1; facItemsPerPage=parseInt(this.value); renderFacturasList();" class="admin-input text-xs py-2 w-auto hidden sm:block">
+                            <select onchange="facCurrentPage=1; facItemsPerPage=parseInt(this.value); renderFacturasList();" class="admin-input text-xs py-2 w-auto hidden sm:block bg-white">
                                 <option value="10" selected>10 items</option>
                                 <option value="20">20 items</option>
                                 <option value="50">50 items</option>
                             </select>
-                            <button onclick="changeFacPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-light border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed" id="fac-btn-next">Siguiente</button>
+                            <button onclick="changeFacPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light" id="fac-btn-next">Siguiente</button>
                         </div>
                     </div>
                 </div>
@@ -363,20 +368,28 @@
                             <span id="inventory-count" class="text-primary text-xs font-semibold">0 Productos</span>
                         </div>
                         
-                        <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                            <!-- C5: Filtro por categoría en Inventario -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs text-muted font-bold"><i class="fas fa-filter"></i></label>
+                                <select id="inv-filter-cat" onchange="invCurrentPage=1; renderAdminList();" class="admin-input text-xs py-2 w-auto px-3 bg-white">
+                                    <option value="all">Todas las Categorías</option>
+                                </select>
+                            </div>
+                            <div class="h-6 w-px bg-border hidden sm:block"></div>
                             <label class="text-xs text-muted font-bold">Mostrar:</label>
-                            <select id="inv-per-page" onchange="invCurrentPage=1; invItemsPerPage=parseInt(this.value); renderAdminList();" class="admin-input text-xs py-2 w-auto px-2">
+                            <select id="inv-per-page" onchange="invCurrentPage=1; invItemsPerPage=parseInt(this.value); renderAdminList();" class="admin-input text-xs py-2 w-auto px-2 bg-white">
                                 <option value="10">10</option>
                                 <option value="20" selected>20</option>
                                 <option value="50">50</option>
                                 <option value="1000">Todos</option>
                             </select>
-                            <button onclick="exportarExcel()" class="bg-[#20b858]/10 text-[#20b858] border border-[#20b858]/30 px-4 py-2 font-bold text-xs hover:bg-[#20b858] hover:text-white transition-all rounded-xl shadow-sm flex items-center gap-2"><i class="fas fa-file-excel"></i> Exportar a Excel</button>
+                            <button onclick="exportarExcel()" class="bg-[#20b858]/10 text-[#20b858] border border-[#20b858]/30 px-4 py-2 font-bold text-xs hover:bg-[#20b858] hover:text-white transition-all rounded-xl shadow-sm flex items-center gap-2 ml-auto md:ml-0"><i class="fas fa-file-excel"></i> Excel</button>
                         </div>
                     </div>
                     <div class="relative">
                         <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-muted"></i>
-                        <input type="text" id="search-inventory" placeholder="Buscar por Nombre o SKU..." class="admin-input pl-10 py-3" oninput="invCurrentPage=1; renderAdminList()">
+                        <input type="text" id="search-inventory" placeholder="Buscar por Nombre o SKU..." class="admin-input pl-10 py-3 bg-white" oninput="invCurrentPage=1; renderAdminList()">
                     </div>
                 </div>
                 
@@ -384,9 +397,9 @@
                 
                 <!-- Paginación Inventario -->
                 <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-border shadow-sm" id="inv-pagination-controls">
-                    <button onclick="changeInvPage(-1)" class="text-xs text-dark font-bold px-5 py-2.5 bg-light border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-border transition-colors" id="inv-btn-prev">Anterior</button>
+                    <button onclick="changeInvPage(-1)" class="text-xs text-dark font-bold px-5 py-2.5 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light transition-colors shadow-sm" id="inv-btn-prev">Anterior</button>
                     <span class="text-xs text-muted font-semibold">Página <span id="inv-page-indicator" class="text-dark">1</span></span>
-                    <button onclick="changeInvPage(1)" class="text-xs text-dark font-bold px-5 py-2.5 bg-light border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-border transition-colors" id="inv-btn-next">Siguiente</button>
+                    <button onclick="changeInvPage(1)" class="text-xs text-dark font-bold px-5 py-2.5 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light transition-colors shadow-sm" id="inv-btn-next">Siguiente</button>
                 </div>
             </div>
 
@@ -401,10 +414,10 @@
                         <div class="space-y-6">
                             
                             <!-- Controles Top -->
-                            <div class="flex flex-col sm:flex-row flex-wrap gap-4 bg-light p-5 border border-border rounded-2xl items-start">
+                            <div class="flex flex-col sm:flex-row flex-wrap gap-4 bg-white p-5 border border-border rounded-2xl items-start shadow-sm">
                                 <div class="flex-1 min-w-[120px]">
                                     <label class="text-xs font-bold text-dark mb-2 block" title="Stock por defecto es 0">Stock / Cantidad</label>
-                                    <input type="number" id="new-stock" min="0" value="0" class="admin-input w-full">
+                                    <input type="number" id="new-stock" min="0" value="0" class="admin-input w-full bg-white">
                                 </div>
                                 <div class="flex items-center justify-between sm:justify-start gap-4 border-t sm:border-t-0 sm:border-l border-border pt-4 sm:pt-0 sm:pl-5 mt-2 sm:mt-0">
                                     <span class="text-xs font-bold text-dark">Modo Preventa</span>
@@ -415,7 +428,7 @@
                                 </div>
                                 <div id="release-date-container" class="border-t sm:border-t-0 sm:border-l border-border pt-4 sm:pt-0 sm:pl-5 mt-2 sm:mt-0 w-full sm:w-auto">
                                     <label class="text-xs font-bold text-dark block mb-2">Fecha Lanzamiento</label>
-                                    <input type="date" id="new-release-date" class="admin-input w-full">
+                                    <input type="date" id="new-release-date" class="admin-input w-full bg-white">
                                 </div>
                                 <div class="flex items-center justify-between sm:justify-start gap-4 border-t sm:border-t-0 sm:border-l border-border pt-4 sm:pt-0 sm:pl-5 mt-2 sm:mt-0">
                                     <span class="text-xs font-bold text-dark">Aplica Impuesto</span>
@@ -436,47 +449,47 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label class="text-xs font-bold text-muted mb-2 block">Nombre de Producto <span class="text-promo">*</span></label>
-                                    <input type="text" id="new-title" class="admin-input" required>
+                                    <input type="text" id="new-title" class="admin-input bg-white" required>
                                 </div>
                                 <div>
                                     <label class="text-xs font-bold text-muted mb-2 block">Código SKU <span class="text-promo">*</span></label>
-                                    <input type="text" id="new-sku" class="admin-input uppercase font-mono" required>
+                                    <input type="text" id="new-sku" class="admin-input uppercase font-mono bg-white" required>
                                 </div>
                                 <div>
                                     <label class="text-xs font-bold text-muted mb-2 block">Categoría <span class="text-promo">*</span></label>
-                                    <select id="new-cat" class="admin-input cursor-pointer" required></select>
+                                    <select id="new-cat" class="admin-input cursor-pointer bg-white" required></select>
                                 </div>
                             </div>
                             
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
                                 <div>
                                     <label class="text-xs font-bold text-muted mb-2 block" title="El precio real que se cobrará">Precio Final <span class="text-promo">*</span></label>
-                                    <div class="flex bg-white border border-border rounded-xl focus-within:border-primary transition-colors overflow-hidden">
+                                    <div class="flex bg-white border border-border rounded-xl focus-within:border-primary transition-colors overflow-hidden shadow-sm">
                                         <span id="form-currency-display" class="bg-light text-primary px-4 py-2 border-r border-border font-bold text-sm flex items-center">$</span>
                                         <input type="number" id="new-price" step="0.01" min="0" placeholder="0.00" class="w-full bg-transparent px-4 py-2 text-sm outline-none text-dark font-mono font-bold" oninput="calcDiscount('price')" required>
                                     </div>
                                 </div>
                                 <div>
                                     <label class="text-xs font-bold text-muted mb-2 block" title="Si es mayor al precio final, se mostrará en oferta">Precio Original</label>
-                                    <div class="flex bg-white border border-border rounded-xl focus-within:border-primary transition-colors overflow-hidden">
+                                    <div class="flex bg-white border border-border rounded-xl focus-within:border-primary transition-colors overflow-hidden shadow-sm">
                                         <span id="form-currency-display-compare" class="bg-light text-muted px-4 py-2 border-r border-border font-bold text-sm flex items-center">$</span>
                                         <input type="number" id="new-price-compare" step="0.01" min="0" placeholder="0.00" class="w-full bg-transparent px-4 py-2 text-sm outline-none text-muted font-mono" oninput="calcDiscount('compare')">
                                     </div>
                                 </div>
                                 <div>
                                     <label class="text-xs font-bold text-muted mb-2 block">% Descuento</label>
-                                    <div class="flex bg-white border border-border rounded-xl focus-within:border-primary transition-colors overflow-hidden">
-                                        <span class="bg-light text-primary px-4 py-2 border-r border-border font-bold text-sm flex items-center">%</span>
-                                        <input type="number" id="new-discount-percent" step="1" min="0" max="99" placeholder="0" class="w-full bg-transparent px-4 py-2 text-sm outline-none text-primary font-mono font-bold" oninput="calcDiscount('percent')">
+                                    <div class="flex bg-white border border-border rounded-xl focus-within:border-promo transition-colors overflow-hidden shadow-sm">
+                                        <span class="bg-promo/10 text-promo px-4 py-2 border-r border-border font-bold text-sm flex items-center">%</span>
+                                        <input type="number" id="new-discount-percent" step="1" min="0" max="99" placeholder="0" class="w-full bg-transparent px-4 py-2 text-sm outline-none text-promo font-mono font-bold" oninput="calcDiscount('percent')">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- CONFIGURADOR DE PROMOCIONES ESPECIALES -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 bg-promo/5 p-5 border border-promo/20 rounded-2xl">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 bg-white p-5 border border-promo/30 rounded-2xl shadow-sm">
                                 <div>
                                     <label class="text-xs font-bold text-promo block mb-2"><i class="fas fa-gift"></i> Tipo de Promoción Especial</label>
-                                    <select id="new-promo-type" class="admin-input cursor-pointer border-promo/30">
+                                    <select id="new-promo-type" class="admin-input cursor-pointer border-promo/30 bg-white">
                                         <option value="normal">Ninguna (Normal)</option>
                                         <option value="2x1">2x1 (Lleva 2, paga 1)</option>
                                         <option value="3x2">3x2 (Lleva 3, paga 2)</option>
@@ -484,18 +497,18 @@
                                 </div>
                                 <div>
                                     <label class="text-xs font-bold text-muted block mb-2"><i class="far fa-calendar-alt"></i> Inicio Oferta (Opcional)</label>
-                                    <input type="date" id="new-offer-start" class="admin-input">
+                                    <input type="date" id="new-offer-start" class="admin-input bg-white">
                                 </div>
                                 <div>
                                     <label class="text-xs font-bold text-muted block mb-2"><i class="far fa-calendar-times"></i> Fin Oferta (Opcional)</label>
-                                    <input type="date" id="new-offer-end" class="admin-input">
+                                    <input type="date" id="new-offer-end" class="admin-input bg-white">
                                 </div>
                             </div>
 
                             <!-- GUIA DE MEDIDAS -->
-                            <div class="flex items-center justify-between bg-light p-4 border border-border rounded-xl">
+                            <div class="flex items-center justify-between bg-white p-4 border border-border rounded-xl shadow-sm">
                                 <span class="text-sm font-bold text-dark">Activar Guía de Tallas / Variantes</span>
-                                <label class="switch">
+                                <label class="switch switch-accent">
                                     <input type="checkbox" id="toggle-measures" checked onchange="toggleMeasuresVisibility()">
                                     <span class="slider"></span>
                                 </label>
@@ -503,28 +516,28 @@
 
                             <div id="measures-config-panel" class="bg-white p-6 border border-border rounded-2xl transition-all shadow-sm">
                                 <div id="medidas-inputs-container" class="space-y-3 mb-6"></div>
-                                <div class="flex flex-col md:flex-row gap-4 border-t border-light pt-5 mt-2">
+                                <div class="flex flex-col md:flex-row gap-4 border-t border-border pt-5 mt-2">
                                     <div class="flex-1 flex gap-2 items-center">
-                                        <input type="text" id="new-size-input" placeholder="Ej: Peluche Grande" class="admin-input text-xs w-full">
-                                        <button type="button" onclick="addNewSizeToForm()" class="bg-light text-primary border border-border px-4 py-2.5 text-xs font-bold hover:bg-primary hover:text-white hover:border-primary transition-all rounded-xl whitespace-nowrap shadow-sm"><i class="fas fa-plus"></i> Variante</button>
+                                        <input type="text" id="new-size-input" placeholder="Ej: Peluche Grande" class="admin-input text-xs w-full bg-white">
+                                        <button type="button" onclick="addNewSizeToForm()" class="bg-white text-primary border border-border px-4 py-2.5 text-xs font-bold hover:bg-primary hover:text-white hover:border-primary transition-all rounded-xl whitespace-nowrap shadow-sm"><i class="fas fa-plus"></i> Variante</button>
                                     </div>
                                     <div class="flex-1 flex gap-2 items-center">
-                                        <input type="text" id="new-column-input" placeholder="Ej: Alto (cm)" class="admin-input text-xs w-full capitalize">
-                                        <button type="button" onclick="addNewColumnToForm()" class="bg-light text-primary border border-border px-4 py-2.5 text-xs font-bold hover:bg-primary hover:text-white hover:border-primary transition-all rounded-xl whitespace-nowrap shadow-sm"><i class="fas fa-plus"></i> Columna</button>
+                                        <input type="text" id="new-column-input" placeholder="Ej: Alto (cm)" class="admin-input text-xs w-full capitalize bg-white">
+                                        <button type="button" onclick="addNewColumnToForm()" class="bg-white text-primary border border-border px-4 py-2.5 text-xs font-bold hover:bg-primary hover:text-white hover:border-primary transition-all rounded-xl whitespace-nowrap shadow-sm"><i class="fas fa-plus"></i> Columna</button>
                                     </div>
                                 </div>
                             </div>
 
                             <div>
                                 <label class="text-xs font-bold text-muted mb-2 block">Descripción corta</label>
-                                <textarea id="new-desc" class="admin-input h-24 resize-none"></textarea>
+                                <textarea id="new-desc" class="admin-input h-24 resize-none bg-white"></textarea>
                             </div>
                         </div>
                         
                         <div class="pt-6 border-t border-border">
                             <h4 class="text-sm font-bold text-dark mb-4 flex items-center gap-2"><i class="fas fa-camera text-primary"></i> Imágenes del Producto</h4>
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                <div class="lg:col-span-1 flex flex-col justify-center items-center border-2 border-dashed border-border bg-light rounded-2xl p-6 hover:border-primary transition-colors cursor-pointer relative min-h-[160px]" onclick="document.getElementById('new-img').click()">
+                                <div class="lg:col-span-1 flex flex-col justify-center items-center border-2 border-dashed border-border bg-white rounded-2xl p-6 hover:border-primary transition-colors cursor-pointer relative min-h-[160px]" onclick="document.getElementById('new-img').click()">
                                     <input type="file" id="new-img" class="hidden" accept="image/jpeg, image/png, image/webp" multiple onchange="compressAndAddImages(this)">
                                     <div class="text-center">
                                         <i class="fas fa-images text-4xl text-muted mb-3 transition-transform hover:scale-110"></i>
@@ -535,7 +548,7 @@
                                     <div id="img-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-10"><div class="loader !block"></div></div>
                                 </div>
                                 
-                                <div id="thumbnails-container" class="lg:col-span-2 flex flex-wrap gap-4 bg-light p-6 rounded-2xl border border-border min-h-[160px] content-start shadow-inner">
+                                <div id="thumbnails-container" class="lg:col-span-2 flex flex-wrap gap-4 bg-white p-6 rounded-2xl border border-border min-h-[160px] content-start shadow-inner">
                                     <p class="text-sm text-muted w-full text-center mt-8 font-medium" id="no-img-text">Aún no hay imágenes seleccionadas</p>
                                 </div>
                             </div>
@@ -547,30 +560,31 @@
                             <i class="fas fa-cloud-upload-alt"></i> <span id="btn-submit-text">Guardar Producto</span>
                             <div id="btn-submit-loader" class="loader !border-t-white !border-white/30 ml-2 hidden"></div>
                         </button>
-                        <button id="btn-cancel-edit" onclick="cancelEdit()" class="hidden bg-light border border-promo text-promo px-8 py-4 font-bold text-sm hover:bg-promo hover:text-white transition-all rounded-xl shadow-sm">Cancelar / Limpiar</button>
+                        <button id="btn-cancel-edit" onclick="cancelEdit()" class="hidden bg-white border border-promo text-promo px-8 py-4 font-bold text-sm hover:bg-promo hover:text-white transition-all rounded-xl shadow-sm">Cancelar / Limpiar</button>
                     </div>
                 </div>
                 
                 <div class="bg-white p-8 border border-border rounded-3xl mt-10 shadow-soft">
                     <h3 class="text-dark text-xl font-bold mb-6 flex items-center gap-2"><i class="fas fa-tags text-primary"></i> Gestión de Categorías</h3>
                     <div class="flex flex-col md:flex-row gap-4 mb-6">
-                        <input type="text" id="new-category-name" placeholder="Ej. Peluches, Figuras, Llaveros..." class="admin-input flex-1">
-                        <button onclick="addNewCategory()" class="bg-light border border-primary text-primary px-8 py-3 text-sm font-bold hover:bg-primary hover:text-white transition-all rounded-xl shadow-sm"><i class="fas fa-plus"></i> Guardar</button>
+                        <input type="text" id="new-category-name" placeholder="Ej. Peluches, Figuras, Llaveros..." class="admin-input flex-1 bg-white">
+                        <button onclick="addNewCategory()" class="bg-white border border-primary text-primary px-8 py-3 text-sm font-bold hover:bg-primary hover:text-white transition-all rounded-xl shadow-sm"><i class="fas fa-plus"></i> Añadir</button>
                     </div>
+                    <!-- C4: Lista de Categorías (Con opción a editar) -->
                     <div id="categories-manager-list" class="flex flex-wrap gap-3"></div>
                 </div>
             </div>
 
             <!-- TAB: PROMOCIONES GLOBALES -->
             <div id="tab-promociones" class="admin-tab hidden">
-                <div class="bg-white p-10 border-2 border-promo/20 rounded-3xl shadow-soft">
+                <div class="bg-white p-10 border-2 border-promo/30 rounded-3xl shadow-soft">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-12 h-12 bg-promo/10 rounded-full flex items-center justify-center text-promo text-2xl"><i class="fas fa-bolt"></i></div>
                         <h3 class="text-dark text-2xl font-bold">Motor Global de Promociones</h3>
                     </div>
                     <p class="text-muted text-sm mb-8 font-medium">Aplica un descuento masivo a todo el catálogo. <br><span class="text-primary bg-primary/10 px-2 py-0.5 rounded text-xs">Nota: Productos con descuentos individuales o 2x1 ignoran el descuento global automáticamente.</span></p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-light p-8 rounded-2xl border border-border">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white p-8 rounded-2xl border border-border shadow-sm">
                         <div>
                             <label class="text-sm text-dark font-bold mb-3 block">Activar Descuento Store-Wide</label>
                             <label class="switch switch-promo mt-1">
@@ -580,11 +594,11 @@
                         </div>
                         <div>
                             <label class="text-sm text-promo font-bold mb-3 block">Porcentaje de Descuento (%)</label>
-                            <input type="number" id="global-promo-val" placeholder="Ej: 15" min="1" max="99" class="w-full bg-white border border-promo/30 text-promo text-2xl font-bold px-4 py-4 outline-none text-center rounded-xl shadow-inner focus:border-promo focus:ring-2 focus:ring-promo/20 transition-all">
+                            <input type="number" id="global-promo-val" placeholder="Ej: 15" min="1" max="99" class="w-full bg-white border border-promo/40 text-promo text-2xl font-bold px-4 py-4 outline-none text-center rounded-xl shadow-inner focus:border-promo focus:ring-2 focus:ring-promo/20 transition-all">
                         </div>
                     </div>
                     
-                    <button onclick="saveGlobalPromo()" class="w-full bg-promo text-white py-4 font-bold text-lg rounded-xl shadow-md mt-8 hover:bg-[#B86C5E] transition-colors"><i class="fas fa-check-circle mr-2"></i>Guardar y Aplicar a Tienda</button>
+                    <button onclick="saveGlobalPromo()" class="w-full bg-promo text-white py-4 font-bold text-lg rounded-xl shadow-md mt-8 hover:bg-[#C92A36] transition-colors"><i class="fas fa-check-circle mr-2"></i>Guardar y Aplicar a Tienda</button>
                 </div>
             </div>
 
@@ -597,7 +611,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
                         <div>
                             <label class="text-xs font-bold text-muted mb-2 block">Moneda Principal</label>
-                            <select id="config-currency" class="admin-input cursor-pointer">
+                            <select id="config-currency" class="admin-input cursor-pointer bg-white">
                                 <option value="$">Dólares ($)</option>
                                 <option value="L">Lempiras (L)</option>
                                 <option value="€">Euros (€)</option>
@@ -606,7 +620,7 @@
                         </div>
                         <div>
                             <label class="text-xs font-bold text-muted mb-2 block" title="Cierra Sesión/Bloquea si no hay movimiento">Auto-bloqueo POS</label>
-                            <select id="config-pos-timeout" class="admin-input cursor-pointer">
+                            <select id="config-pos-timeout" class="admin-input cursor-pointer bg-white">
                                 <option value="0">Desactivado</option>
                                 <option value="5">5 minutos</option>
                                 <option value="10">10 minutos</option>
@@ -615,7 +629,7 @@
                         </div>
                         <div>
                             <label class="text-xs font-bold text-primary mb-2 block">Activar Impuestos (IVA/ISV)</label>
-                            <div class="bg-light border border-border px-4 py-[11px] rounded-xl flex items-center justify-between">
+                            <div class="bg-white border border-border px-4 py-[11px] rounded-xl flex items-center justify-between shadow-sm">
                                 <span class="text-xs text-dark font-bold">General</span>
                                 <label class="switch">
                                     <input type="checkbox" id="config-tax-enabled">
@@ -625,32 +639,63 @@
                         </div>
                         <div>
                             <label class="text-xs font-bold text-primary mb-2 block">Tasa de Impuesto (%)</label>
-                            <input type="number" id="config-tax-rate" step="0.1" min="0" placeholder="Ej. 15" class="admin-input">
+                            <input type="number" id="config-tax-rate" step="0.1" min="0" placeholder="Ej. 15" class="admin-input bg-white">
                         </div>
                         <div class="md:col-span-2 lg:col-span-4 mt-2">
-                            <button onclick="saveSystemConfig()" class="w-full bg-light border border-primary text-primary py-3 font-bold text-sm hover:bg-primary hover:text-white transition-all shadow-sm rounded-xl">Guardar Preferencias del Sistema</button>
+                            <button onclick="saveSystemConfig()" class="w-full bg-white border border-primary text-primary py-3 font-bold text-sm hover:bg-primary hover:text-white transition-all shadow-sm rounded-xl">Guardar Preferencias del Sistema</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Hero Section -->
+                <!-- C3 y C9: Apariencia, Logo y Banner -->
                 <div class="bg-white p-8 border border-border rounded-3xl shadow-soft">
-                    <h3 class="text-dark text-xl font-bold mb-8 border-b border-border pb-4 flex items-center gap-2"><i class="fas fa-image text-primary"></i> Personalizar Banner Web</h3>
+                    <h3 class="text-dark text-xl font-bold mb-8 border-b border-border pb-4 flex items-center gap-2"><i class="fas fa-paint-brush text-primary"></i> Apariencia de la Tienda (Logo y Banner)</h3>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                        <!-- Configuraciones de Textos y Toggles -->
                         <div class="space-y-6">
-                            <div><label class="text-xs font-bold text-muted mb-2 block">Título Principal</label><input type="text" id="config-hero-title" class="admin-input"></div>
-                            <div><label class="text-xs font-bold text-muted mb-2 block">Subtítulo</label><input type="text" id="config-hero-subtitle" class="admin-input"></div>
-                            <button onclick="saveHeroConfig()" id="btn-save-hero" class="w-full mt-4 bg-primary text-white py-4 font-bold text-sm hover:bg-[#A6763A] transition-all shadow-md rounded-xl"><i class="fas fa-save mr-2"></i> Actualizar Banner Web</button>
-                        </div>
-                        <div class="flex flex-col justify-center items-center border-2 border-dashed border-border rounded-2xl p-6 hover:border-primary transition-colors cursor-pointer relative bg-light min-h-[250px]" onclick="document.getElementById('new-hero-img').click()">
-                            <input type="file" id="new-hero-img" class="hidden" accept="image/*" onchange="compressHeroImage(this)">
-                            <div id="hero-preview-container" class="text-center z-10 relative bg-white/80 p-5 rounded-2xl backdrop-blur-sm mt-8 shadow-sm">
-                                <i class="fas fa-camera text-4xl text-primary mb-3"></i>
-                                <p class="text-sm text-dark font-bold">Cambiar Fondo</p>
-                                <p class="text-[10px] text-muted mt-1 font-medium">RECOMENDADO: 1920x1080px, MÁX 500KB</p>
+                            
+                            <!-- Toggle Banner -->
+                            <div class="flex items-center justify-between bg-white border border-border p-4 rounded-xl shadow-sm">
+                                <div>
+                                    <h4 class="text-sm font-bold text-dark">Activar Banner Promocional</h4>
+                                    <p class="text-xs text-muted">Si está apagado, el catálogo será la primera vista.</p>
+                                </div>
+                                <label class="switch switch-accent">
+                                    <input type="checkbox" id="config-hero-active" checked>
+                                    <span class="slider"></span>
+                                </label>
                             </div>
-                            <img id="hero-preview" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl opacity-80" src="">
-                            <div id="hero-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20"><div class="loader !block"></div></div>
+
+                            <div><label class="text-xs font-bold text-muted mb-2 block">Título Banner</label><input type="text" id="config-hero-title" class="admin-input bg-white"></div>
+                            <div><label class="text-xs font-bold text-muted mb-2 block">Subtítulo Banner</label><input type="text" id="config-hero-subtitle" class="admin-input bg-white"></div>
+                            
+                            <button onclick="saveAppearanceConfig()" id="btn-save-appearance" class="w-full mt-4 bg-primary text-white py-4 font-bold text-sm hover:bg-[#A6763A] transition-all shadow-md rounded-xl"><i class="fas fa-save mr-2"></i> Guardar Cambios de Apariencia</button>
+                        </div>
+                        
+                        <!-- Zonas de Subida de Imagen -->
+                        <div class="space-y-6 flex flex-col h-full">
+                            <!-- Logo de la Tienda -->
+                            <div class="flex-1 flex flex-col justify-center items-center border-2 border-dashed border-border rounded-2xl p-4 hover:border-primary transition-colors cursor-pointer relative bg-white" onclick="document.getElementById('new-logo-img').click()">
+                                <input type="file" id="new-logo-img" class="hidden" accept="image/png, image/jpeg, image/webp" onchange="compressLogoImage(this)">
+                                <div id="logo-preview-container" class="text-center z-10 relative">
+                                    <div class="w-16 h-16 bg-accent/10 rounded-full mx-auto flex items-center justify-center text-accent text-2xl mb-2"><i class="fas fa-cat"></i></div>
+                                    <p class="text-sm text-dark font-bold">Cambiar Logo</p>
+                                    <p class="text-[10px] text-muted mt-1 font-medium">PNG/JPG. Fondo transparente recomendado.</p>
+                                </div>
+                                <img id="logo-preview" class="hidden absolute inset-0 w-full h-full object-contain p-4 rounded-2xl opacity-90" src="">
+                                <div id="logo-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20"><div class="loader !block"></div></div>
+                            </div>
+                            <!-- Fondo del Banner -->
+                            <div class="flex-1 flex flex-col justify-center items-center border-2 border-dashed border-border rounded-2xl p-4 hover:border-primary transition-colors cursor-pointer relative bg-white" onclick="document.getElementById('new-hero-img').click()">
+                                <input type="file" id="new-hero-img" class="hidden" accept="image/png, image/jpeg, image/webp" onchange="compressHeroImage(this)">
+                                <div id="hero-preview-container" class="text-center z-10 relative bg-white/80 p-4 rounded-2xl backdrop-blur-sm shadow-sm">
+                                    <i class="fas fa-image text-3xl text-primary mb-2"></i>
+                                    <p class="text-sm text-dark font-bold">Fondo de Banner</p>
+                                    <p class="text-[10px] text-muted mt-1 font-medium">RECOMENDADO: 1920x1080px, MÁX 500KB</p>
+                                </div>
+                                <img id="hero-preview" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl opacity-80" src="">
+                                <div id="hero-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20"><div class="loader !block"></div></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -660,28 +705,30 @@
                     <div class="bg-white p-8 border border-border shadow-soft rounded-3xl flex flex-col justify-between h-full">
                         <div class="space-y-5">
                             <h3 class="text-primary text-sm font-bold mb-4 flex items-center gap-2 border-b border-light pb-2"><i class="fas fa-font"></i> Textos de la Marca</h3>
-                            <div><label class="text-xs font-bold text-muted mb-1 block">Eslogan Corto</label><input type="text" id="config-slogan" class="admin-input"></div>
-                            <div><label class="text-xs font-bold text-muted mb-1 block">Título "Nosotros"</label><input type="text" id="config-about-title" class="admin-input"></div>
-                            <div><label class="text-xs font-bold text-muted mb-1 block">Descripción "Nosotros"</label><textarea id="config-about-desc" class="admin-input h-24 resize-none"></textarea></div>
+                            <div><label class="text-xs font-bold text-muted mb-1 block">Eslogan Corto</label><input type="text" id="config-slogan" class="admin-input bg-white"></div>
+                            <div><label class="text-xs font-bold text-muted mb-1 block">Título "Nosotros"</label><input type="text" id="config-about-title" class="admin-input bg-white"></div>
+                            <div><label class="text-xs font-bold text-muted mb-1 block">Descripción "Nosotros"</label><textarea id="config-about-desc" class="admin-input h-24 resize-none bg-white"></textarea></div>
                             
                             <hr class="border-border my-4">
                             
-                            <div><label class="text-xs font-bold text-muted mb-1 block">Encabezado de Factura</label><input type="text" id="config-invoice-header" class="admin-input"></div>
-                            <div><label class="text-xs font-bold text-muted mb-1 block">Pie de Factura (Gracias/Legal)</label><input type="text" id="config-invoice-footer" class="admin-input"></div>
+                            <div><label class="text-xs font-bold text-muted mb-1 block">Encabezado de Factura</label><input type="text" id="config-invoice-header" class="admin-input bg-white"></div>
+                            <div><label class="text-xs font-bold text-muted mb-1 block">Pie de Factura (Gracias/Legal)</label><input type="text" id="config-invoice-footer" class="admin-input bg-white"></div>
                         </div>
-                        <button onclick="saveBrandTexts()" class="w-full mt-8 bg-light border border-primary text-primary py-3 font-bold text-sm hover:bg-primary hover:text-white transition-all shadow-sm rounded-xl">Guardar Textos</button>
+                        <button onclick="saveBrandTexts()" class="w-full mt-8 bg-white border border-primary text-primary py-3 font-bold text-sm hover:bg-primary hover:text-white transition-all shadow-sm rounded-xl">Guardar Textos</button>
                     </div>
                     
                     <div class="bg-white p-8 border border-border shadow-soft rounded-3xl flex flex-col justify-between h-full">
                         <div class="space-y-5">
                             <h3 class="text-primary text-sm font-bold mb-4 flex items-center gap-2 border-b border-light pb-2"><i class="fas fa-share-alt"></i> Redes y Contacto</h3>
-                            <div><label class="text-xs font-bold text-muted mb-1 block">Texto Compartir Producto</label><input type="text" id="config-share-text" class="admin-input"></div>
+                            <div><label class="text-xs font-bold text-muted mb-1 block">Texto Compartir Producto</label><input type="text" id="config-share-text" class="admin-input bg-white"></div>
                             <hr class="border-border my-4">
-                            <div><label class="text-xs font-bold text-muted mb-1 block"><i class="fab fa-whatsapp text-green-500 mr-1"></i> Número WhatsApp</label><input type="text" id="config-whatsapp" placeholder="Ej. +50499999999 sin espacios" class="admin-input"></div>
-                            <div><label class="text-xs font-bold text-muted mb-1 block"><i class="fab fa-instagram text-pink-500 mr-1"></i> Instagram URL</label><input type="text" id="config-instagram" class="admin-input"></div>
-                            <div><label class="text-xs font-bold text-muted mb-1 block"><i class="fab fa-facebook text-blue-500 mr-1"></i> Facebook URL</label><input type="text" id="config-facebook" class="admin-input"></div>
+                            <div><label class="text-xs font-bold text-muted mb-1 block"><i class="fab fa-whatsapp text-green-500 mr-1"></i> Número WhatsApp</label><input type="text" id="config-whatsapp" placeholder="Ej. +50499999999 sin espacios" class="admin-input bg-white"></div>
+                            <div><label class="text-xs font-bold text-muted mb-1 block"><i class="fab fa-instagram text-pink-500 mr-1"></i> Instagram URL</label><input type="text" id="config-instagram" class="admin-input bg-white"></div>
+                            <div><label class="text-xs font-bold text-muted mb-1 block"><i class="fab fa-facebook text-blue-500 mr-1"></i> Facebook URL</label><input type="text" id="config-facebook" class="admin-input bg-white"></div>
+                            <!-- C1: Campo TikTok -->
+                            <div><label class="text-xs font-bold text-muted mb-1 block"><i class="fab fa-tiktok text-dark mr-1"></i> TikTok URL</label><input type="text" id="config-tiktok" placeholder="Ej. https://www.tiktok.com/@tu_cuenta" class="admin-input bg-white"></div>
                         </div>
-                        <button onclick="saveSocials()" class="w-full mt-8 bg-light border border-primary text-primary py-3 font-bold text-sm hover:bg-primary hover:text-white transition-all shadow-sm rounded-xl">Guardar Redes</button>
+                        <button onclick="saveSocials()" class="w-full mt-8 bg-white border border-primary text-primary py-3 font-bold text-sm hover:bg-primary hover:text-white transition-all shadow-sm rounded-xl">Guardar Redes</button>
                     </div>
                 </div>
 
@@ -692,32 +739,32 @@
                             <h3 class="text-secondary text-sm font-bold mb-4 flex items-center gap-2 border-b border-light pb-2"><i class="fas fa-shield-alt"></i> Seguridad de tu Cuenta</h3>
                             <div>
                                 <label class="text-xs font-bold text-muted mb-2 block">Cambiar Mi Contraseña</label>
-                                <input type="password" id="config-password-old" autocomplete="new-password" placeholder="Contraseña Actual" class="admin-input mb-3">
-                                <input type="password" id="config-password" autocomplete="new-password" placeholder="Nueva contraseña (mín 6 carac.)" class="admin-input">
+                                <input type="password" id="config-password-old" autocomplete="new-password" placeholder="Contraseña Actual" class="admin-input mb-3 bg-white">
+                                <input type="password" id="config-password" autocomplete="new-password" placeholder="Nueva contraseña (mín 6 carac.)" class="admin-input bg-white">
                                 <p class="text-[10px] text-muted mt-2 font-medium">Dejar vacío si no deseas cambiarla.</p>
                             </div>
                             <hr class="border-border my-4">
                             <div>
                                 <label class="text-xs font-bold text-secondary mb-2 block">PIN para Autorizaciones (Cajero -> Admin)</label>
-                                <input type="password" id="config-pin" autocomplete="new-password" placeholder="Ej. 1234" class="admin-input font-mono tracking-widest text-center">
+                                <input type="password" id="config-pin" autocomplete="new-password" placeholder="Ej. 1234" class="admin-input font-mono tracking-widest text-center bg-white">
                             </div>
                         </div>
                         <button onclick="saveSecurity()" class="w-full mt-8 bg-secondary text-white py-3 font-bold text-sm hover:bg-[#78522E] transition-all shadow-md rounded-xl">Actualizar Seguridad</button>
                     </div>
 
-                    <div class="bg-light p-8 border border-border shadow-inner rounded-3xl flex flex-col h-full">
+                    <div class="bg-white p-8 border border-border shadow-soft rounded-3xl flex flex-col h-full">
                         <h3 class="text-dark text-lg font-bold mb-2 flex items-center gap-2"><i class="fas fa-users-cog text-primary"></i> Gestor de Accesos</h3>
                         <p class="text-xs text-muted mb-6 font-medium">Crea accesos para cajeros o administradores secundarios.</p>
                         
                         <div class="space-y-4 flex-1">
                             <div>
                                 <label class="text-xs font-bold text-dark mb-1 block">Correo del Nuevo Usuario</label>
-                                <input type="email" id="new-user-email" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" placeholder="ej. pos2@pinkitos.com" class="admin-input">
+                                <input type="email" id="new-user-email" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" placeholder="ej. pos2@pinkitos.com" class="admin-input bg-white">
                                 <p class="text-[10px] text-primary mt-1 font-bold">Tip: Si contiene "pos", tendrá acceso limitado solo a la terminal.</p>
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-dark mb-1 block">Asignar Contraseña</label>
-                                <input type="password" id="new-user-pass" autocomplete="new-password" placeholder="Mínimo 6 caracteres" class="admin-input">
+                                <input type="password" id="new-user-pass" autocomplete="new-password" placeholder="Mínimo 6 caracteres" class="admin-input bg-white">
                             </div>
                         </div>
                         <button id="btn-create-user" onclick="crearUsuarioSecundario()" class="w-full mt-8 bg-white border border-dark text-dark hover:bg-dark hover:text-white py-3.5 font-bold text-sm transition-all rounded-xl shadow-sm flex justify-center items-center gap-2">
@@ -732,14 +779,14 @@
     <!-- EL CEREBRO JS COMPLETO MIGRADO -->
     <script>
         // Utilidades Visuales Adaptadas a Pinkitos
-        const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000, background: '#FFFFFF', color: '#2C2421', iconColor: '#B88645', customClass: { popup: 'border border-[#F0EBE6] rounded-xl shadow-float !py-3 !px-5', title: '!text-sm !font-bold' }});
-        const DarkAlert = Swal.mixin({ background: '#FFFFFF', color: '#2C2421', confirmButtonColor: '#B88645', cancelButtonColor: '#CD7F6F', customClass: { popup: 'border border-[#F0EBE6] rounded-3xl shadow-float', confirmButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm', cancelButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm' } });
+        const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000, background: '#FFFFFF', color: '#2C2421', iconColor: '#B88645', customClass: { popup: 'border border-[#E5E7EB] rounded-xl shadow-float !py-3 !px-5', title: '!text-sm !font-bold' }});
+        const DarkAlert = Swal.mixin({ background: '#FFFFFF', color: '#2C2421', confirmButtonColor: '#B88645', cancelButtonColor: '#E63946', customClass: { popup: 'border border-[#E5E7EB] rounded-3xl shadow-float', confirmButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm', cancelButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm' } });
 
-        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", categories: ["figuras"], heroTitle: "", heroSubtitle: "", heroImage: "", invoiceHeader: "", invoiceFooter: "", shareText: "", currency: "$", posTimeout: "0", taxEnabled: false, taxRate: 15, posPin: "", globalDiscountActivo: false, globalDiscountValue: 0 };
+        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", categories: ["figuras"], heroTitle: "", heroSubtitle: "", heroImage: "", logoUrl: "", heroActive: true, invoiceHeader: "", invoiceFooter: "", shareText: "", currency: "$", posTimeout: "0", taxEnabled: false, taxRate: 15, posPin: "", globalDiscountActivo: false, globalDiscountValue: 0 };
         const DEFAULT_MEASURES = { "Pequeño": { medida: "" }, "Mediano": { medida: "" }, "Grande": { medida: "" } };
 
         let inventario = []; let pedidosList = []; let config = { ...DEFAULT_CONFIG };
-        let selectedBase64Imgs = []; let selectedHeroImg = ""; let editId = null;
+        let selectedBase64Imgs = []; let selectedHeroImg = ""; let selectedLogoImg = ""; let editId = null;
         let currentFormSizes = ["Pequeño", "Mediano", "Grande"];
         let currentFormColumns = ["Medida"];
 
@@ -821,6 +868,18 @@
             }).catch(() => document.getElementById('lock-error').classList.remove('hidden') );
         }
 
+        // C9: Actualizar Logo en Header Admin
+        function updateAdminHeaderLogo() {
+            const logoContainer = document.getElementById('admin-logo-container');
+            if(config.logoUrl) {
+                logoContainer.innerHTML = `<img src="${config.logoUrl}" class="w-10 h-10 object-contain rounded-full shadow-sm">`;
+                logoContainer.classList.remove('bg-accent/20'); // Remove background color if image exists
+            } else {
+                logoContainer.innerHTML = `<i class="fas fa-cat"></i>`;
+                logoContainer.classList.add('bg-accent/20');
+            }
+        }
+
         // INICIALIZACIÓN Y AUTH
         function init() {
             auth.onAuthStateChanged((user) => {
@@ -881,10 +940,12 @@
 
             const navGroupPos = document.getElementById('nav-group-pos'); const navGroupAdmin = document.getElementById('nav-group-admin');
             if (module === 'POS') {
-                title.innerHTML = '<div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center text-primary text-sm"><i class="fas fa-cash-register"></i></div> Terminal POS<span class="text-primary">.</span>';
+                title.innerHTML = '<div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center text-primary text-sm shadow-sm"><i class="fas fa-cash-register"></i></div> Terminal POS<span class="text-primary">.</span>';
                 navGroupPos.classList.remove('hidden'); navGroupPos.classList.add('flex'); navGroupAdmin.classList.add('hidden'); navGroupAdmin.classList.remove('flex'); showAdminTab('pos');
             } else if (module === 'ADMIN') {
-                title.innerHTML = '<div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center text-primary text-sm"><i class="fas fa-cat"></i></div> Pinkitos<span class="text-primary">.</span>';
+                // Reconstruir con el div del logo dinámico
+                title.innerHTML = `<div id="admin-logo-container" class="w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-sm transition-all"></div> Pinkitos<span class="text-primary">.</span>`;
+                updateAdminHeaderLogo(); // Asegura que cargue correcto
                 navGroupAdmin.classList.remove('hidden'); navGroupAdmin.classList.add('flex'); navGroupPos.classList.add('hidden'); navGroupPos.classList.remove('flex'); showAdminTab('inventario');
             }
         }
@@ -938,7 +999,7 @@
         }
 
         function _createPosCard(p, isGrid) {
-            const img = p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen || 'https://via.placeholder.com/150/FDFDFD/2C2421?text=Sin+Imagen');
+            const img = p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen || 'https://via.placeholder.com/150/FFFFFF/2C2421?text=Sin+Imagen');
             const isOut = p.stock !== undefined && p.stock <= 0;
             const clickAction = isOut ? '' : `openPosSizeSelector('${p.id}')`;
             
@@ -958,11 +1019,11 @@
             if(isGrid) {
                 return `
                 <div class="bg-white border border-border rounded-2xl overflow-hidden cursor-pointer hover:shadow-soft hover:border-primary/40 transition-all flex flex-col ${isOut ? 'opacity-70' : ''}" onclick="${clickAction}">
-                    <div class="aspect-square relative bg-light shrink-0 p-2">
+                    <div class="aspect-square relative bg-white shrink-0 p-2">
                         <img src="${img}" class="w-full h-full object-contain drop-shadow-sm">
                         ${overlayBadges}
                     </div>
-                    <div class="p-3 border-t border-light flex flex-col justify-between flex-1 min-w-0">
+                    <div class="p-3 border-t border-border flex flex-col justify-between flex-1 min-w-0 bg-white">
                         <div class="flex items-center gap-1.5 mb-1.5 truncate">
                             <span class="bg-light text-muted px-1.5 py-0.5 rounded text-[9px] font-bold uppercase shrink-0">${p.categoria || 'Gen'}</span>
                             <p class="text-[11px] font-bold text-dark truncate">${p.titulo}</p>
@@ -974,7 +1035,7 @@
                 let listOverlayBadges = isOut ? '<div class="absolute inset-0 bg-white/70 flex items-center justify-center backdrop-blur-sm"><i class="fas fa-ban text-muted"></i></div>' : '';
                 return `
                 <div class="flex items-center gap-4 bg-white border border-border p-3 rounded-2xl cursor-pointer hover:shadow-soft hover:border-primary/40 transition-all ${isOut ? 'opacity-70' : ''}" onclick="${clickAction}">
-                    <div class="w-16 h-16 bg-light rounded-xl overflow-hidden shrink-0 relative p-1">
+                    <div class="w-16 h-16 bg-white rounded-xl overflow-hidden shrink-0 relative p-1 border border-border">
                         <img src="${img}" class="w-full h-full object-contain drop-shadow-sm">
                         ${listOverlayBadges}
                     </div>
@@ -1000,13 +1061,13 @@
             let htmlOptions = p.tallas.map(t => `<button class="swal-size-btn bg-white border border-border text-dark w-full py-3 mb-2 rounded-xl hover:bg-light hover:border-primary transition-colors text-sm font-bold shadow-sm" onclick="Swal.clickConfirm(); window.tempSelectedSize='${t}'">${t}</button>`).join('');
             window.tempSelectedSize = null;
             
-            Swal.fire({ title: 'Seleccionar Variante', html: htmlOptions, background: '#FFFFFF', color: '#2C2421', showConfirmButton: false, showCloseButton: true, customClass: { popup: 'rounded-3xl border border-border shadow-float', title: 'font-bold text-lg' }, preConfirm: () => { if(window.tempSelectedSize) addToPosCart(p, window.tempSelectedSize); } });
+            Swal.fire({ title: 'Seleccionar Variante', html: htmlOptions, background: '#FFFFFF', color: '#2C2421', showConfirmButton: false, showCloseButton: true, customClass: { popup: 'rounded-3xl border border-border shadow-float bg-white', title: 'font-bold text-lg' }, preConfirm: () => { if(window.tempSelectedSize) addToPosCart(p, window.tempSelectedSize); } });
         }
 
         function addToPosCart(p, talla) {
             const idx = posCart.findIndex(i => i.id === p.id && i.talla === talla);
             if(idx !== -1) posCart[idx].cantidad++;
-            else posCart.push({ id: p.id, titulo: p.titulo, sku: p.sku || '', precio: p.precio, precioOriginal: p.precioOriginal, talla: talla, cantidad: 1, taxable: p.taxable !== undefined ? p.taxable : !!config.taxEnabled, img: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen||'https://via.placeholder.com/100/FDFDFD/2C2421?text=Sin+Imagen') });
+            else posCart.push({ id: p.id, titulo: p.titulo, sku: p.sku || '', precio: p.precio, precioOriginal: p.precioOriginal, talla: talla, cantidad: 1, taxable: p.taxable !== undefined ? p.taxable : !!config.taxEnabled, img: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen||'https://via.placeholder.com/100/FFFFFF/2C2421?text=Sin+Imagen') });
             renderPosCart();
         }
 
@@ -1028,7 +1089,7 @@
                 if (discount > 0) priceDisplayHtml = `<div class="flex flex-col items-end leading-none"><span class="text-muted line-through text-[10px] font-mono">${config.currency||'$'}${itemOrigSub.toFixed(2)}</span><span class="text-promo font-bold text-sm">${config.currency||'$'}${itemSub.toFixed(2)}</span></div>`;
 
                 return `
-                <div class="flex items-center gap-3 bg-light border border-border p-3 rounded-2xl relative shadow-sm">
+                <div class="flex items-center gap-3 bg-white border border-border p-3 rounded-2xl relative shadow-sm">
                     ${discount > 0 ? `<span class="absolute -top-2 -left-2 bg-promo text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg shadow-sm z-10">-${discount}%</span>` : ''}
                     <div class="w-14 h-14 bg-white rounded-xl overflow-hidden shrink-0 border border-border"><img src="${item.img}" class="w-full h-full object-contain"></div>
                     <div class="flex-1 min-w-0 flex flex-col justify-center">
@@ -1043,7 +1104,7 @@
                             </div>
                         </div>
                     </div>
-                    <button onclick="updatePosQty(${index}, -${item.cantidad})" class="absolute top-2 right-2 w-6 h-6 text-muted hover:text-promo transition-colors bg-white rounded-full flex items-center justify-center shadow-sm"><i class="fas fa-times text-xs"></i></button>
+                    <button onclick="updatePosQty(${index}, -${item.cantidad})" class="absolute top-2 right-2 w-6 h-6 text-muted hover:text-promo transition-colors bg-white rounded-full flex items-center justify-center shadow-sm border border-border"><i class="fas fa-times text-xs"></i></button>
                 </div>`;
             }).join('');
 
@@ -1087,7 +1148,7 @@
         function loadOrderIntoPos(docId) {
             const pedido = pedidosList.find(p => p.id === docId); if(!pedido) return;
             posEditingOrderId = docId; 
-            posCart = pedido.items.map(item => { const prod = inventario.find(x => x.id === item.id); return { ...item, precio: item.precio || (prod ? prod.precio : (item.precioFinalAplicado ? String(item.precioFinalAplicado) : "0")), precioOriginal: item.precioOriginal || (prod ? prod.precioOriginal : null), taxable: item.taxable !== undefined ? item.taxable : (prod ? prod.taxable : !!config.taxEnabled), img: item.img || (prod && prod.imagenes && prod.imagenes.length > 0 ? prod.imagenes[0] : (prod ? prod.imagen : 'https://via.placeholder.com/100/FDFDFD/2C2421?text=Sin+Imagen')), sku: item.sku || (prod ? prod.sku : '') }; });
+            posCart = pedido.items.map(item => { const prod = inventario.find(x => x.id === item.id); return { ...item, precio: item.precio || (prod ? prod.precio : (item.precioFinalAplicado ? String(item.precioFinalAplicado) : "0")), precioOriginal: item.precioOriginal || (prod ? prod.precioOriginal : null), taxable: item.taxable !== undefined ? item.taxable : (prod ? prod.taxable : !!config.taxEnabled), img: item.img || (prod && prod.imagenes && prod.imagenes.length > 0 ? prod.imagenes[0] : (prod ? prod.imagen : 'https://via.placeholder.com/100/FFFFFF/2C2421?text=Sin+Imagen')), sku: item.sku || (prod ? prod.sku : '') }; });
             posCart._origIdPedido = pedido.idPedido; document.getElementById('pos-client-name').value = pedido.cliente || ''; document.getElementById('pos-ticket-title').innerText = `Editando: ${pedido.idPedido || 'S/N'}`; showAdminTab('pos'); renderPosCart();
         }
 
@@ -1104,7 +1165,7 @@
             document.getElementById('ped-page-indicator').innerText = `${pedCurrentPage} / ${totalPages}`; document.getElementById('ped-btn-prev').disabled = pedCurrentPage === 1; document.getElementById('ped-btn-next').disabled = pedCurrentPage === totalPages;
             const slice = pedidosPendientes.slice((pedCurrentPage - 1) * pedItemsPerPage, pedCurrentPage * pedItemsPerPage);
 
-            if(slice.length === 0) return list.innerHTML = `<div class="text-center py-12 border border-dashed border-border rounded-2xl bg-light"><i class="fas fa-box-open text-3xl text-muted mb-3"></i><p class="text-muted text-sm font-semibold">No hay pedidos pendientes</p></div>`;
+            if(slice.length === 0) return list.innerHTML = `<div class="text-center py-12 border border-dashed border-border rounded-2xl bg-white"><i class="fas fa-box-open text-3xl text-muted mb-3"></i><p class="text-muted text-sm font-semibold">No hay pedidos pendientes</p></div>`;
 
             list.innerHTML = slice.map(pedido => {
                 const dateStr = (pedido.createdAt && typeof pedido.createdAt.toDate === 'function') ? new Date(pedido.createdAt.toDate()).toLocaleString() : 'Nuevo / Pendiente';
@@ -1128,14 +1189,14 @@
 
                     ${pedido.mensaje ? `<p class="text-dark text-sm font-medium italic mt-2 bg-light p-4 rounded-2xl border border-border">" ${pedido.mensaje} "</p>` : ''}
                     
-                    <div class="mt-5 border-t border-light pt-5 ml-4">
-                        <button onclick="toggleAccordion('acc-${pedido.id}')" class="w-full flex justify-between items-center text-sm font-bold text-dark hover:text-primary transition-colors bg-light px-4 py-3 rounded-xl">
+                    <div class="mt-5 border-t border-border pt-5 ml-4">
+                        <button onclick="toggleAccordion('acc-${pedido.id}')" class="w-full flex justify-between items-center text-sm font-bold text-dark hover:text-primary transition-colors bg-white border border-border px-4 py-3 rounded-xl shadow-sm">
                             <span><i class="fas fa-shopping-bag mr-2"></i> Ver Productos (${pedido.items ? pedido.items.length : 0})</span>
                             <i id="icon-acc-${pedido.id}" class="fas fa-chevron-down transition-transform duration-300"></i>
                         </button>
                         <div id="acc-${pedido.id}" class="hidden bg-white p-2 space-y-3 mt-4 border border-border rounded-2xl">
                             ${(pedido.items || []).map(i => `
-                                <div class="flex items-center gap-4 bg-light border border-border p-3 rounded-xl">
+                                <div class="flex items-center gap-4 bg-white border border-border p-3 rounded-xl shadow-sm">
                                     <div class="w-12 h-12 bg-white rounded-lg border border-border overflow-hidden shrink-0"><img src="${i.img}" class="w-full h-full object-contain drop-shadow-sm"></div>
                                     <div class="flex-1 min-w-0">
                                         <p class="text-dark text-xs font-bold truncate">${i.titulo}</p>
@@ -1187,7 +1248,7 @@
                 const itemsHtml = (pedido.items || []).map(i => {
                     const finalP = parseFloat(String(i.precio||i.precioFinalAplicado||"0").replace(/[^0-9.-]+/g,"")) || 0; const discount = getDiscountPercent(i.precio, i.precioOriginal);
                     let discountHtml = ''; if (discount > 0) { const origBase = parseFloat(String(i.precioOriginal||"0").replace(/[^0-9.-]+/g,"")) || 0; discountHtml = `<br><span style="color:#999; text-decoration: line-through;">${config.currency||'$'}${origBase.toFixed(2)} c/u</span>`; }
-                    return `<tr style="border-bottom: 1px solid #F0EBE6;"><td style="padding: 8px 0; font-size: 12px; color: #2C2421;">${i.titulo} <br><small style="color:#A09893;" class="notranslate" translate="no">Var: ${i.talla}</small>${discountHtml}</td><td style="text-align: center; font-size: 12px; color: #2C2421; font-weight: bold;">${i.cantidad}</td><td style="text-align: right; font-size: 12px; color: #2C2421; font-weight: bold;">${config.currency||'$'}${(finalP * i.cantidad).toFixed(2)}</td></tr>`;
+                    return `<tr style="border-bottom: 1px solid #E5E7EB;"><td style="padding: 8px 0; font-size: 12px; color: #2C2421;">${i.titulo} <br><small style="color:#9CA3AF;" class="notranslate" translate="no">Var: ${i.talla}</small>${discountHtml}</td><td style="text-align: center; font-size: 12px; color: #2C2421; font-weight: bold;">${i.cantidad}</td><td style="text-align: right; font-size: 12px; color: #2C2421; font-weight: bold;">${config.currency||'$'}${(finalP * i.cantidad).toFixed(2)}</td></tr>`;
                 }).join('');
                 
                 let totalAhorro = pedido.ahorro || 0; if (!pedido.ahorro) { (pedido.items || []).forEach(i => { const finalP = parseFloat(String(i.precio||i.precioFinalAplicado||"0").replace(/[^0-9.-]+/g,"")) || 0; const origP = parseFloat(String(i.precioOriginal||i.precio||"0").replace(/[^0-9.-]+/g,"")) || finalP; if (origP > finalP) totalAhorro += (origP - finalP) * i.cantidad; }); }
@@ -1197,7 +1258,7 @@
                 if (totalAhorro > 0) extraTotals += `<h3 style="text-align: right; font-size: 14px; margin: 0 0 5px 0; color: #B88645; font-weight: bold;">Ahorro: -${config.currency||'$'}${totalAhorro.toFixed(2)}</h3>`;
                 if(pedido.impuesto > 0) extraTotals += `<h3 style="text-align: right; font-size: 14px; margin: 0 0 10px 0; color: #2C2421; font-weight: normal;">ISV: ${config.currency||'$'}${(pedido.impuesto).toFixed(2)}</h3>`;
 
-                const ticketHtml = `<div id="temp-invoice-capture" style="background: #FFFFFF; color: #2C2421; font-family: 'Courier New', Courier, monospace; width: 350px; padding: 25px; box-sizing: border-box; position: absolute; left: -9999px; top: -9999px; z-index: -1; border-radius: 16px; border: 1px solid #F0EBE6;"><h2 style="text-align: center; margin-bottom: 5px; font-size: 26px; color: #2C2421; font-family: sans-serif; font-weight: 800;">PINKITOS SHOP</h2><p style="text-align: center; margin-top: 0; font-size: 11px; color: #A09893; font-family: sans-serif; font-weight: bold;">${invHeader}</p><hr style="border: 1px dashed #F0EBE6; margin: 15px 0;"><p style="font-size: 12px; margin: 5px 0;"><strong>FACTURA:</strong> ${pedido.idPedido || 'S/N'}</p><p style="font-size: 12px; margin: 5px 0;"><strong>CLIENTE:</strong> ${pedido.cliente}</p><p style="font-size: 12px; margin: 5px 0;"><strong>FECHA:</strong> ${dateStr}</p><hr style="border: 1px dashed #F0EBE6; margin: 15px 0;"><table style="width: 100%; border-collapse: collapse;"><thead><tr style="border-bottom: 2px solid #2C2421;"><th style="text-align: left; padding-bottom: 5px; font-size: 12px;">DESC.</th><th style="text-align: center; padding-bottom: 5px; font-size: 12px;">CANT</th><th style="text-align: right; padding-bottom: 5px; font-size: 12px;">SUB</th></tr></thead><tbody>${itemsHtml}</tbody></table><hr style="border: 1px dashed #F0EBE6; margin: 15px 0;">${extraTotals}<h3 style="text-align: right; font-size: 20px; margin: 0; color: #2C2421; font-weight: 800;">TOTAL: ${config.currency||'$'}${(pedido.total || 0).toFixed(2)}</h3><p style="text-align: center; margin-top: 30px; font-size: 11px; color: #A09893; font-family: sans-serif; font-weight: 600;">${invFooter}</p></div>`;
+                const ticketHtml = `<div id="temp-invoice-capture" style="background: #FFFFFF; color: #2C2421; font-family: 'Courier New', Courier, monospace; width: 350px; padding: 25px; box-sizing: border-box; position: absolute; left: -9999px; top: -9999px; z-index: -1; border-radius: 16px; border: 1px solid #E5E7EB;"><h2 style="text-align: center; margin-bottom: 5px; font-size: 26px; color: #2C2421; font-family: sans-serif; font-weight: 800;">PINKITOS SHOP</h2><p style="text-align: center; margin-top: 0; font-size: 11px; color: #9CA3AF; font-family: sans-serif; font-weight: bold;">${invHeader}</p><hr style="border: 1px dashed #E5E7EB; margin: 15px 0;"><p style="font-size: 12px; margin: 5px 0;"><strong>FACTURA:</strong> ${pedido.idPedido || 'S/N'}</p><p style="font-size: 12px; margin: 5px 0;"><strong>CLIENTE:</strong> ${pedido.cliente}</p><p style="font-size: 12px; margin: 5px 0;"><strong>FECHA:</strong> ${dateStr}</p><hr style="border: 1px dashed #E5E7EB; margin: 15px 0;"><table style="width: 100%; border-collapse: collapse;"><thead><tr style="border-bottom: 2px solid #2C2421;"><th style="text-align: left; padding-bottom: 5px; font-size: 12px;">DESC.</th><th style="text-align: center; padding-bottom: 5px; font-size: 12px;">CANT</th><th style="text-align: right; padding-bottom: 5px; font-size: 12px;">SUB</th></tr></thead><tbody>${itemsHtml}</tbody></table><hr style="border: 1px dashed #E5E7EB; margin: 15px 0;">${extraTotals}<h3 style="text-align: right; font-size: 20px; margin: 0; color: #2C2421; font-weight: 800;">TOTAL: ${config.currency||'$'}${(pedido.total || 0).toFixed(2)}</h3><p style="text-align: center; margin-top: 30px; font-size: 11px; color: #9CA3AF; font-family: sans-serif; font-weight: 600;">${invFooter}</p></div>`;
                 document.body.insertAdjacentHTML('beforeend', ticketHtml); const captureDiv = document.getElementById('temp-invoice-capture');
                 try {
                     const canvas = await html2canvas(captureDiv, { backgroundColor: '#ffffff', scale: 2 }); const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png')); const file = new File([blob], `Factura_${pedido.idPedido}.png`, { type: 'image/png' });
@@ -1225,7 +1286,7 @@
             document.getElementById('fac-page-indicator').innerText = `${facCurrentPage} / ${totalPages}`; document.getElementById('fac-btn-prev').disabled = facCurrentPage === 1; document.getElementById('fac-btn-next').disabled = facCurrentPage === totalPages;
             const slice = facturas.slice((facCurrentPage - 1) * facItemsPerPage, facCurrentPage * facItemsPerPage);
 
-            if(slice.length === 0) return list.innerHTML = `<div class="text-center py-12 border border-dashed border-border rounded-3xl bg-light"><i class="fas fa-archive text-3xl text-muted mb-3"></i><p class="text-sm text-muted font-bold">No hay facturas en este rango</p></div>`;
+            if(slice.length === 0) return list.innerHTML = `<div class="text-center py-12 border border-dashed border-border rounded-3xl bg-white"><i class="fas fa-archive text-3xl text-muted mb-3"></i><p class="text-sm text-muted font-bold">No hay facturas en este rango</p></div>`;
 
             list.innerHTML = slice.map(pedido => {
                 const dateStr = (pedido.despachadoAt && typeof pedido.despachadoAt.toDate === 'function') ? new Date(pedido.despachadoAt.toDate()).toLocaleString() : 'Fecha desconocida';
@@ -1237,10 +1298,10 @@
                         <p class="text-muted text-[10px] mt-1.5 font-semibold"><i class="fas fa-calendar-check text-[#20b858] w-4"></i> Despachado: ${dateStr}</p>
                     </div>
                     <div class="flex flex-wrap gap-2 w-full md:w-auto mt-2 md:mt-0">
-                        <button onclick="marcarPendiente('${pedido.id}')" class="bg-light border border-border text-dark px-3 py-2 font-bold text-xs hover:bg-border transition-all rounded-xl" title="Regresar a Pendiente"><i class="fas fa-undo"></i></button>
-                        <button onclick="compartirPorWhatsApp('${pedido.id}', 'factura')" class="bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/30 px-3 py-2 font-bold text-xs hover:bg-[#25D366] hover:text-white transition-all rounded-xl"><i class="fab fa-whatsapp text-sm"></i></button>
-                        <button onclick="imprimirFactura('${pedido.id}')" class="bg-primary/10 text-primary border border-primary/30 px-3 py-2 font-bold text-xs hover:bg-primary hover:text-white transition-all rounded-xl"><i class="fas fa-print"></i></button>
-                        <button onclick="eliminarFactura('${pedido.id}')" class="bg-promo/10 text-promo border border-promo/30 px-3 py-2 font-bold text-xs hover:bg-promo hover:text-white transition-all rounded-xl"><i class="fas fa-trash"></i></button>
+                        <button onclick="marcarPendiente('${pedido.id}')" class="bg-white border border-border text-dark px-3 py-2 font-bold text-xs hover:bg-light transition-all rounded-xl shadow-sm" title="Regresar a Pendiente"><i class="fas fa-undo"></i></button>
+                        <button onclick="compartirPorWhatsApp('${pedido.id}', 'factura')" class="bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/30 px-3 py-2 font-bold text-xs hover:bg-[#25D366] hover:text-white transition-all rounded-xl shadow-sm"><i class="fab fa-whatsapp text-sm"></i></button>
+                        <button onclick="imprimirFactura('${pedido.id}')" class="bg-primary/10 text-primary border border-primary/30 px-3 py-2 font-bold text-xs hover:bg-primary hover:text-white transition-all rounded-xl shadow-sm"><i class="fas fa-print"></i></button>
+                        <button onclick="eliminarFactura('${pedido.id}')" class="bg-promo/10 text-promo border border-promo/30 px-3 py-2 font-bold text-xs hover:bg-promo hover:text-white transition-all rounded-xl shadow-sm"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`
             }).join('');
@@ -1262,7 +1323,7 @@
                     <p><strong>Desde:</strong> ${dStart}</p>
                     <p><strong>Hasta:</strong> ${dEnd}</p>
                     <p><strong>Facturas del periodo:</strong> ${data.count}</p>
-                    <div class="border-t border-border my-6 pt-6 text-center bg-light rounded-2xl p-4">
+                    <div class="border-t border-border my-6 pt-6 text-center bg-white border border-border shadow-sm rounded-2xl p-4">
             `;
             if (config.taxEnabled) {
                 htmlBody += `<p class="text-xs text-muted font-bold">Subtotal Acumulado</p><p class="text-lg text-dark font-bold mb-2">${config.currency||'$'}${data.subtotal.toFixed(2)}</p><p class="text-xs text-muted font-bold">Impuestos</p><p class="text-lg text-dark font-bold mb-4">${config.currency||'$'}${data.impuesto.toFixed(2)}</p>`;
@@ -1279,7 +1340,7 @@
         async function compartirCierreWAPorImagen(dStart, dEnd) {
             Toast.fire({ icon: 'info', title: 'Generando imagen del cierre...' }); const data = obtenerCalculosCierre(dStart, dEnd); const invHeader = config.invoiceHeader || 'JUGUETES Y COLECCIONABLES'; let extraTotals = '';
             if(config.taxEnabled) extraTotals = `<h3 style="text-align: right; font-size: 14px; margin: 0 0 5px 0; color: #2C2421; font-weight: normal;">Subtotal: ${config.currency||'$'}${data.subtotal.toFixed(2)}</h3><h3 style="text-align: right; font-size: 14px; margin: 0 0 10px 0; color: #2C2421; font-weight: normal;">Impuestos: ${config.currency||'$'}${data.impuesto.toFixed(2)}</h3>`;
-            const ticketHtml = `<div id="temp-cierre-capture" style="background: #FFFFFF; color: #2C2421; font-family: 'Courier New', Courier, monospace; width: 350px; padding: 25px; box-sizing: border-box; position: absolute; left: -9999px; top: -9999px; z-index: -1; border-radius: 16px; border: 1px solid #F0EBE6;"><h2 style="text-align: center; margin-bottom: 5px; font-size: 24px; font-family: sans-serif; font-weight: 800;">REPORTE DE CIERRE</h2><p style="text-align: center; margin-top: 0; font-size: 11px; color: #A09893; font-family: sans-serif; font-weight: bold;">${invHeader}</p><hr style="border: 1px dashed #F0EBE6; margin: 15px 0;"><p style="font-size: 13px; margin: 5px 0;"><strong>DESDE:</strong> ${dStart}</p><p style="font-size: 13px; margin: 5px 0;"><strong>HASTA:</strong> ${dEnd}</p><p style="font-size: 13px; margin: 5px 0;"><strong>FACTURAS:</strong> ${data.count}</p><hr style="border: 1px dashed #F0EBE6; margin: 15px 0;">${extraTotals}<h3 style="text-align: right; font-size: 20px; margin: 0; font-weight: 800;">INGRESO: ${config.currency||'$'}${data.total.toFixed(2)}</h3><p style="text-align: center; margin-top: 30px; font-size: 11px; color: #A09893;">Generado desde Pinkitos POS</p></div>`;
+            const ticketHtml = `<div id="temp-cierre-capture" style="background: #FFFFFF; color: #2C2421; font-family: 'Courier New', Courier, monospace; width: 350px; padding: 25px; box-sizing: border-box; position: absolute; left: -9999px; top: -9999px; z-index: -1; border-radius: 16px; border: 1px solid #E5E7EB;"><h2 style="text-align: center; margin-bottom: 5px; font-size: 24px; font-family: sans-serif; font-weight: 800;">REPORTE DE CIERRE</h2><p style="text-align: center; margin-top: 0; font-size: 11px; color: #9CA3AF; font-family: sans-serif; font-weight: bold;">${invHeader}</p><hr style="border: 1px dashed #E5E7EB; margin: 15px 0;"><p style="font-size: 13px; margin: 5px 0;"><strong>DESDE:</strong> ${dStart}</p><p style="font-size: 13px; margin: 5px 0;"><strong>HASTA:</strong> ${dEnd}</p><p style="font-size: 13px; margin: 5px 0;"><strong>FACTURAS:</strong> ${data.count}</p><hr style="border: 1px dashed #E5E7EB; margin: 15px 0;">${extraTotals}<h3 style="text-align: right; font-size: 20px; margin: 0; font-weight: 800;">INGRESO: ${config.currency||'$'}${data.total.toFixed(2)}</h3><p style="text-align: center; margin-top: 30px; font-size: 11px; color: #9CA3AF;">Generado desde Pinkitos POS</p></div>`;
             document.body.insertAdjacentHTML('beforeend', ticketHtml); const captureDiv = document.getElementById('temp-cierre-capture');
             try {
                 const canvas = await html2canvas(captureDiv, { backgroundColor: '#ffffff', scale: 2 }); const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png')); const file = new File([blob], `Cierre_${dStart}.png`, { type: 'image/png' });
@@ -1312,8 +1373,16 @@
         function changeInvPage(dir) { invCurrentPage += dir; renderAdminList(); }
 
         function renderAdminList() {
-            const list = document.getElementById('admin-list'); const term = (document.getElementById('search-inventory').value || "").toLowerCase();
-            const filt = inventario.filter(p => (p.titulo || "").toLowerCase().includes(term) || (p.sku || "").toLowerCase().includes(term) || (p.categoria || "").toLowerCase().includes(term));
+            const list = document.getElementById('admin-list'); 
+            const term = (document.getElementById('search-inventory').value || "").toLowerCase();
+            const filterCat = document.getElementById('inv-filter-cat').value; // C5: Obtener Categoría a Filtrar
+
+            const filt = inventario.filter(p => {
+                const matchTerm = (p.titulo || "").toLowerCase().includes(term) || (p.sku || "").toLowerCase().includes(term) || (p.categoria || "").toLowerCase().includes(term);
+                const matchCat = filterCat === 'all' ? true : p.categoria === filterCat;
+                return matchTerm && matchCat;
+            });
+
             document.getElementById('inventory-count').innerText = `${filt.length} Productos`;
             const totalPages = Math.ceil(filt.length / invItemsPerPage) || 1; if(invCurrentPage > totalPages) invCurrentPage = totalPages; if(invCurrentPage < 1) invCurrentPage = 1;
             document.getElementById('inv-page-indicator').innerText = `${invCurrentPage} / ${totalPages}`; document.getElementById('inv-btn-prev').disabled = invCurrentPage === 1; document.getElementById('inv-btn-next').disabled = invCurrentPage === totalPages;
@@ -1321,7 +1390,7 @@
 
             if(filt.length === 0) return list.innerHTML = `<p class="col-span-full text-muted text-sm italic text-center py-8">No se encontraron productos.</p>`;
             list.innerHTML = slice.map(prod => {
-                const cover = prod.imagenes && prod.imagenes.length > 0 ? prod.imagenes[0] : (prod.imagen||'https://via.placeholder.com/150/FDFDFD/2C2421?text=Sin+Imagen');
+                const cover = prod.imagenes && prod.imagenes.length > 0 ? prod.imagenes[0] : (prod.imagen||'https://via.placeholder.com/150/FFFFFF/2C2421?text=Sin+Imagen');
                 let statusInfo = '';
                 if(prod.isPinned) statusInfo += `<span class="bg-primary/20 text-primary text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-star"></i> Fijado</span>`;
                 if(prod.precioOriginal) statusInfo += `<span class="bg-promo/20 text-promo text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-tags"></i> Oferta</span>`;
@@ -1332,22 +1401,25 @@
                 else if(prod.stock <= 0) statusInfo += `<span class="bg-muted text-white text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-ban"></i> Agotado</span>`;
                 else statusInfo += `<span class="bg-[#20b858]/10 text-[#20b858] text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-check"></i> Stock: ${prod.stock}</span>`;
 
+                // C2: Mostrar la cantidad de Favoritos
+                const favCountInfo = prod.favCount && prod.favCount > 0 ? `<span class="bg-promo/10 text-promo text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm flex items-center gap-1" title="Veces añadido a favoritos"><i class="fas fa-heart"></i> ${prod.favCount}</span>` : '';
+
                 return `<div class="bg-white p-4 flex items-center justify-between border border-border rounded-2xl hover:shadow-soft hover:border-primary/40 transition-all">
                     <div class="flex items-center gap-4 truncate min-w-0 flex-1">
-                        <div class="w-16 h-16 bg-light rounded-xl border border-border flex-shrink-0 overflow-hidden relative p-1">
+                        <div class="w-16 h-16 bg-white rounded-xl border border-border flex-shrink-0 overflow-hidden relative p-1">
                             <img src="${cover}" class="w-full h-full object-contain drop-shadow-sm">
                         </div>
                         <div class="truncate min-w-0 flex-1">
                             <div class="flex items-center gap-2 mb-1.5 truncate">
-                                <span class="bg-light border border-border text-muted text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase shrink-0">${prod.categoria || 'Gen'}</span>
+                                <span class="bg-white border border-border text-muted text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase shrink-0">${prod.categoria || 'Gen'}</span>
                                 <p class="text-dark text-sm font-bold truncate">${prod.titulo} <span class="text-muted font-normal text-[10px]">#${prod.sku||''}</span></p>
                             </div>
-                            <div class="flex flex-wrap items-center mt-1">${statusInfo}</div>
+                            <div class="flex flex-wrap items-center mt-1">${statusInfo}${favCountInfo}</div>
                         </div>
                     </div>
                     <div class="flex flex-col gap-2 flex-shrink-0 ml-4">
-                        <button onclick="startEdit('${prod.id}')" class="w-8 h-8 text-primary bg-light border border-border hover:bg-white rounded-lg transition-colors shadow-sm"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteProduct('${prod.id}')" class="w-8 h-8 text-promo bg-light border border-border hover:bg-white rounded-lg transition-colors shadow-sm"><i class="fas fa-trash"></i></button>
+                        <button onclick="startEdit('${prod.id}')" class="w-8 h-8 text-primary bg-white border border-border hover:bg-light rounded-lg transition-colors shadow-sm"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteProduct('${prod.id}')" class="w-8 h-8 text-promo bg-white border border-border hover:bg-light rounded-lg transition-colors shadow-sm"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`
             }).join('');
@@ -1361,18 +1433,80 @@
                 let precioBase = parseFloat((p.precio || "0").replace(/[^0-9.-]+/g,"")) || 0; let isTaxable = p.taxable !== undefined ? p.taxable : !!config.taxEnabled; let impuesto = 0;
                 if (config.taxEnabled && isTaxable) impuesto = precioBase * ((parseFloat(config.taxRate) || 0) / 100);
                 let precioTotal = precioBase + impuesto; totalStock += (p.stock || 0); totalPrecioBase += precioBase; totalImpuesto += impuesto; totalFinal += precioTotal;
-                return { 'Nombre': p.titulo, 'SKU': p.sku || '', 'Categoría': (p.categoria || '').toUpperCase(), 'Estado': p.isPresale ? 'Preventa' : (p.stock <= 0 ? 'Agotado' : 'Disponible'), 'Promo Tipo': p.promoType || 'Normal', 'Stock': p.stock || 0, 'Precio Base': parseFloat(precioBase.toFixed(2)), 'Impuesto': parseFloat(impuesto.toFixed(2)), 'Precio Final': parseFloat(precioTotal.toFixed(2)) };
+                return { 'Nombre': p.titulo, 'SKU': p.sku || '', 'Categoría': (p.categoria || '').toUpperCase(), 'Estado': p.isPresale ? 'Preventa' : (p.stock <= 0 ? 'Agotado' : 'Disponible'), 'Promo Tipo': p.promoType || 'Normal', 'Favoritos': p.favCount || 0, 'Stock': p.stock || 0, 'Precio Base': parseFloat(precioBase.toFixed(2)), 'Impuesto': parseFloat(impuesto.toFixed(2)), 'Precio Final': parseFloat(precioTotal.toFixed(2)) };
             });
-            data.push({ 'Nombre': '---', 'SKU': '---', 'Categoría': '---', 'Estado': 'TOTALES GLOBALES', 'Promo Tipo': '---', 'Stock': totalStock, 'Precio Base': parseFloat(totalPrecioBase.toFixed(2)), 'Impuesto': parseFloat(totalImpuesto.toFixed(2)), 'Precio Final': parseFloat(totalFinal.toFixed(2)) });
+            data.push({ 'Nombre': '---', 'SKU': '---', 'Categoría': '---', 'Estado': 'TOTALES GLOBALES', 'Promo Tipo': '---', 'Favoritos': '---', 'Stock': totalStock, 'Precio Base': parseFloat(totalPrecioBase.toFixed(2)), 'Impuesto': parseFloat(totalImpuesto.toFixed(2)), 'Precio Final': parseFloat(totalFinal.toFixed(2)) });
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Inventario"); XLSX.writeFile(wb, `Inventario_Pinkitos_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`);
         }
 
         // --- LÓGICA PRODUCT FORM ---
-        function renderCategoryInputs() { const sel = document.getElementById('new-cat'); if(sel && config.categories) sel.innerHTML = '<option value="" disabled selected>Seleccione...</option>' + config.categories.map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join(''); }
-        function renderCategoriesManager() { const list = document.getElementById('categories-manager-list'); if(list && config.categories) { list.innerHTML = config.categories.map((c, index) => { const isFirst = index === 0; const isLast = index === config.categories.length - 1; return `<div class="flex items-center gap-3 bg-light border border-border px-4 py-2 rounded-xl shadow-sm"><span class="text-xs uppercase font-bold text-dark">${c}</span><div class="flex items-center gap-2 border-l border-border pl-3"><button onclick="moveCategoryOrder(${index}, -1)" ${isFirst ? 'disabled class="opacity-30 cursor-not-allowed text-muted"' : 'class="text-primary hover:text-dark transition-colors"'}><i class="fas fa-chevron-left text-xs"></i></button><button onclick="moveCategoryOrder(${index}, 1)" ${isLast ? 'disabled class="opacity-30 cursor-not-allowed text-muted"' : 'class="text-primary hover:text-dark transition-colors"'}><i class="fas fa-chevron-right text-xs"></i></button></div><button onclick="removeCategory('${c}')" class="text-muted hover:text-promo ml-2 transition-colors"><i class="fas fa-times-circle"></i></button></div>`; }).join(''); } }
+        function renderCategoryInputs() { 
+            const sel = document.getElementById('new-cat'); 
+            const filterSel = document.getElementById('inv-filter-cat');
+            if(config.categories) {
+                const options = config.categories.map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join('');
+                if(sel) sel.innerHTML = '<option value="" disabled selected>Seleccione...</option>' + options;
+                if(filterSel) filterSel.innerHTML = '<option value="all">Todas las Categorías</option>' + options;
+            }
+        }
+        function renderCategoriesManager() { 
+            const list = document.getElementById('categories-manager-list'); 
+            if(list && config.categories) { 
+                list.innerHTML = config.categories.map((c, index) => { 
+                    const isFirst = index === 0; const isLast = index === config.categories.length - 1; 
+                    return `<div class="flex items-center gap-3 bg-white border border-border px-4 py-2 rounded-xl shadow-sm">
+                        <span class="text-xs uppercase font-bold text-dark">${c}</span>
+                        <div class="flex items-center gap-2 border-l border-border pl-3">
+                            <button onclick="moveCategoryOrder(${index}, -1)" ${isFirst ? 'disabled class="opacity-30 cursor-not-allowed text-muted"' : 'class="text-primary hover:text-dark transition-colors"'}><i class="fas fa-chevron-left text-xs"></i></button>
+                            <button onclick="moveCategoryOrder(${index}, 1)" ${isLast ? 'disabled class="opacity-30 cursor-not-allowed text-muted"' : 'class="text-primary hover:text-dark transition-colors"'}><i class="fas fa-chevron-right text-xs"></i></button>
+                        </div>
+                        <div class="flex items-center gap-1 border-l border-border pl-2 ml-1">
+                            <button onclick="editCategory('${c}')" class="text-muted hover:text-primary transition-colors px-1" title="Editar"><i class="fas fa-pencil-alt text-xs"></i></button>
+                            <button onclick="removeCategory('${c}')" class="text-muted hover:text-promo transition-colors px-1" title="Eliminar"><i class="fas fa-times-circle"></i></button>
+                        </div>
+                    </div>`; 
+                }).join(''); 
+            } 
+        }
         function moveCategoryOrder(index, direction) { if (!config.categories) return; const newIndex = index + direction; if (newIndex < 0 || newIndex >= config.categories.length) return; const cats = [...config.categories]; const temp = cats[index]; cats[index] = cats[newIndex]; cats[newIndex] = temp; db.collection("config").doc("global").set({ categories: cats }, { merge: true }).then(() => Toast.fire({ icon: 'success', title: 'Orden guardado' })); }
         function addNewCategory() { const input = document.getElementById('new-category-name'); const name = input.value.trim().toLowerCase(); if(!name || (config.categories||[]).includes(name)) return; db.collection("config").doc("global").set({ categories: [...(config.categories||[]), name] }, { merge: true }).then(() => input.value = ""); }
         function removeCategory(cat) { if((config.categories||[]).length <= 1) return Toast.fire({ icon: 'warning', title: 'Mínimo una categoría' }); db.collection("config").doc("global").set({ categories: config.categories.filter(c => c !== cat) }, { merge: true }); }
+
+        // C4: Función para Editar Categoría Global
+        async function editCategory(oldCat) {
+            const { value: newCat } = await Swal.fire({
+                title: 'Editar Categoría',
+                input: 'text',
+                inputValue: oldCat,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                background: '#FFFFFF', color: '#2C2421', confirmButtonColor: '#B88645',
+                customClass: { popup: 'rounded-3xl border border-border shadow-float', input: 'border border-border rounded-xl text-center focus:border-primary' }
+            });
+            
+            if (newCat && newCat.trim().toLowerCase() !== oldCat && !config.categories.includes(newCat.trim().toLowerCase())) {
+                const newCatClean = newCat.trim().toLowerCase();
+                const newCats = config.categories.map(c => c === oldCat ? newCatClean : c);
+                
+                Swal.fire({title: 'Actualizando Base de Datos...', text: 'Modificando productos asociados.', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+                
+                try {
+                    const batch = db.batch();
+                    const snapshot = await db.collection("productos").where("categoria", "==", oldCat).get();
+                    snapshot.forEach(doc => { batch.update(doc.ref, { categoria: newCatClean }); });
+                    
+                    await db.collection("config").doc("global").update({ categories: newCats });
+                    await batch.commit();
+                    
+                    Toast.fire({ icon: 'success', title: 'Categoría actualizada con éxito' });
+                } catch (error) {
+                    DarkAlert.fire({ icon: 'error', title: 'Error al actualizar', text: error.message });
+                }
+            } else if (newCat && config.categories.includes(newCat.trim().toLowerCase()) && newCat.trim().toLowerCase() !== oldCat) {
+                Toast.fire({ icon: 'error', title: 'La categoría ya existe' });
+            }
+        }
 
         function toggleMeasuresVisibility() { document.getElementById('measures-config-panel').style.display = document.getElementById('toggle-measures').checked ? 'block' : 'none'; }
         function addNewSizeToForm() { const input = document.getElementById('new-size-input'); const val = input.value.trim().charAt(0).toUpperCase() + input.value.trim().slice(1); if(!val) return; if(!currentFormSizes.includes(val)) { currentFormSizes.push(val); renderMedidasForm(); } else { Toast.fire({ icon: 'info', title: 'Ya existe' }); } input.value = ""; }
@@ -1387,7 +1521,7 @@
             let rowsHTML = currentFormSizes.map(t => {
                 const safeT = t.replace(/[^a-zA-Z0-9_-]/g, '');
                 let inputsHTML = currentFormColumns.map(c => { const safeC = c.replace(/[^a-zA-Z0-9_-]/g, ''); let defaultVal = currentValues[t] && currentValues[t][c] !== undefined ? currentValues[t][c] : (!editId && DEFAULT_MEASURES[t] && DEFAULT_MEASURES[t][c.toLowerCase()] !== undefined ? DEFAULT_MEASURES[t][c.toLowerCase()] : ""); return `<input type="text" id="measure-${safeT}-${safeC}" class="measure-input shadow-inner" value="${defaultVal}">`; }).join('');
-                return `<div class="flex items-center gap-3 mb-3"><div class="w-20"><input type="checkbox" id="t-${safeT}" value="${t}" checked class="hidden"><label for="t-${safeT}" class="block text-center py-2.5 bg-light border border-border text-dark text-[10px] cursor-pointer hover:border-primary font-bold rounded-xl truncate px-1 transition-all shadow-sm">${t}</label></div><div class="flex-1 grid gap-3" style="grid-template-columns: repeat(${currentFormColumns.length}, minmax(0, 1fr));">${inputsHTML}</div><button onclick="removeSizeFromForm('${t}')" class="w-8 h-8 text-muted hover:text-promo bg-light rounded-xl flex items-center justify-center cursor-pointer transition-colors border border-border shadow-sm"><i class="fas fa-trash text-xs"></i></button></div>`;
+                return `<div class="flex items-center gap-3 mb-3"><div class="w-20"><input type="checkbox" id="t-${safeT}" value="${t}" checked class="hidden"><label for="t-${safeT}" class="block text-center py-2.5 bg-white border border-border text-dark text-[10px] cursor-pointer hover:border-primary font-bold rounded-xl truncate px-1 transition-all shadow-sm">${t}</label></div><div class="flex-1 grid gap-3" style="grid-template-columns: repeat(${currentFormColumns.length}, minmax(0, 1fr));">${inputsHTML}</div><button onclick="removeSizeFromForm('${t}')" class="w-8 h-8 text-muted hover:text-promo bg-white rounded-xl flex items-center justify-center cursor-pointer transition-colors border border-border shadow-sm"><i class="fas fa-trash text-xs"></i></button></div>`;
             }).join(''); document.getElementById('medidas-inputs-container').innerHTML = headerHTML + rowsHTML;
         }
 
@@ -1416,13 +1550,17 @@
             document.getElementById('btn-submit-admin').disabled = true; document.getElementById('btn-submit-loader').style.display = "block";
             try {
                 let docId = editId; let docRef = docId ? db.collection("productos").doc(docId) : db.collection("productos").doc(); docId = docRef.id;
-                let imageUrls = []; if (selectedBase64Imgs.length > 0) { imageUrls = await Promise.all(selectedBase64Imgs.map((b64, idx) => uploadImageToStorage(b64, `productos/${docId}/img_${idx}_${Date.now()}.jpg`))); } else { imageUrls = ['https://via.placeholder.com/800x800/FDFDFD/2C2421?text=Sin+Imagen']; }
+                let imageUrls = []; if (selectedBase64Imgs.length > 0) { imageUrls = await Promise.all(selectedBase64Imgs.map((b64, idx) => uploadImageToStorage(b64, `productos/${docId}/img_${idx}_${Date.now()}.jpg`))); } else { imageUrls = ['https://via.placeholder.com/800x800/FFFFFF/2C2421?text=Sin+Imagen']; }
                 const hasMeasures = document.getElementById('toggle-measures').checked; const tallas = []; const medidas = {};
                 if(hasMeasures) { currentFormSizes.forEach(t => { const safeT = t.replace(/[^a-zA-Z0-9_-]/g, ''); const checkbox = document.getElementById(`t-${safeT}`); if(checkbox && checkbox.checked) { tallas.push(t); medidas[t] = {}; currentFormColumns.forEach(c => { const safeC = c.replace(/[^a-zA-Z0-9_-]/g, ''); const inputEl = document.getElementById(`measure-${safeT}-${safeC}`); medidas[t][c] = inputEl ? inputEl.value : ""; }); } }); }
                 
                 const productData = { sku: skuVal, categoria: catVal, titulo: title, descripcion: document.getElementById('new-desc').value.trim() || "", precio: finalPrice, precioOriginal: finalComparePrice, fechaLanzamiento: document.getElementById('new-release-date').value || null, promoType: document.getElementById('new-promo-type').value, ofertaInicio: document.getElementById('new-offer-start').value || null, ofertaFin: document.getElementById('new-offer-end').value || null, stock: parseInt(document.getElementById('new-stock').value) || 0, isPresale: document.getElementById('toggle-presale').checked, taxable: document.getElementById('toggle-taxable').checked, isPinned: document.getElementById('toggle-pinned').checked, hasMeasures, tallas, medidas, columnas: currentFormColumns, imagen: imageUrls[0] || "", imagenes: imageUrls || [] };
                 
-                if (!editId) productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                if (!editId) {
+                    productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    productData.favCount = 0; // Inicializar contador de favoritos
+                }
+                
                 await docRef.set(productData, { merge: true }); Toast.fire({ icon: 'success', title: 'Producto Guardado' }); 
                 const wasEditing = !!editId; cancelEdit(); if (wasEditing) showAdminTab('inventario');
 
@@ -1463,16 +1601,36 @@
         }
 
         // --- LÓGICA DE CONFIGURACIONES ---
-        function escucharConfigGlobal() { db.collection("config").doc("global").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; renderConfig(); renderCategoryInputs(); renderCategoriesManager(); document.getElementById('form-currency-display').innerText = config.currency || '$'; if(document.getElementById('form-currency-display-compare')) document.getElementById('form-currency-display-compare').innerText = config.currency || '$'; } }); }
+        function escucharConfigGlobal() { 
+            db.collection("config").doc("global").onSnapshot((doc) => { 
+                if (doc.exists) { 
+                    config = { ...config, ...doc.data() }; 
+                    renderConfig(); 
+                    renderCategoryInputs(); 
+                    renderCategoriesManager(); 
+                    updateAdminHeaderLogo();
+                    document.getElementById('form-currency-display').innerText = config.currency || '$'; 
+                    if(document.getElementById('form-currency-display-compare')) document.getElementById('form-currency-display-compare').innerText = config.currency || '$'; 
+                } 
+            }); 
+        }
         function escucharHero() { db.collection("config").doc("hero").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; renderHeroConfig(); } }); }
 
         function renderConfig() { 
-            document.getElementById('config-slogan').value = config.slogan || ""; document.getElementById('config-about-title').value = config.aboutTitle || ""; document.getElementById('config-about-desc').value = config.aboutDesc || ""; document.getElementById('config-whatsapp').value = config.whatsapp || ""; document.getElementById('config-instagram').value = config.instagram || ""; document.getElementById('config-facebook').value = config.facebook || ""; document.getElementById('config-invoice-header').value = config.invoiceHeader || ""; document.getElementById('config-invoice-footer').value = config.invoiceFooter || ""; document.getElementById('config-share-text').value = config.shareText || ""; document.getElementById('config-currency').value = config.currency || "$"; document.getElementById('config-pos-timeout').value = config.posTimeout || "0"; document.getElementById('config-tax-enabled').checked = !!config.taxEnabled; document.getElementById('config-tax-rate').value = config.taxRate || 15; document.getElementById('config-pin').value = config.posPin || "";
+            document.getElementById('config-slogan').value = config.slogan || ""; document.getElementById('config-about-title').value = config.aboutTitle || ""; document.getElementById('config-about-desc').value = config.aboutDesc || ""; document.getElementById('config-whatsapp').value = config.whatsapp || ""; document.getElementById('config-instagram').value = config.instagram || ""; document.getElementById('config-facebook').value = config.facebook || ""; document.getElementById('config-tiktok').value = config.tiktok || ""; document.getElementById('config-invoice-header').value = config.invoiceHeader || ""; document.getElementById('config-invoice-footer').value = config.invoiceFooter || ""; document.getElementById('config-share-text').value = config.shareText || ""; document.getElementById('config-currency').value = config.currency || "$"; document.getElementById('config-pos-timeout').value = config.posTimeout || "0"; document.getElementById('config-tax-enabled').checked = !!config.taxEnabled; document.getElementById('config-tax-rate').value = config.taxRate || 15; document.getElementById('config-pin').value = config.posPin || "";
             if(document.getElementById('global-promo-active')) { document.getElementById('global-promo-active').checked = config.globalDiscountActivo || false; document.getElementById('global-promo-val').value = config.globalDiscountValue || 0; }
+            if(document.getElementById('config-hero-active')) { document.getElementById('config-hero-active').checked = config.heroActive !== false; } // Por defecto es true
+            
+            // Render Logo actual
+            if(config.logoUrl) {
+                document.getElementById('logo-preview').src = config.logoUrl;
+                document.getElementById('logo-preview').classList.remove('hidden');
+                document.getElementById('logo-preview-container').classList.add('opacity-0', 'group-hover:opacity-100', 'transition-opacity', 'bg-white/90', 'p-4', 'rounded-2xl', 'backdrop-blur-sm'); // Muestra overlay al hacer hover
+            }
         }
 
         function saveBrandTexts() { db.collection("config").doc("global").set({ slogan: document.getElementById('config-slogan').value, aboutTitle: document.getElementById('config-about-title').value, aboutDesc: document.getElementById('config-about-desc').value, invoiceHeader: document.getElementById('config-invoice-header').value, invoiceFooter: document.getElementById('config-invoice-footer').value }, { merge: true }).then(()=> Toast.fire({ icon:'success', title:'Textos Guardadas' })); }
-        function saveSocials() { db.collection("config").doc("global").set({ whatsapp: document.getElementById('config-whatsapp').value, instagram: document.getElementById('config-instagram').value, facebook: document.getElementById('config-facebook').value, shareText: document.getElementById('config-share-text').value }, { merge: true }).then(()=> Toast.fire({ icon:'success', title:'Redes Guardadas' })); }
+        function saveSocials() { db.collection("config").doc("global").set({ whatsapp: document.getElementById('config-whatsapp').value, instagram: document.getElementById('config-instagram').value, facebook: document.getElementById('config-facebook').value, tiktok: document.getElementById('config-tiktok').value, shareText: document.getElementById('config-share-text').value }, { merge: true }).then(()=> Toast.fire({ icon:'success', title:'Redes Guardadas' })); }
         function saveSystemConfig() { db.collection("config").doc("global").set({ currency: document.getElementById('config-currency').value, posTimeout: document.getElementById('config-pos-timeout').value, taxEnabled: document.getElementById('config-tax-enabled').checked, taxRate: parseFloat(document.getElementById('config-tax-rate').value) || 0 }, { merge: true }).then(()=> { Toast.fire({ icon:'success', title:'Sistema Actualizado' }); resetIdleTimer(); }); }
         function saveGlobalPromo() { const activo = document.getElementById('global-promo-active').checked; const val = parseFloat(document.getElementById('global-promo-val').value) || 0; db.collection("config").doc("global").set({ globalDiscountActivo: activo, globalDiscountValue: val }, {merge:true}).then(()=>Toast.fire({icon:'success', title:'Promo Global Activa'})); }
 
@@ -1495,8 +1653,43 @@
             secondaryApp.auth().createUserWithEmailAndPassword(email, pass).then(() => { secondaryApp.auth().signOut(); Toast.fire({ icon: 'success', title: 'Usuario Registrado Correctamente' }); document.getElementById('new-user-email').value = ""; document.getElementById('new-user-pass').value = ""; }).catch((error) => { let msg = error.message; if (error.code === 'auth/email-already-in-use') msg = 'Este correo ya está en uso.'; DarkAlert.fire({ icon: 'error', title: 'Error al crear', text: msg }); }).finally(() => { btn.disabled = false; btn.innerHTML = `<i class="fas fa-user-plus"></i> Registrar Usuario`; });
         }
 
+        // C9: Cargar y Guardar Logo
+        function compressLogoImage(input) {
+            if (!input.files || !input.files[0]) return; const reader = new FileReader(); reader.readAsDataURL(input.files[0]); reader.onload = function(e) { const img = new Image(); img.src = e.target.result; img.onload = function() { const canvas = document.createElement('canvas'); let w = img.width > 500 ? 500 : img.width; canvas.width = w; canvas.height = img.height * (w / img.width); canvas.getContext('2d').drawImage(img, 0, 0, w, canvas.height); selectedLogoImg = canvas.toDataURL('image/png', 0.9); document.getElementById('logo-preview').src = selectedLogoImg; document.getElementById('logo-preview').classList.remove('hidden'); document.getElementById('logo-preview-container').classList.add('opacity-0', 'group-hover:opacity-100', 'transition-opacity', 'bg-white/90', 'p-4', 'rounded-2xl', 'backdrop-blur-sm'); } }
+        }
+
         function compressHeroImage(input) { if (!input.files || !input.files[0]) return; const reader = new FileReader(); reader.readAsDataURL(input.files[0]); reader.onload = function(e) { const img = new Image(); img.src = e.target.result; img.onload = function() { const canvas = document.createElement('canvas'); let w = img.width > 1200 ? 1200 : img.width; canvas.width = w; canvas.height = img.height * (w / img.width); canvas.getContext('2d').drawImage(img, 0, 0, w, canvas.height); selectedHeroImg = canvas.toDataURL('image/jpeg', 0.8); document.getElementById('hero-preview').src = selectedHeroImg; document.getElementById('hero-preview').classList.remove('hidden'); document.getElementById('hero-preview-container').classList.add('bg-white/90'); } } }
-        async function saveHeroConfig() { const btn = document.getElementById('btn-save-hero'); btn.innerHTML = "<div class='loader !border-t-white !border-white/30 !block w-4 h-4 mx-auto'></div>"; btn.disabled = true; try { let img = config.heroImage || ""; if (selectedHeroImg) img = await uploadImageToStorage(selectedHeroImg, `config/hero_bg_${Date.now()}.jpg`); await db.collection("config").doc("hero").set({ heroTitle: document.getElementById('config-hero-title').value, heroSubtitle: document.getElementById('config-hero-subtitle').value, heroImage: img }, { merge: true }); btn.innerText = "¡Actualizado!"; setTimeout(() => { btn.innerHTML = "<i class='fas fa-save mr-2'></i> Actualizar Banner Web"; btn.disabled = false; }, 2000); } catch (e) { btn.disabled = false; btn.innerHTML = "<i class='fas fa-save mr-2'></i> Actualizar Banner Web"; } }
+        
+        async function saveAppearanceConfig() { 
+            const btn = document.getElementById('btn-save-appearance'); 
+            btn.innerHTML = "<div class='loader !border-t-white !border-white/30 !block w-4 h-4 mx-auto'></div>"; 
+            btn.disabled = true; 
+            try { 
+                let imgBanner = config.heroImage || ""; 
+                if (selectedHeroImg) imgBanner = await uploadImageToStorage(selectedHeroImg, `config/hero_bg_${Date.now()}.jpg`); 
+                
+                let imgLogo = config.logoUrl || "";
+                if (selectedLogoImg) imgLogo = await uploadImageToStorage(selectedLogoImg, `config/logo_${Date.now()}.png`);
+                
+                await db.collection("config").doc("hero").set({ 
+                    heroTitle: document.getElementById('config-hero-title').value, 
+                    heroSubtitle: document.getElementById('config-hero-subtitle').value, 
+                    heroImage: imgBanner 
+                }, { merge: true }); 
+                
+                await db.collection("config").doc("global").set({ 
+                    logoUrl: imgLogo,
+                    heroActive: document.getElementById('config-hero-active').checked
+                }, { merge: true }); 
+
+                btn.innerText = "¡Apariencia Actualizada!"; 
+                setTimeout(() => { btn.innerHTML = "<i class='fas fa-save mr-2'></i> Guardar Cambios de Apariencia"; btn.disabled = false; }, 2000); 
+            } catch (e) { 
+                btn.disabled = false; btn.innerHTML = "<i class='fas fa-save mr-2'></i> Guardar Cambios de Apariencia"; 
+                DarkAlert.fire({ icon: 'error', title: 'Error', text: e.message });
+            } 
+        }
+
         function renderHeroConfig() { document.getElementById('config-hero-title').value = config.heroTitle || ""; document.getElementById('config-hero-subtitle').value = config.heroSubtitle || ""; if(config.heroImage) { document.getElementById('hero-preview').src = config.heroImage; document.getElementById('hero-preview').classList.remove('hidden'); document.getElementById('hero-preview-container').classList.add('bg-white/90'); } }
 
         window.onload = init;

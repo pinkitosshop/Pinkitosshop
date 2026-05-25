@@ -39,12 +39,13 @@
                         primary: '#B88645', // Luxury Gold / Camel
                         secondary: '#8C6239', // Warm Bronze
                         dark: '#2C2421', // Espresso Charcoal text
-                        light: '#FDFDFD', // Premium Clean White
-                        card: '#FFFFFF', // Card Pure White
-                        border: '#F0EBE6', // Soft elegant border
-                        muted: '#A09893', // Muted elegant grey-brown
-                        promo: '#CD7F6F', // Elegant Terracotta for promos
-                        success: '#729B79'  // Sophisticated Sage Green
+                        light: '#F3F4F6', // C6: Fondo sutil para crear contraste con componentes blancos
+                        card: '#FFFFFF', // C6: Blanco puro para las tarjetas de productos y modales
+                        border: '#E5E7EB', // Gris sutil para bordes
+                        muted: '#9CA3AF', // Gris elegante
+                        promo: '#E63946', // C8: Rojo vibrante (ofertas y favoritos)
+                        success: '#729B79', // Sophisticated Sage Green
+                        accent: '#6EC1E4'  // C8: Pantone Azul (detalles del logo)
                     }, 
                     fontFamily: { 
                         sans: ['"Poppins"', 'sans-serif'], 
@@ -63,7 +64,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
         
-        body { background-color: #FDFDFD; color: #2C2421; padding-bottom: 70px; }
+        body { background-color: #F3F4F6; color: #2C2421; padding-bottom: 70px; }
         @media (min-width: 768px) { body { padding-bottom: 0; } }
         
         .section-fade { display: none; opacity: 0; transition: opacity 0.4s ease-in-out; }
@@ -71,12 +72,12 @@
         
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44, 36, 33, 0.4); z-index: 200; backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 20px; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: #FFFFFF; border: 1px solid #F0EBE6; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(44, 36, 33, 0.25); max-width: 1200px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
+        .modal-content { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(44, 36, 33, 0.25); max-width: 1200px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
         
-        .hero-bg { background-color: #F0EBE6; background-size: cover; background-position: center; background-repeat: no-repeat; border-radius: 0 0 40px 40px; }
-        .hero-overlay { background: linear-gradient(to top, rgba(253, 253, 253, 1) 0%, rgba(253, 253, 253, 0) 100%); }
+        .hero-bg { background-color: #E5E7EB; background-size: cover; background-position: center; background-repeat: no-repeat; border-radius: 0 0 40px 40px; }
+        .hero-overlay { background: linear-gradient(to top, rgba(243, 244, 246, 1) 0%, rgba(243, 244, 246, 0) 100%); }
         
-        .loader { border: 3px solid rgba(184, 134, 69, 0.3); border-radius: 50%; border-top: 3px solid #B88645; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
+        .loader { border: 3px solid rgba(110, 193, 228, 0.3); border-radius: 50%; border-top: 3px solid #6EC1E4; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -98,8 +99,8 @@
             
             <!-- Logo Mix (Icon + Text) -->
             <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity shrink-0" onclick="showSection('inicio')">
-                <!-- Icono de Gatito -->
-                <div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary text-xl">
+                <!-- C9: Logo Tienda Dinámico -->
+                <div class="header-logo-container w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-accent text-xl transition-all">
                     <i class="fas fa-cat"></i>
                 </div>
                 <div class="font-bold text-2xl md:text-3xl tracking-tight text-dark">
@@ -109,7 +110,7 @@
             
             <div class="flex-1 max-w-md relative group hidden md:block ml-auto mr-8">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-muted group-hover:text-primary transition-colors text-sm"></i>
-                <input type="text" id="live-search" oninput="handleSearch(this.value)" placeholder="Buscar juguetes o coleccionables..." class="w-full bg-light border border-border pl-10 pr-4 py-2.5 rounded-2xl text-dark outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium">
+                <input type="text" id="live-search" oninput="handleSearch(this.value)" placeholder="Buscar juguetes o coleccionables..." class="w-full bg-white border border-border pl-10 pr-4 py-2.5 rounded-2xl text-dark outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium shadow-sm">
             </div>
 
             <nav class="hidden md:flex space-x-6 items-center shrink-0">
@@ -121,7 +122,10 @@
                 <span onclick="showSection('nosotros')" class="cursor-pointer text-sm font-semibold text-dark hover:text-primary transition-colors">Nosotros</span>
                 
                 <div class="flex items-center gap-4 border-l border-border pl-6 ml-2">
-                    <button onclick="abrirWishlist()" class="text-dark hover:text-promo transition-colors relative" title="Favoritos"><i class="far fa-heart text-xl"></i></button>
+                    <button onclick="abrirWishlist()" class="text-dark hover:text-promo transition-colors relative" title="Favoritos">
+                        <!-- C7: Icono Favoritos Barra Menu -->
+                        <i id="nav-wishlist-icon" class="far fa-heart text-xl"></i>
+                    </button>
                     <button onclick="abrirMisPedidos()" class="text-dark hover:text-primary transition-colors relative" title="Mis Pedidos"><i class="fas fa-box-open text-xl"></i></button>
                     <button onclick="toggleCartDrawer()" class="bg-dark text-white hover:bg-primary transition-colors px-4 py-2.5 rounded-2xl flex items-center gap-2 font-semibold shadow-md">
                         <i class="fas fa-shopping-bag"></i>
@@ -139,7 +143,7 @@
             </div>
         </div>
         <div id="mobile-search-container" class="md:hidden absolute top-20 left-0 w-full bg-white shadow-sm border-b border-border p-4 transition-transform origin-top scale-y-0 hidden z-[90]">
-            <div class="relative"><i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-muted text-sm"></i><input type="text" id="mobile-live-search" oninput="handleSearch(this.value)" placeholder="Buscar productos..." class="w-full bg-light border border-border pl-10 pr-4 py-3 rounded-2xl text-dark outline-none focus:border-primary transition-all text-sm font-medium"></div>
+            <div class="relative"><i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-muted text-sm"></i><input type="text" id="mobile-live-search" oninput="handleSearch(this.value)" placeholder="Buscar productos..." class="w-full bg-white border border-border pl-10 pr-4 py-3 rounded-2xl text-dark outline-none focus:border-primary transition-all text-sm font-medium shadow-sm"></div>
         </div>
     </header>
 
@@ -147,7 +151,7 @@
     <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-border z-[150] flex justify-around items-center pt-2 pb-safe h-16 shadow-[0_-5px_20px_rgba(44,36,33,0.05)] rounded-t-3xl">
         <button onclick="showSection('inicio')" class="flex flex-col items-center text-muted hover:text-primary transition-colors w-16"><i class="fas fa-home text-lg mb-1"></i><span class="text-[10px] font-semibold">Inicio</span></button>
         <button onclick="toggleMobileCategories()" class="flex flex-col items-center text-muted hover:text-primary transition-colors w-16"><i class="fas fa-shapes text-lg mb-1"></i><span class="text-[10px] font-semibold">Catálogo</span></button>
-        <button onclick="abrirWishlist()" class="flex flex-col items-center text-muted hover:text-promo transition-colors w-16"><i class="fas fa-heart text-lg mb-1"></i><span class="text-[10px] font-semibold">Favoritos</span></button>
+        <button onclick="abrirWishlist()" class="flex flex-col items-center text-muted hover:text-promo transition-colors w-16"><i id="nav-wishlist-icon-mobile" class="far fa-heart text-lg mb-1"></i><span class="text-[10px] font-semibold">Favoritos</span></button>
         <button onclick="abrirMisPedidos()" class="flex flex-col items-center text-muted hover:text-primary transition-colors w-16"><i class="fas fa-box-open text-lg mb-1"></i><span class="text-[10px] font-semibold">Pedidos</span></button>
     </nav>
 
@@ -155,7 +159,7 @@
     <div id="mobile-cat-drawer" class="fixed inset-y-0 left-0 w-72 bg-white border-r border-border z-[200] transform -translate-x-full transition-transform duration-300 pt-20 pb-20 overflow-y-auto shadow-2xl">
         <div class="px-6 py-5 border-b border-border flex justify-between items-center sticky top-0 bg-white z-10">
             <h3 class="text-dark font-bold text-lg"><i class="fas fa-list-ul mr-2 text-primary"></i> Categorías</h3>
-            <button onclick="toggleMobileCategories()" class="text-muted hover:text-dark w-8 h-8 rounded-full bg-light flex items-center justify-center"><i class="fas fa-times"></i></button>
+            <button onclick="toggleMobileCategories()" class="text-muted hover:text-dark w-8 h-8 rounded-full bg-light flex items-center justify-center border border-border"><i class="fas fa-times"></i></button>
         </div>
         <div id="mobile-nav-categories" class="flex flex-col p-4 space-y-2"></div>
     </div>
@@ -165,10 +169,10 @@
     <div id="cart-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[450px] bg-white border-l border-border z-[210] transform translate-x-full transition-transform duration-300 flex flex-col shadow-float rounded-l-3xl">
         <div class="px-6 py-5 border-b border-border flex justify-between items-center shrink-0">
             <h2 class="text-dark font-bold text-2xl tracking-tight"><i class="fas fa-shopping-cart text-primary mr-2"></i> Tu Cesta</h2>
-            <button onclick="toggleCartDrawer()" class="text-muted hover:text-dark text-xl w-10 h-10 bg-light flex items-center justify-center rounded-full transition-colors"><i class="fas fa-times"></i></button>
+            <button onclick="toggleCartDrawer()" class="text-muted hover:text-dark text-xl w-10 h-10 bg-light flex items-center justify-center rounded-full transition-colors border border-border"><i class="fas fa-times"></i></button>
         </div>
         
-        <div id="cart-promo-banner" class="hidden bg-primary/10 border-b border-primary/20 px-6 py-2.5 text-center text-xs text-primary font-bold">
+        <div id="cart-promo-banner" class="hidden bg-promo/10 border-b border-promo/20 px-6 py-2.5 text-center text-xs text-promo font-bold">
             <i class="fas fa-tag mr-1"></i> ¡Descuento global aplicado en la tienda!
         </div>
 
@@ -180,7 +184,7 @@
                     <span>Subtotal Original</span>
                     <span id="cart-drawer-subtotal-orig" class="line-through">L0.00</span>
                 </div>
-                <div id="cart-drawer-savings-row" class="hidden flex justify-between items-center text-primary text-sm font-bold">
+                <div id="cart-drawer-savings-row" class="hidden flex justify-between items-center text-promo text-sm font-bold">
                     <span>Ahorro Total</span>
                     <span id="cart-drawer-savings">- L0.00</span>
                 </div>
@@ -193,8 +197,8 @@
             
             <div id="checkout-form" class="space-y-4 mb-4 hidden bg-light p-4 rounded-2xl border border-border">
                 <label class="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Datos de Envío</label>
-                <input type="text" id="cliente-nombre" placeholder="Tu Nombre Completo" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl">
-                <textarea id="mensaje" rows="2" maxlength="150" placeholder="Nota adicional (Ej. Para regalo)" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all resize-none rounded-xl"></textarea>
+                <input type="text" id="cliente-nombre" placeholder="Tu Nombre Completo" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl shadow-sm">
+                <textarea id="mensaje" rows="2" maxlength="150" placeholder="Nota adicional (Ej. Para regalo)" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all resize-none rounded-xl shadow-sm"></textarea>
             </div>
 
             <button id="btn-checkout-init" onclick="iniciarCheckout()" class="w-full py-4 bg-primary text-white font-bold text-lg hover:bg-[#A6763A] transition-colors shadow-md rounded-2xl">Procesar Pedido</button>
@@ -205,18 +209,18 @@
 
     <!-- MODALES SECUNDARIOS -->
     <div id="mis-pedidos-modal" class="modal-overlay" onclick="cerrarMisPedidos(event)">
-        <div class="modal-content p-8 animate-in fade-in zoom-in duration-300 max-w-lg" onclick="event.stopPropagation()">
-            <button onclick="cerrarMisPedidos()" class="absolute top-4 right-4 text-muted hover:text-dark text-xl z-30 transition-colors w-10 h-10 bg-light rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+        <div class="modal-content p-8 animate-in fade-in zoom-in duration-300 max-w-lg bg-white" onclick="event.stopPropagation()">
+            <button onclick="cerrarMisPedidos()" class="absolute top-4 right-4 text-muted hover:text-dark text-xl z-30 transition-colors w-10 h-10 bg-light rounded-full flex items-center justify-center border border-border"><i class="fas fa-times"></i></button>
             <h2 class="font-bold text-2xl text-dark mb-2 border-b border-border pb-4"><i class="fas fa-box-open text-primary mr-2"></i> Mis Pedidos</h2>
             <p class="text-sm text-muted mb-4 font-medium">Historial de tus compras recientes</p>
             <div id="lista-mis-pedidos" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
-            <button onclick="limpiarMisPedidos()" class="w-full mt-6 bg-light text-secondary border border-secondary/20 py-3 font-bold text-sm hover:bg-secondary hover:text-white transition-all rounded-xl">Borrar Historial</button>
+            <button onclick="limpiarMisPedidos()" class="w-full mt-6 bg-white text-secondary border border-border py-3 font-bold text-sm hover:bg-secondary hover:text-white transition-all rounded-xl shadow-sm">Borrar Historial</button>
         </div>
     </div>
 
     <div id="wishlist-modal" class="modal-overlay" onclick="cerrarWishlist(event)">
-        <div class="modal-content p-8 animate-in fade-in zoom-in duration-300 max-w-lg" onclick="event.stopPropagation()">
-            <button onclick="cerrarWishlist()" class="absolute top-4 right-4 text-muted hover:text-dark text-xl z-30 transition-colors w-10 h-10 bg-light rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+        <div class="modal-content p-8 animate-in fade-in zoom-in duration-300 max-w-lg bg-white" onclick="event.stopPropagation()">
+            <button onclick="cerrarWishlist()" class="absolute top-4 right-4 text-muted hover:text-dark text-xl z-30 transition-colors w-10 h-10 bg-light rounded-full flex items-center justify-center border border-border"><i class="fas fa-times"></i></button>
             <h2 class="font-bold text-2xl text-dark mb-2 border-b border-border pb-4"><i class="fas fa-heart text-promo mr-2"></i> Favoritos</h2>
             <p class="text-sm text-muted mb-4 font-medium">Artículos que te han encantado</p>
             <div id="lista-wishlist" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2"></div>
@@ -227,14 +231,14 @@
     <div id="product-modal" class="modal-overlay z-[250]" onclick="closeModal(event)">
         <button onclick="closeModal()" class="absolute top-4 right-4 md:top-6 md:right-6 text-dark hover:text-primary text-xl z-[300] transition-colors bg-white border border-border w-12 h-12 rounded-full flex items-center justify-center shadow-md cursor-pointer"><i class="fas fa-times"></i></button>
 
-        <div class="modal-content animate-in fade-in zoom-in duration-300 !max-w-5xl rounded-3xl overflow-y-auto overflow-x-hidden overscroll-none border-0 shadow-float" onclick="event.stopPropagation()">
+        <div class="modal-content animate-in fade-in zoom-in duration-300 !max-w-5xl rounded-3xl overflow-y-auto overflow-x-hidden overscroll-none border-0 shadow-float bg-white" onclick="event.stopPropagation()">
             <div class="grid grid-cols-1 lg:grid-cols-2 bg-white">
                 
-                <div id="modal-img-container" class="h-[350px] sm:h-[450px] lg:h-[650px] bg-light/50 flex flex-col items-center justify-center relative group select-none rounded-t-3xl lg:rounded-l-3xl lg:rounded-tr-none border-b lg:border-b-0 lg:border-r border-border" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)">
+                <div id="modal-img-container" class="h-[350px] sm:h-[450px] lg:h-[650px] bg-white flex flex-col items-center justify-center relative group select-none rounded-t-3xl lg:rounded-l-3xl lg:rounded-tr-none border-b lg:border-b-0 lg:border-r border-border" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)">
                     <div id="modal-badges-container" class="absolute top-6 left-6 z-30 flex flex-col gap-2"></div>
                     <button id="btn-prev-img" onclick="changeImage(-1)" class="absolute left-4 z-20 text-dark bg-white/80 backdrop-blur-md border border-border w-10 h-10 rounded-full flex items-center justify-center hover:text-primary transition-all opacity-0 group-hover:opacity-100 hidden shadow-md"><i class="fas fa-chevron-left"></i></button>
                     <img id="modal-img" src="" alt="Producto" class="max-w-[85%] max-h-[85%] object-contain absolute inset-0 m-auto drop-shadow-2xl transition-opacity duration-300">
-                    <div id="modal-img-loader" class="absolute inset-0 flex items-center justify-center bg-light/80 z-10 hidden"><div class="loader !block"></div></div>
+                    <div id="modal-img-loader" class="absolute inset-0 flex items-center justify-center bg-white/80 z-10 hidden"><div class="loader !block"></div></div>
                     <button id="btn-next-img" onclick="changeImage(1)" class="absolute right-4 z-20 text-dark bg-white/80 backdrop-blur-md border border-border w-10 h-10 rounded-full flex items-center justify-center hover:text-primary transition-all opacity-0 group-hover:opacity-100 hidden shadow-md"><i class="fas fa-chevron-right"></i></button>
                     <div id="carousel-dots" class="absolute bottom-6 flex justify-center w-full space-x-2 z-20 mx-auto"></div>
                 </div>
@@ -243,11 +247,11 @@
                     
                     <div class="flex justify-between items-start mb-2">
                         <h2 id="modal-title" class="font-bold text-2xl md:text-3xl text-dark leading-tight pr-4"></h2>
-                        <button onclick="shareProduct()" class="text-muted hover:text-dark transition-colors bg-light rounded-full w-10 h-10 flex items-center justify-center shrink-0"><i class="fas fa-share-alt"></i></button>
+                        <button onclick="shareProduct()" class="text-muted hover:text-dark transition-colors bg-light rounded-full w-10 h-10 flex items-center justify-center shrink-0 border border-border"><i class="fas fa-share-alt"></i></button>
                     </div>
                     
                     <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-border">
-                        <p id="modal-cat" class="bg-light text-primary px-3 py-1 text-xs font-bold rounded-full"></p>
+                        <p id="modal-cat" class="bg-white border border-border text-primary px-3 py-1 text-xs font-bold rounded-full"></p>
                         <p id="modal-sku-display" class="text-muted text-xs font-semibold font-mono"></p>
                         <span id="modal-status-badge" class="px-2 py-1 text-[10px] font-bold uppercase rounded hidden"></span>
                     </div>
@@ -256,8 +260,8 @@
                     
                     <!-- ACORDEÓN DE MEDIDAS -->
                     <div id="modal-measures-container" class="mb-6 hidden">
-                        <details class="group bg-light border border-border rounded-2xl">
-                            <summary class="flex justify-between items-center font-bold cursor-pointer p-5 text-dark text-sm select-none">
+                        <details class="group bg-white border border-border rounded-2xl shadow-sm">
+                            <summary class="flex justify-between items-center font-bold cursor-pointer p-5 text-dark text-sm select-none hover:bg-light transition-colors rounded-2xl">
                                 <span class="flex items-center gap-2"><i class="fas fa-ruler-combined text-primary"></i> Guía de Medidas (cm)</span>
                                 <span class="transition group-open:rotate-180 text-muted"><i class="fas fa-chevron-down"></i></span>
                             </summary>
@@ -272,7 +276,7 @@
 
                     <div id="modal-talla-select-container" class="mb-8 hidden">
                         <label class="text-xs text-muted font-bold mb-2 block">Variante / Tamaño <span class="text-promo">*</span></label>
-                        <select id="modal-talla" class="w-full bg-light border border-border px-4 py-3.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm font-semibold transition-colors cursor-pointer rounded-xl appearance-none relative"></select>
+                        <select id="modal-talla" class="w-full bg-white border border-border px-4 py-3.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm font-semibold transition-colors cursor-pointer rounded-xl appearance-none relative shadow-sm"></select>
                     </div>
 
                     <div class="flex flex-col lg:flex-row justify-between items-end gap-6 mt-auto pt-6 border-t border-border">
@@ -281,10 +285,10 @@
                         
                         <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
                             <!-- SELECTOR DE CANTIDAD -->
-                            <div id="modal-quantity-container" class="flex items-center gap-3 bg-light border border-border rounded-xl p-1.5 w-full sm:w-auto shrink-0 justify-between sm:justify-start">
-                                <button onclick="updateQuantity(-1)" class="w-10 h-10 text-dark hover:bg-white hover:text-primary rounded-lg transition-colors shadow-sm"><i class="fas fa-minus text-xs"></i></button>
+                            <div id="modal-quantity-container" class="flex items-center gap-3 bg-white border border-border rounded-xl p-1.5 w-full sm:w-auto shrink-0 justify-between sm:justify-start shadow-sm">
+                                <button onclick="updateQuantity(-1)" class="w-10 h-10 text-dark hover:bg-light hover:text-primary rounded-lg transition-colors"><i class="fas fa-minus text-xs"></i></button>
                                 <span id="modal-quantity" class="text-dark text-lg font-bold w-8 text-center select-none">1</span>
-                                <button onclick="updateQuantity(1)" class="w-10 h-10 text-dark hover:bg-white hover:text-primary rounded-lg transition-colors shadow-sm"><i class="fas fa-plus text-xs"></i></button>
+                                <button onclick="updateQuantity(1)" class="w-10 h-10 text-dark hover:bg-light hover:text-primary rounded-lg transition-colors"><i class="fas fa-plus text-xs"></i></button>
                             </div>
                             
                             <button id="btn-add-cart" onclick="agregarAlPedido()" class="w-full sm:w-auto bg-primary text-white px-8 py-4 font-bold text-sm hover:bg-[#A6763A] transition-all text-center flex items-center justify-center gap-3 rounded-xl shadow-md">
@@ -301,6 +305,7 @@
     <!-- SECCIONES PRINCIPALES REDISEÑADAS -->
     <div id="inicio" class="section-fade active pt-20">
         
+        <!-- C3: Hero Banner ocultable -->
         <section id="hero-display" class="h-[50vh] md:h-[65vh] flex items-center justify-center text-center relative overflow-hidden hero-bg mx-2 md:mx-6 mt-4">
             <!-- Capa Decorativa -->
             <div class="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
@@ -321,10 +326,10 @@
             </div>
             
             <div class="w-full">
-                <!-- Grid actualizado a estilo card -->
+                <!-- Grid actualizado a estilo card pura blanca -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 transition-opacity duration-300 min-h-[400px]" id="gallery-grid">
                     <div class="col-span-full text-center py-20 flex flex-col items-center justify-center">
-                            <div class="loader !border-t-primary !border-border !w-10 !h-10 mb-4 !block"></div>
+                            <div class="loader !border-t-accent !border-border !w-10 !h-10 mb-4 !block"></div>
                             <p class="text-muted font-semibold text-sm">Cargando magia...</p>
                     </div>
                 </div>
@@ -332,24 +337,26 @@
         </section>
     </div>
 
-    <div id="nosotros" class="section-fade pt-32 bg-light min-h-screen">
+    <div id="nosotros" class="section-fade pt-32 min-h-screen">
         <div class="max-w-4xl mx-auto px-6 text-center">
-            <div class="w-24 h-24 bg-white rounded-full mx-auto mb-8 shadow-sm flex items-center justify-center text-4xl text-primary border border-border">
+            <div class="w-24 h-24 bg-white rounded-full mx-auto mb-8 shadow-sm flex items-center justify-center text-4xl text-accent border border-border">
                 <i class="fas fa-store"></i>
             </div>
             <h1 class="font-bold text-4xl md:text-5xl text-dark mb-8" id="display-about-title"></h1>
-            <p class="text-secondary leading-relaxed text-base md:text-lg mb-12 font-medium" id="display-about-desc"></p>
+            <p class="text-secondary leading-relaxed text-base md:text-lg mb-12 font-medium bg-white p-6 rounded-3xl border border-border shadow-sm inline-block" id="display-about-desc"></p>
             <div class="w-16 h-1 bg-border mx-auto mb-12 rounded-full"></div>
             
-            <div class="flex justify-center gap-8">
+            <div class="flex justify-center gap-6 flex-wrap">
                 <a href="#" id="link-instagram" target="_blank" class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-2xl text-dark shadow-sm hover:shadow-md hover:text-primary transition-all border border-border"><i class="fab fa-instagram"></i></a>
                 <a href="#" id="link-facebook" target="_blank" class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-2xl text-dark shadow-sm hover:shadow-md hover:text-primary transition-all border border-border"><i class="fab fa-facebook"></i></a>
-                <a href="#" id="link-whatsapp" target="_blank" class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-2xl text-dark shadow-sm hover:shadow-md hover:text-primary transition-all border border-border"><i class="fab fa-whatsapp"></i></a>
+                <!-- C1: Botón de TikTok en Tienda Clientes -->
+                <a href="#" id="link-tiktok" target="_blank" class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-2xl text-dark shadow-sm hover:shadow-md hover:text-primary transition-all border border-border"><i class="fab fa-tiktok"></i></a>
+                <a href="#" id="link-whatsapp" target="_blank" class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-2xl text-dark shadow-sm hover:shadow-md hover:text-[#25D366] transition-all border border-border"><i class="fab fa-whatsapp"></i></a>
             </div>
         </div>
     </div>
 
-    <footer class="py-12 bg-white text-center border-t border-border mt-auto">
+    <footer class="py-12 bg-white text-center border-t border-border mt-auto shadow-[0_-5px_15px_rgba(0,0,0,0.02)]">
         <p class="text-muted text-sm font-semibold">© <span id="current-year"></span> Pinkitos Shop | Hecho con <i class="fas fa-heart text-promo mx-1"></i></p>
     </footer>
 
@@ -357,9 +364,9 @@
         // LÓGICA DE NEGOCIO Y RENDERIZADO REESCRITA CON NUEVAS CLASES (Misma estructura backend)
         
         document.getElementById('current-year').innerText = new Date().getFullYear();
-        const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000, background: '#FFFFFF', color: '#2C2421', iconColor: '#B88645', customClass: { popup: 'border border-[#F0EBE6] rounded-xl shadow-float !py-3 !px-5', title: '!text-sm !font-bold' }});
+        const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000, background: '#FFFFFF', color: '#2C2421', iconColor: '#B88645', customClass: { popup: 'border border-[#E5E7EB] rounded-xl shadow-float !py-3 !px-5', title: '!text-sm !font-bold' }});
 
-        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", categories: ["figuras", "peluches"], heroTitle: "Bienvenido a Pinkitos", heroSubtitle: "Coleccionables y Juguetes", heroImage: "", shareText: "¡Mira este juguete!", currency: "$", taxEnabled: false, taxRate: 15, globalDiscountActivo: false, globalDiscountValue: 0 };
+        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", categories: ["figuras", "peluches"], heroTitle: "Bienvenido a Pinkitos", heroSubtitle: "Coleccionables y Juguetes", heroImage: "", logoUrl: "", heroActive: true, shareText: "¡Mira este juguete!", currency: "$", taxEnabled: false, taxRate: 15, globalDiscountActivo: false, globalDiscountValue: 0 };
 
         let inventario = []; let config = { ...DEFAULT_CONFIG };
         let carrito = []; let wishlist = []; let currentModalImages = [];
@@ -399,7 +406,7 @@
             format: function(num) { return (config.currency || '$') + Number(num).toFixed(2); }
         };
 
-        function init() { cargarDatosLocales(); applyConfig(); escucharFirebase(); escucharHero(); escucharConfigGlobal(); renderCarrito(); }
+        function init() { cargarDatosLocales(); applyConfig(); escucharFirebase(); escucharHero(); escucharConfigGlobal(); renderCarrito(); updateWishlistNav(); }
         
         function cargarDatosLocales() { try { const sc = localStorage.getItem('pk_carrito'); if(sc) carrito = JSON.parse(sc); const sw = localStorage.getItem('pk_wishlist'); if(sw) wishlist = JSON.parse(sw); } catch (e) {} }
         
@@ -411,17 +418,60 @@
         // Mis Pedidos
         function abrirMisPedidos() { renderMisPedidos(); document.getElementById('mis-pedidos-modal').classList.add('active'); }
         function cerrarMisPedidos(e) { if(e) e.stopPropagation(); document.getElementById('mis-pedidos-modal').classList.remove('active'); }
-        function renderMisPedidos() { const lista = document.getElementById('lista-mis-pedidos'); const h = JSON.parse(localStorage.getItem('pk_pedidos') || '[]'); if(h.length===0) return lista.innerHTML = `<div class="text-center py-8"><div class="w-16 h-16 bg-light rounded-full mx-auto flex items-center justify-center text-muted mb-3"><i class="fas fa-box-open text-2xl"></i></div><p class="text-muted text-sm font-semibold">No tienes compras recientes</p></div>`; lista.innerHTML = h.reverse().map(pedido => `<div class="bg-white border border-border p-5 rounded-2xl mb-4 shadow-sm"><div class="flex justify-between items-center mb-4 border-b border-light pb-3"><span class="text-dark font-bold text-sm">Pedido: ${pedido.idPedido}</span><span class="text-muted text-xs font-medium">${new Date(pedido.fecha).toLocaleDateString()}</span></div><div class="space-y-3 mb-4">${pedido.items.map(item => `<div class="flex items-center gap-3 bg-light border border-border p-2.5 rounded-xl"><div class="w-12 h-12 bg-white rounded-lg border border-border overflow-hidden shrink-0"><img src="${item.img}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><p class="text-dark text-xs font-bold truncate">${item.titulo}</p><p class="text-muted text-[10px] mt-0.5">Tipo: <span class="text-dark font-semibold">${item.talla}</span> | Cant: <span class="text-primary font-bold">x${item.cantidad}</span></p></div><div class="text-right shrink-0"><button onclick="cerrarMisPedidos(); openModalById('${item.id}')" class="bg-white hover:bg-primary hover:text-white border border-border text-dark p-2 rounded-lg transition-colors text-xs shadow-sm"><i class="fas fa-redo"></i></button></div></div>`).join('')}</div><div class="text-right border-t border-light pt-3"><span class="text-dark font-bold">Total: ${config.currency||'$'}${(pedido.total||0).toFixed(2)}</span></div></div>`).join(''); }
+        function renderMisPedidos() { const lista = document.getElementById('lista-mis-pedidos'); const h = JSON.parse(localStorage.getItem('pk_pedidos') || '[]'); if(h.length===0) return lista.innerHTML = `<div class="text-center py-8"><div class="w-16 h-16 bg-white border border-border rounded-full mx-auto flex items-center justify-center text-muted mb-3 shadow-sm"><i class="fas fa-box-open text-2xl"></i></div><p class="text-muted text-sm font-semibold">No tienes compras recientes</p></div>`; lista.innerHTML = h.reverse().map(pedido => `<div class="bg-white border border-border p-5 rounded-2xl mb-4 shadow-sm"><div class="flex justify-between items-center mb-4 border-b border-border pb-3"><span class="text-dark font-bold text-sm">Pedido: ${pedido.idPedido}</span><span class="text-muted text-xs font-medium">${new Date(pedido.fecha).toLocaleDateString()}</span></div><div class="space-y-3 mb-4">${pedido.items.map(item => `<div class="flex items-center gap-3 bg-white border border-border shadow-sm p-2.5 rounded-xl"><div class="w-12 h-12 bg-white rounded-lg border border-border overflow-hidden shrink-0"><img src="${item.img}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><p class="text-dark text-xs font-bold truncate">${item.titulo}</p><p class="text-muted text-[10px] mt-0.5">Tipo: <span class="text-dark font-semibold">${item.talla}</span> | Cant: <span class="text-primary font-bold">x${item.cantidad}</span></p></div><div class="text-right shrink-0"><button onclick="cerrarMisPedidos(); openModalById('${item.id}')" class="bg-white hover:bg-light border border-border text-dark p-2 rounded-lg transition-colors text-xs shadow-sm"><i class="fas fa-redo"></i></button></div></div>`).join('')}</div><div class="text-right border-t border-border pt-3"><span class="text-dark font-bold">Total: ${config.currency||'$'}${(pedido.total||0).toFixed(2)}</span></div></div>`).join(''); }
         function limpiarMisPedidos() { localStorage.removeItem('pk_pedidos'); renderMisPedidos(); Toast.fire({icon: 'info', title: 'Historial borrado'}); }
+
+        // C7: Actualizar Corazón de Navegación (Relleno Rojo si hay items)
+        function updateWishlistNav() {
+            const iconD = document.getElementById('nav-wishlist-icon');
+            const iconM = document.getElementById('nav-wishlist-icon-mobile');
+            if(wishlist.length > 0) {
+                if(iconD) iconD.className = 'fas fa-heart text-promo text-xl transition-all';
+                if(iconM) iconM.className = 'fas fa-heart text-promo text-lg mb-1 transition-all';
+            } else {
+                if(iconD) iconD.className = 'far fa-heart text-dark text-xl transition-all';
+                if(iconM) iconM.className = 'far fa-heart text-dark text-lg mb-1 transition-all';
+            }
+        }
 
         // Wishlist
         function abrirWishlist() { renderWishlist(); document.getElementById('wishlist-modal').classList.add('active'); }
         function cerrarWishlist(e) { if(e) e.stopPropagation(); document.getElementById('wishlist-modal').classList.remove('active'); }
-        function toggleWishlist(id, event) { event.stopPropagation(); const idx = wishlist.indexOf(id); if(idx > -1) { wishlist.splice(idx, 1); Toast.fire({icon: 'info', title: 'Removido de favoritos'}); } else { wishlist.push(id); Toast.fire({icon: 'success', title: 'Añadido a favoritos'}); } localStorage.setItem('pk_wishlist', JSON.stringify(wishlist)); renderGallery(); if(document.getElementById('wishlist-modal').classList.contains('active')) renderWishlist(); }
-        function renderWishlist() { const lista = document.getElementById('lista-wishlist'); const items = inventario.filter(p => wishlist.includes(p.id)); if(items.length===0) return lista.innerHTML = `<div class="text-center py-8"><div class="w-16 h-16 bg-light rounded-full mx-auto flex items-center justify-center text-promo mb-3"><i class="fas fa-heart text-2xl"></i></div><p class="text-muted text-sm font-semibold">Tu lista está vacía</p></div>`; lista.innerHTML = items.map(p => { const pData = PricingEngine.calcular(p); const img = p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen||'https://via.placeholder.com/400x400/FDFDFD/2C2421?text=Sin+Imagen'); return `<div class="flex items-center gap-4 bg-white border border-border p-3 rounded-2xl cursor-pointer hover:shadow-md transition-shadow mb-3" onclick="cerrarWishlist(); openModalById('${p.id}')"><div class="w-16 h-16 bg-light rounded-xl overflow-hidden shrink-0"><img src="${img}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><p class="text-dark text-sm font-bold truncate">${p.titulo}</p><p class="text-primary font-bold text-sm mt-1">${PricingEngine.format(pData.finalUnitario)}</p></div><button onclick="toggleWishlist('${p.id}', event)" class="w-10 h-10 text-promo hover:bg-light rounded-full flex items-center justify-center transition-colors"><i class="fas fa-heart"></i></button></div>` }).join(''); }
+        
+        function toggleWishlist(id, event) { 
+            event.stopPropagation(); 
+            const idx = wishlist.indexOf(id); 
+            let incVal = 0;
+            if(idx > -1) { 
+                wishlist.splice(idx, 1); 
+                Toast.fire({icon: 'info', title: 'Removido de favoritos'}); 
+                incVal = -1;
+            } else { 
+                wishlist.push(id); 
+                Toast.fire({icon: 'success', title: 'Añadido a favoritos'}); 
+                incVal = 1;
+            } 
+            localStorage.setItem('pk_wishlist', JSON.stringify(wishlist)); 
+            renderGallery(); updateWishlistNav();
+            if(document.getElementById('wishlist-modal').classList.contains('active')) renderWishlist(); 
+
+            // C2: Incrementar Contador Global en Firestore silenciosamente
+            try { db.collection("productos").doc(id).update({ favCount: firebase.firestore.FieldValue.increment(incVal) }).catch(e=>console.log(e)); } catch(e){}
+        }
+
+        function renderWishlist() { 
+            const lista = document.getElementById('lista-wishlist'); 
+            const items = inventario.filter(p => wishlist.includes(p.id)); 
+            if(items.length===0) return lista.innerHTML = `<div class="text-center py-8"><div class="w-16 h-16 bg-white border border-border rounded-full mx-auto flex items-center justify-center text-promo mb-3 shadow-sm"><i class="fas fa-heart text-2xl"></i></div><p class="text-muted text-sm font-semibold">Tu lista está vacía</p></div>`; 
+            lista.innerHTML = items.map(p => { 
+                const pData = PricingEngine.calcular(p); 
+                const img = p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen||'https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Sin+Imagen'); 
+                return `<div class="flex items-center gap-4 bg-white border border-border p-3 rounded-2xl cursor-pointer hover:shadow-md transition-shadow mb-3 shadow-sm" onclick="cerrarWishlist(); openModalById('${p.id}')"><div class="w-16 h-16 bg-white border border-border rounded-xl overflow-hidden shrink-0"><img src="${img}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><p class="text-dark text-sm font-bold truncate">${p.titulo}</p><p class="text-primary font-bold text-sm mt-1">${PricingEngine.format(pData.finalUnitario)}</p></div><button onclick="toggleWishlist('${p.id}', event)" class="w-10 h-10 text-promo hover:bg-light rounded-full flex items-center justify-center transition-colors border border-border"><i class="fas fa-heart"></i></button></div>` 
+            }).join(''); 
+        }
 
         // Data Fetching
-        function escucharConfigGlobal() { db.collection("config").doc("global").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; applyConfig(); renderFilters(); renderGallery(); renderCarrito(); } else { applyConfig(); renderFilters(); } }); }
+        function escucharConfigGlobal() { db.collection("config").doc("global").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; applyConfig(); renderFilters(); renderGallery(); renderCarrito(); updateHeaderLogo(); } else { applyConfig(); renderFilters(); } }); }
         function escucharFirebase() { db.collection("productos").orderBy("createdAt", "desc").onSnapshot((snapshot) => { inventario = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); inventario.sort((a, b) => { const aPrev = esPreventaActiva(a); const bPrev = esPreventaActiva(b); if (aPrev && !bPrev) return -1; if (!aPrev && bPrev) return 1; if (a.isPinned && !b.isPinned) return -1; if (!a.isPinned && b.isPinned) return 1; return 0; }); renderGallery(); if (!hasCheckedUrlParams && inventario.length > 0) { const p = new URLSearchParams(window.location.search); const pId = p.get('producto'); if (pId && inventario.find(x => x.id === pId)) setTimeout(() => openModalById(pId), 400); else window.history.pushState({}, '', window.location.pathname); hasCheckedUrlParams = true; } }, (e) => console.error(e)); }
         function escucharHero() { db.collection("config").doc("hero").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; applyConfig(); } }); }
 
@@ -429,16 +479,32 @@
         function showSection(id) { document.querySelectorAll('.section-fade').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; }); const target = document.getElementById(id); if(target) { target.style.display = 'block'; setTimeout(() => target.classList.add('active'), 50); } window.scrollTo({top: 0, behavior: 'smooth'}); }
         function handleSearch(val) { if(val!==undefined){ document.getElementById('live-search').value=val; const m=document.getElementById('mobile-live-search'); if(m)m.value=val; } const t=(document.getElementById('live-search').value||"").toLowerCase(); if(t.length>0&&window.innerWidth>=768){ const s=document.getElementById('productos'); if(window.scrollY<s.offsetTop-150)s.scrollIntoView({behavior:'smooth',block:'start'}); } renderGallery(); }
 
+        // C9: Actualizar el Logo de la Barra Superior
+        function updateHeaderLogo() {
+            const containers = document.querySelectorAll('.header-logo-container');
+            containers.forEach(c => {
+                if (config.logoUrl) {
+                    c.innerHTML = `<img src="${config.logoUrl}" alt="Logo" class="w-10 h-10 object-contain rounded-full shadow-sm">`;
+                    c.classList.remove('bg-accent/20');
+                    c.classList.add('bg-transparent');
+                } else {
+                    c.innerHTML = `<i class="fas fa-cat"></i>`;
+                    c.classList.add('bg-accent/20');
+                    c.classList.remove('bg-transparent');
+                }
+            });
+        }
+
         function renderGallery() {
             const grid = document.getElementById('gallery-grid'); if(!grid) return;
             const term = (document.getElementById('live-search').value || "").toLowerCase();
             let filt = inventario.filter(p => (currentCategory === 'all' || p.categoria === currentCategory) && ((p.titulo || "").toLowerCase().includes(term) || (p.sku || "").toLowerCase().includes(term)));
             
-            if(filt.length === 0) return grid.innerHTML = `<div class="col-span-full text-center py-20"><div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center text-muted mb-4 border border-border"><i class="fas fa-search text-2xl"></i></div><p class="text-muted font-semibold text-sm">No encontramos artículos</p></div>`;
+            if(filt.length === 0) return grid.innerHTML = `<div class="col-span-full text-center py-20"><div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center text-muted mb-4 border border-border shadow-sm"><i class="fas fa-search text-2xl"></i></div><p class="text-muted font-semibold text-sm">No encontramos artículos</p></div>`;
             
             grid.innerHTML = filt.map(prod => {
                 const pData = PricingEngine.calcular(prod);
-                const coverImg = prod.imagenes && prod.imagenes.length > 0 ? prod.imagenes[0] : (prod.imagen||'https://via.placeholder.com/400x400/FDFDFD/2C2421?text=Sin+Imagen');
+                const coverImg = prod.imagenes && prod.imagenes.length > 0 ? prod.imagenes[0] : (prod.imagen||'https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Sin+Imagen');
                 const isOut = prod.stock !== undefined && prod.stock <= 0;
                 
                 let btnQuickAddHTML = ''; let badgesHTML = '';
@@ -461,16 +527,17 @@
 
                 const badgesWrapper = badgesHTML ? `<div class="absolute top-3 left-3 flex flex-col gap-1.5 z-10">${badgesHTML}</div>` : '';
                 const isFav = wishlist.includes(prod.id);
-                const btnFavHTML = `<button onclick="toggleWishlist('${prod.id}', event)" class="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all z-20 ${isFav ? 'bg-white text-promo shadow-md opacity-100' : 'bg-white/80 text-muted hover:bg-white hover:text-promo opacity-0 group-hover:opacity-100 backdrop-blur-sm shadow-sm'}"><i class="${isFav ? 'fas' : 'far'} fa-heart"></i></button>`;
+                // Botón de Favorito
+                const btnFavHTML = `<button onclick="toggleWishlist('${prod.id}', event)" class="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all z-20 border border-border ${isFav ? 'bg-white text-promo shadow-md opacity-100' : 'bg-white/90 text-muted hover:bg-white hover:text-promo opacity-0 group-hover:opacity-100 backdrop-blur-sm shadow-sm'}"><i class="${isFav ? 'fas' : 'far'} fa-heart"></i></button>`;
                 
-                // REDISEÑO TARJETA
+                // Rediseño a Tarjeta Pura Blanca con Sombra
                 return `
                 <div class="group cursor-pointer flex flex-col h-full bg-white border border-border rounded-3xl shadow-sm hover:shadow-soft transition-all duration-300 transform hover:-translate-y-1 ${isOut ? 'opacity-70' : ''}" onclick="openModalById('${prod.id}')">
-                    <div class="relative aspect-square overflow-hidden rounded-t-3xl bg-light p-4 flex items-center justify-center">
+                    <div class="relative aspect-square overflow-hidden rounded-t-3xl bg-white p-4 flex items-center justify-center">
                         ${badgesWrapper} ${btnFavHTML}
                         <img src="${coverImg}" loading="lazy" alt="${prod.titulo}" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 drop-shadow-md ${isOut ? 'grayscale' : ''}">
                     </div>
-                    <div class="p-4 flex-1 flex flex-col justify-between">
+                    <div class="p-4 flex-1 flex flex-col justify-between border-t border-border">
                         <div class="mb-3">
                             <p class="text-muted text-[10px] uppercase font-bold mb-1 tracking-wider">${prod.categoria || 'General'}</p>
                             <h3 class="text-dark font-bold text-sm line-clamp-2 leading-tight">${prod.titulo}</h3>
@@ -488,7 +555,7 @@
             event.stopPropagation(); const p = inventario.find(x => x.id === id); if(!p || esPreventaActiva(p) || p.stock <= 0) return;
             if (p.hasMeasures && p.tallas && p.tallas.length > 0) { openModalById(p.id); Toast.fire({ icon: 'info', title: 'Selecciona una variante' }); return; }
             let t = "Única"; const idx = carrito.findIndex(i => i.id === p.id && i.talla === t);
-            if(idx !== -1) carrito[idx].cantidad++; else carrito.push({ id: p.id, titulo: p.titulo, talla: t, cantidad: 1, img: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen||'https://via.placeholder.com/400x400/FDFDFD/2C2421?text=Sin+Imagen') });
+            if(idx !== -1) carrito[idx].cantidad++; else carrito.push({ id: p.id, titulo: p.titulo, talla: t, cantidad: 1, img: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen||'https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Sin+Imagen') });
             Toast.fire({ icon: 'success', title: `Añadido` }); saveCart(); renderCarrito();
             if(window.innerWidth > 768 && document.getElementById('cart-drawer').classList.contains('translate-x-full')) toggleCartDrawer();
         }
@@ -508,7 +575,7 @@
             productQuantity = 1; document.getElementById('modal-quantity').innerText = productQuantity;
             
             const isPh = p.imagen && p.imagen.includes('via.placeholder.com');
-            currentModalImages = p.imagenes && p.imagenes.length > 0 && !isPh ? p.imagenes : (p.imagen && !isPh ? [p.imagen] : ['https://via.placeholder.com/400x400/FDFDFD/2C2421?text=Sin+Imagen']); 
+            currentModalImages = p.imagenes && p.imagenes.length > 0 && !isPh ? p.imagenes : (p.imagen && !isPh ? [p.imagen] : ['https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Sin+Imagen']); 
             currentImageIndex = 0; updateCarouselView();
             
             document.getElementById('modal-title').innerText = p.titulo; 
@@ -562,7 +629,7 @@
         window.addEventListener('popstate', () => { const p = new URLSearchParams(window.location.search); const id = p.get('producto'); if(id) openModalById(id); else { document.getElementById('product-modal').classList.remove('active'); document.body.classList.remove('overflow-hidden'); } });
 
         function changeImage(d) { currentImageIndex += d; if (currentImageIndex >= currentModalImages.length) currentImageIndex = 0; if (currentImageIndex < 0) currentImageIndex = currentModalImages.length - 1; updateCarouselView(); }
-        function updateCarouselView() { const img = document.getElementById('modal-img'); const l = document.getElementById('modal-img-loader'); img.style.opacity = 0; l.classList.remove('hidden'); const nImg = new Image(); nImg.src = currentModalImages[currentImageIndex]; nImg.onerror = () => { img.src = "https://via.placeholder.com/400x400/FDFDFD/2C2421?text=Error"; l.classList.add('hidden'); img.style.opacity = 1; }; nImg.onload = () => { img.src = nImg.src; l.classList.add('hidden'); img.style.opacity = 1; }; const p = document.getElementById('btn-prev-img'), n = document.getElementById('btn-next-img'), dots = document.getElementById('carousel-dots'); if (currentModalImages.length > 1) { p.classList.remove('hidden'); n.classList.remove('hidden'); dots.innerHTML = currentModalImages.map((_, i) => `<span class="h-2 rounded-full transition-all duration-300 ${i === currentImageIndex ? 'bg-primary w-8' : 'bg-dark/20 w-2'}"></span>`).join(''); } else { p.classList.add('hidden'); n.classList.add('hidden'); dots.innerHTML = ''; } }
+        function updateCarouselView() { const img = document.getElementById('modal-img'); const l = document.getElementById('modal-img-loader'); img.style.opacity = 0; l.classList.remove('hidden'); const nImg = new Image(); nImg.src = currentModalImages[currentImageIndex]; nImg.onerror = () => { img.src = "https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Error"; l.classList.add('hidden'); img.style.opacity = 1; }; nImg.onload = () => { img.src = nImg.src; l.classList.add('hidden'); img.style.opacity = 1; }; const p = document.getElementById('btn-prev-img'), n = document.getElementById('btn-next-img'), dots = document.getElementById('carousel-dots'); if (currentModalImages.length > 1) { p.classList.remove('hidden'); n.classList.remove('hidden'); dots.innerHTML = currentModalImages.map((_, i) => `<span class="h-2 rounded-full transition-all duration-300 ${i === currentImageIndex ? 'bg-primary w-8' : 'bg-dark/20 w-2'}"></span>`).join(''); } else { p.classList.add('hidden'); n.classList.add('hidden'); dots.innerHTML = ''; } }
         function saveCart() { localStorage.setItem('pk_carrito', JSON.stringify(carrito)); }
 
         function agregarAlPedido() {
@@ -571,7 +638,7 @@
             if (p.hasMeasures && p.tallas && p.tallas.length > 0) { const s = document.getElementById('modal-talla'); if (!s.value) { s.classList.add('ring-2', 'ring-promo'); setTimeout(() => s.classList.remove('ring-2', 'ring-promo'), 1500); return Toast.fire({ icon: 'warning', title: 'Selecciona una opción' }); } t = s.value; }
             const idx = carrito.findIndex(i => i.id === p.id && i.talla === t);
             if (idx !== -1) carrito[idx].cantidad += productQuantity;
-            else carrito.push({ id: p.id, titulo: p.titulo, sku: p.sku || '', talla: t, cantidad: productQuantity, img: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen||'https://via.placeholder.com/400x400/FDFDFD/2C2421?text=Sin+Imagen') });
+            else carrito.push({ id: p.id, titulo: p.titulo, sku: p.sku || '', talla: t, cantidad: productQuantity, img: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen||'https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Sin+Imagen') });
             
             const btn = document.getElementById('btn-add-cart'); const ogHTML = btn.innerHTML;
             btn.innerHTML = `<i class="fas fa-check"></i> ¡Cesta Lista!`; btn.classList.replace('bg-primary', 'bg-[#25D366]');
@@ -588,7 +655,7 @@
             const pBanner = document.getElementById('cart-promo-banner');
 
             if (carrito.length === 0) { 
-                container.innerHTML = `<div class="text-center py-10 mt-10"><div class="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center text-border mb-4"><i class="fas fa-shopping-basket text-4xl"></i></div><p class="text-muted font-bold">Cesta vacía</p></div>`; 
+                container.innerHTML = `<div class="text-center py-10 mt-10"><div class="w-20 h-20 bg-white border border-border shadow-sm rounded-full mx-auto flex items-center justify-center text-border mb-4"><i class="fas fa-shopping-basket text-4xl"></i></div><p class="text-muted font-bold">Cesta vacía</p></div>`; 
                 document.getElementById('cart-drawer-total').innerText = PricingEngine.format(0); 
                 document.getElementById('cart-drawer-subtotal-orig').innerText = PricingEngine.format(0);
                 document.getElementById('cart-drawer-savings-row').classList.add('hidden');
@@ -617,20 +684,20 @@
                 return `
                 <div class="flex items-center gap-4 bg-white border border-border p-3.5 rounded-2xl relative shadow-sm">
                     ${badgeUI}
-                    <div class="w-20 h-20 bg-light rounded-xl overflow-hidden shrink-0"><img src="${item.img}" class="w-full h-full object-contain drop-shadow-sm"></div>
+                    <div class="w-20 h-20 bg-white border border-border rounded-xl overflow-hidden shrink-0"><img src="${item.img}" class="w-full h-full object-contain drop-shadow-sm"></div>
                     <div class="flex-1 min-w-0 h-full flex flex-col justify-center">
                         <p class="text-dark text-xs font-bold line-clamp-2 leading-tight mb-1">${item.titulo}</p>
                         <p class="text-muted text-[10px] font-medium mb-2">Tipo: <span class="text-dark font-bold">${item.talla}</span></p>
                         <div class="flex items-end justify-between mt-auto">
                             ${priceUI}
-                            <div class="flex items-center gap-1 bg-light border border-border rounded-lg p-0.5 h-8">
-                                <button onclick="updateCartQty(${index}, -1)" class="w-7 h-full text-dark hover:bg-white rounded-md transition-colors"><i class="fas fa-minus text-[10px]"></i></button>
+                            <div class="flex items-center gap-1 bg-white border border-border shadow-sm rounded-lg p-0.5 h-8">
+                                <button onclick="updateCartQty(${index}, -1)" class="w-7 h-full text-dark hover:bg-light rounded-md transition-colors"><i class="fas fa-minus text-[10px]"></i></button>
                                 <span class="text-dark text-xs font-bold w-5 text-center">${item.cantidad}</span>
-                                <button onclick="updateCartQty(${index}, 1)" class="w-7 h-full text-dark hover:bg-white rounded-md transition-colors"><i class="fas fa-plus text-[10px]"></i></button>
+                                <button onclick="updateCartQty(${index}, 1)" class="w-7 h-full text-dark hover:bg-light rounded-md transition-colors"><i class="fas fa-plus text-[10px]"></i></button>
                             </div>
                         </div>
                     </div>
-                    <button onclick="updateCartQty(${index}, -${item.cantidad})" class="absolute top-2 right-2 w-6 h-6 text-muted hover:text-promo hover:bg-light transition-colors bg-white rounded-full flex items-center justify-center"><i class="fas fa-times text-xs"></i></button>
+                    <button onclick="updateCartQty(${index}, -${item.cantidad})" class="absolute top-2 right-2 w-6 h-6 text-muted hover:text-promo hover:bg-light transition-colors bg-white rounded-full flex items-center justify-center border border-border"><i class="fas fa-times text-xs"></i></button>
                 </div>`;
             }).join('');
 
@@ -678,7 +745,40 @@
             window.open(`https://wa.me/${config.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        function applyConfig() { document.getElementById('display-hero-title').innerText = config.heroTitle; document.getElementById('display-hero-subtitle').innerText = config.heroSubtitle; document.getElementById('hero-display').style.backgroundImage = `url('${config.heroImage}')`; document.getElementById('display-shop-slogan').innerText = config.slogan; document.getElementById('display-about-title').innerText = config.aboutTitle; document.getElementById('display-about-desc').innerText = config.aboutDesc; const w=document.getElementById('link-whatsapp'); if(w) w.href=`https://wa.me/${config.whatsapp}`; const ig=document.getElementById('link-instagram'); if(ig) { ig.href = config.instagram !== "#" ? config.instagram : "#"; ig.style.display = config.instagram==="#" ? "none" : "inline-block"; } const fb=document.getElementById('link-facebook'); if(fb) { fb.href = config.facebook !== "#" ? config.facebook : "#"; fb.style.display = config.facebook==="#" ? "none" : "inline-block"; } }
+        // C3, C1 y C9: Mostrar/Ocultar Hero y Renderizar Logo + Redes Dinámicas
+        function applyConfig() { 
+            document.getElementById('display-hero-title').innerText = config.heroTitle || ""; 
+            document.getElementById('display-hero-subtitle').innerText = config.heroSubtitle || ""; 
+            document.getElementById('hero-display').style.backgroundImage = `url('${config.heroImage || ""}')`; 
+            
+            // Ocultar Banner si el interruptor del admin está en false
+            const heroSection = document.getElementById('hero-display');
+            if(config.heroActive === false) {
+                heroSection.style.display = 'none';
+                document.getElementById('inicio').classList.remove('pt-20');
+                document.getElementById('inicio').classList.add('pt-24'); 
+            } else {
+                heroSection.style.display = 'flex';
+                document.getElementById('inicio').classList.add('pt-20');
+                document.getElementById('inicio').classList.remove('pt-24');
+            }
+
+            document.getElementById('display-shop-slogan').innerText = config.slogan || ""; 
+            document.getElementById('display-about-title').innerText = config.aboutTitle || ""; 
+            document.getElementById('display-about-desc').innerText = config.aboutDesc || ""; 
+            
+            const w=document.getElementById('link-whatsapp'); if(w) w.href=`https://wa.me/${config.whatsapp}`; 
+            
+            const ig=document.getElementById('link-instagram'); 
+            if(ig) { ig.href = config.instagram && config.instagram !== "#" ? config.instagram : "#"; ig.style.display = (!config.instagram || config.instagram==="#") ? "none" : "flex"; } 
+            
+            const fb=document.getElementById('link-facebook'); 
+            if(fb) { fb.href = config.facebook && config.facebook !== "#" ? config.facebook : "#"; fb.style.display = (!config.facebook || config.facebook==="#") ? "none" : "flex"; } 
+            
+            // C1: Renderizar Enlace TikTok
+            const tk=document.getElementById('link-tiktok'); 
+            if(tk) { tk.href = config.tiktok && config.tiktok !== "#" ? config.tiktok : "#"; tk.style.display = (!config.tiktok || config.tiktok==="#") ? "none" : "flex"; } 
+        }
 
         window.onload = init;
     </script>
