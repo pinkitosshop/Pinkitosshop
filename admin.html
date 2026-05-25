@@ -49,20 +49,20 @@
                         primary: '#B88645', // Luxury Gold / Camel
                         secondary: '#8C6239', // Warm Bronze
                         dark: '#2C2421', // Espresso Charcoal text
-                        light: '#F3F4F6', // C6: Fondo gris suave para crear contraste con el blanco puro
-                        card: '#FFFFFF', // C6: Blanco puro para las tarjetas y ventanas
-                        border: '#E5E7EB', // Gris sutil para bordes
-                        muted: '#9CA3AF', // Gris para textos secundarios
-                        promo: '#E63946', // C8: Rojo vibrante para ofertas y alertas
-                        success: '#729B79', // Sophisticated Sage Green
-                        accent: '#6EC1E4'  // C8: Azul Pantone (ojo del logo gatito)
+                        light: '#F3F4F6', // Fondo gris suave
+                        card: '#FFFFFF', // Blanco puro
+                        border: '#E5E7EB', // Gris sutil
+                        muted: '#9CA3AF', // Gris secundario
+                        promo: '#E63946', // Rojo vibrante
+                        success: '#729B79', // Sage Green
+                        accent: '#6EC1E4'  // Azul Pantone
                     }, 
                     fontFamily: { 
                         sans: ['"Poppins"', 'sans-serif'], 
                         serif: ['"Poppins"', 'sans-serif']
                     },
                     boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(44, 36, 33, 0.08)', // Sombra aumentada para contraste
+                        'soft': '0 4px 20px -2px rgba(44, 36, 33, 0.08)',
                         'float': '0 10px 30px -5px rgba(44, 36, 33, 0.15)'
                     }
                 } 
@@ -91,11 +91,10 @@
         input:checked + .slider:before { transform: translateX(20px); }
         
         .switch-promo input:checked + .slider { background-color: #E63946; border-color: #E63946; }
-        .switch-accent input:checked + .slider { background-color: #6EC1E4; border-color: #6EC1E4; } /* C8: Switch azul */
+        .switch-accent input:checked + .slider { background-color: #6EC1E4; border-color: #6EC1E4; }
 
         .tab-btn.active { border-bottom: 3px solid #B88645; color: #B88645; font-weight: bold; }
         
-        /* Inputs limpios - forzados a blanco puro para resaltar sobre el fondo gris */
         .admin-input { background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 16px; color: #2C2421; outline: none; border-radius: 12px; transition: all 0.2s; font-size: 14px; width: 100%; }
         .admin-input:focus { border-color: #B88645; box-shadow: 0 0 0 3px rgba(184, 134, 69, 0.2); }
         .measure-input { width: 100%; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 8px; text-align: center; font-size: 12px; color: #2C2421; border-radius: 8px; outline: none; }
@@ -103,7 +102,7 @@
 
         .editing-mode { border: 2px solid #B88645 !important; background: rgba(184, 134, 69, 0.05) !important; }
 
-        .loader { border: 3px solid rgba(110, 193, 228, 0.3); border-radius: 50%; border-top: 3px solid #6EC1E4; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; } /* C8: Loader azul */
+        .loader { border: 3px solid rgba(110, 193, 228, 0.3); border-radius: 50%; border-top: 3px solid #6EC1E4; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .img-thumb-container { position: relative; width: 80px; height: 80px; border-radius: 12px; overflow: hidden; border: 1px solid #E5E7EB; background: #FFFFFF;}
@@ -120,6 +119,27 @@
         
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* =========================================================
+           REMODELACIÓN 2: Optimización de espacios y escala para móviles 
+           ========================================================= */
+        @media (max-width: 768px) {
+            /* Reduce la base un ~12.5%, encogiendo todos los rems (fuentes, paddings, margins) proporcionalmente */
+            html { font-size: 14px !important; }
+            
+            /* Ajuste quirúrgico de paddings y gaps excesivos que causan scroll en celular */
+            .admin-tab > div { padding: 1.25rem !important; margin-bottom: 1.5rem !important; }
+            .modal-content { padding: 1.5rem !important; }
+            .gap-10 { gap: 1.25rem !important; }
+            .gap-8 { gap: 1rem !important; }
+            .p-8 { padding: 1.25rem !important; }
+            .p-10 { padding: 1.5rem !important; }
+            .mt-10 { margin-top: 1.5rem !important; }
+            .mb-10 { margin-bottom: 1.5rem !important; }
+            
+            /* Ajustes para modales principales */
+            #selector-modal .modal-content, #login-modal .modal-content { padding: 2rem 1.5rem !important; }
+        }
     </style>
 </head>
 <body class="bg-light text-dark font-sans antialiased selection:bg-primary selection:text-white min-h-screen flex flex-col">
@@ -129,7 +149,6 @@
     <header class="w-full z-[100] bg-white border-b border-border shadow-sm">
         <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
             <div id="header-title" class="font-bold text-2xl text-dark tracking-tight flex items-center gap-2">
-                <!-- C9: Contenedor Dinámico Logo Tienda -->
                 <div id="admin-logo-container" class="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-accent text-xl">
                     <i class="fas fa-cat"></i>
                 </div>
@@ -1012,13 +1031,14 @@
                 }
             }
 
+            // REMODELACIÓN 1: Quitar filtro borroso y hacer que la tarjeta "Agotado" destaque
             let overlayBadges = ''; const isPrevActiva = esPreventaActiva(p);
-            if (isOut) overlayBadges += '<div class="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center"><span class="bg-muted text-white text-[10px] px-3 py-1 uppercase font-bold rounded-lg shadow-sm">Agotado</span></div>';
-            else if (isPrevActiva) overlayBadges += `<div class="absolute top-2 right-2 bg-accent/90 text-white text-[9px] px-2 py-1 uppercase font-bold rounded-lg shadow-sm text-center">Pronto</div>`;
+            if (isOut) overlayBadges += '<div class="absolute inset-0 bg-white/20 flex items-center justify-center z-10"><span class="bg-dark/80 backdrop-blur-md text-white text-[10px] px-3 py-1.5 uppercase font-bold rounded-lg shadow-md border border-white/20">Agotado</span></div>';
+            else if (isPrevActiva) overlayBadges += `<div class="absolute top-2 right-2 bg-accent/90 text-white text-[9px] px-2 py-1 uppercase font-bold rounded-lg shadow-sm text-center z-10">Pronto</div>`;
 
             if(isGrid) {
                 return `
-                <div class="bg-white border border-border rounded-2xl overflow-hidden cursor-pointer hover:shadow-soft hover:border-primary/40 transition-all flex flex-col ${isOut ? 'opacity-70' : ''}" onclick="${clickAction}">
+                <div class="bg-white border border-border rounded-2xl overflow-hidden cursor-pointer hover:shadow-soft hover:border-primary/40 transition-all flex flex-col" onclick="${clickAction}">
                     <div class="aspect-square relative bg-white shrink-0 p-2">
                         <img src="${img}" class="w-full h-full object-contain drop-shadow-sm">
                         ${overlayBadges}
@@ -1032,9 +1052,9 @@
                     </div>
                 </div>`;
             } else {
-                let listOverlayBadges = isOut ? '<div class="absolute inset-0 bg-white/70 flex items-center justify-center backdrop-blur-sm"><i class="fas fa-ban text-muted"></i></div>' : '';
+                let listOverlayBadges = isOut ? '<div class="absolute inset-0 bg-white/20 flex items-center justify-center z-10"><span class="bg-dark/80 backdrop-blur-md text-white text-[8px] px-2 py-1 uppercase font-bold rounded shadow-md border border-white/20">Agotado</span></div>' : '';
                 return `
-                <div class="flex items-center gap-4 bg-white border border-border p-3 rounded-2xl cursor-pointer hover:shadow-soft hover:border-primary/40 transition-all ${isOut ? 'opacity-70' : ''}" onclick="${clickAction}">
+                <div class="flex items-center gap-4 bg-white border border-border p-3 rounded-2xl cursor-pointer hover:shadow-soft hover:border-primary/40 transition-all" onclick="${clickAction}">
                     <div class="w-16 h-16 bg-white rounded-xl overflow-hidden shrink-0 relative p-1 border border-border">
                         <img src="${img}" class="w-full h-full object-contain drop-shadow-sm">
                         ${listOverlayBadges}
