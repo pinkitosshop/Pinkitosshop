@@ -1014,7 +1014,7 @@
 
             let overlayBadges = ''; const isPrevActiva = esPreventaActiva(p);
             if (isOut) overlayBadges += '<div class="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center"><span class="bg-muted text-white text-[10px] px-3 py-1 uppercase font-bold rounded-lg shadow-sm">Agotado</span></div>';
-            else if (isPrevActiva) overlayBadges += `<div class="absolute top-2 right-2 bg-primary/90 text-white text-[9px] px-2 py-1 uppercase font-bold rounded-lg shadow-sm text-center">Pronto</div>`;
+            else if (isPrevActiva) overlayBadges += `<div class="absolute top-2 right-2 bg-accent/90 text-white text-[9px] px-2 py-1 uppercase font-bold rounded-lg shadow-sm text-center">Pronto</div>`;
 
             if(isGrid) {
                 return `
@@ -1045,7 +1045,7 @@
                                 <span class="bg-light text-muted px-1.5 py-0.5 rounded text-[10px] font-bold uppercase shrink-0">${p.categoria || 'Gen'}</span>
                                 <p class="text-xs font-bold text-dark truncate">${p.titulo} <span class="text-muted font-normal text-[10px]">#${p.sku||''}</span></p>
                             </div>
-                            ${isPrevActiva ? `<span class="bg-primary text-white text-[9px] px-2 py-1 rounded-lg font-bold uppercase shrink-0">Pronto</span>` : ''}
+                            ${isPrevActiva ? `<span class="bg-accent text-white text-[9px] px-2 py-1 rounded-lg font-bold uppercase shrink-0">Pronto</span>` : ''}
                         </div>
                         ${priceHtml}
                         <p class="text-muted text-[10px] font-semibold mt-1">Stock: ${p.stock||0}</p>
@@ -1397,12 +1397,12 @@
                 if(prod.promoType && prod.promoType !== 'normal') statusInfo += `<span class="bg-secondary/10 text-secondary text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-gift"></i> ${prod.promoType}</span>`;
                 
                 const isPrevActiva = esPreventaActiva(prod);
-                if(isPrevActiva) statusInfo += `<span class="bg-primary/20 text-primary text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-clock"></i> Prev ${prod.fechaLanzamiento ? '('+prod.fechaLanzamiento+')' : ''}</span>`;
+                if(isPrevActiva) statusInfo += `<span class="bg-accent/20 text-accent text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-clock"></i> Prev ${prod.fechaLanzamiento ? '('+prod.fechaLanzamiento+')' : ''}</span>`;
                 else if(prod.stock <= 0) statusInfo += `<span class="bg-muted text-white text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-ban"></i> Agotado</span>`;
                 else statusInfo += `<span class="bg-[#20b858]/10 text-[#20b858] text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-check"></i> Stock: ${prod.stock}</span>`;
 
-                // C2: Mostrar la cantidad de Favoritos
-                const favCountInfo = prod.favCount && prod.favCount > 0 ? `<span class="bg-promo/10 text-promo text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm flex items-center gap-1" title="Veces añadido a favoritos"><i class="fas fa-heart"></i> ${prod.favCount}</span>` : '';
+                // C2: Mostrar la cantidad de Favoritos (siempre visible para monitorear)
+                const favCountInfo = `<span class="bg-promo/10 text-promo text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm flex items-center gap-1" title="Veces añadido a favoritos por clientes"><i class="fas fa-heart"></i> ${prod.favCount || 0}</span>`;
 
                 return `<div class="bg-white p-4 flex items-center justify-between border border-border rounded-2xl hover:shadow-soft hover:border-primary/40 transition-all">
                     <div class="flex items-center gap-4 truncate min-w-0 flex-1">
