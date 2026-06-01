@@ -120,14 +120,8 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* =========================================================
-           REMODELACIÓN 2: Optimización de espacios y escala para móviles 
-           ========================================================= */
         @media (max-width: 768px) {
-            /* Reduce la base un ~12.5%, encogiendo todos los rems (fuentes, paddings, margins) proporcionalmente */
             html { font-size: 14px !important; }
-            
-            /* Ajuste quirúrgico de paddings y gaps excesivos que causan scroll en celular */
             .admin-tab > div { padding: 1.25rem !important; margin-bottom: 1.5rem !important; }
             .modal-content { padding: 1.5rem !important; }
             .gap-10 { gap: 1.25rem !important; }
@@ -136,8 +130,6 @@
             .p-10 { padding: 1.5rem !important; }
             .mt-10 { margin-top: 1.5rem !important; }
             .mb-10 { margin-bottom: 1.5rem !important; }
-            
-            /* Ajustes para modales principales */
             #selector-modal .modal-content, #login-modal .modal-content { padding: 2rem 1.5rem !important; }
         }
     </style>
@@ -198,7 +190,7 @@
         </div>
     </div>
 
-    <!-- LOCK SCREEN MODAL (GLOBAL) -->
+    <!-- LOCK SCREEN MODAL -->
     <div id="lock-modal" class="modal-overlay z-[300]">
         <div class="modal-content p-10 text-center shadow-float bg-white">
             <i class="fas fa-lock text-4xl text-primary mb-4"></i>
@@ -215,14 +207,12 @@
             
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-border mb-8 gap-4 bg-white p-2 px-4 rounded-2xl shadow-sm">
                 
-                <!-- GRUPO TABS: POS -->
                 <div id="nav-group-pos" class="hidden space-x-2 overflow-x-auto w-full md:w-auto scrollbar-hide">
                     <button id="nav-pos" onclick="showAdminTab('pos', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-cash-register"></i> Terminal POS</button>
                     <button id="nav-pedidos" onclick="showAdminTab('pedidos', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-bell"></i> Pedidos <span id="badge-pedidos" class="bg-promo text-white px-2 py-0.5 rounded-full text-[10px] hidden">0</span></button>
                     <button id="nav-facturas" onclick="showAdminTab('facturas', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-file-invoice"></i> Historial y Cierre</button>
                 </div>
 
-                <!-- GRUPO TABS: ADMIN -->
                 <div id="nav-group-admin" class="hidden space-x-2 overflow-x-auto w-full md:w-auto scrollbar-hide">
                     <button id="nav-inventario" onclick="showAdminTab('inventario', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-box"></i> Inventario</button>
                     <button id="nav-add-producto" onclick="showAdminTab('add-producto', event)" class="tab-btn py-3 px-4 text-sm font-semibold transition-colors flex items-center gap-2 text-muted hover:text-dark rounded-xl"><i class="fas fa-plus-circle"></i> Producto</button>
@@ -236,7 +226,6 @@
             <!-- TAB: TERMINAL POS -->
             <div id="tab-pos" class="admin-tab hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                    <!-- Catálogo POS -->
                     <div class="lg:col-span-2 bg-white p-6 border border-border rounded-3xl shadow-soft relative overflow-hidden">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
                             <h3 class="text-dark text-lg font-bold flex items-center gap-2 shrink-0"><i class="fas fa-search text-primary"></i> Catálogo Rápido</h3>
@@ -249,13 +238,10 @@
                             </div>
                         </div>
                         
-                        <div id="pos-inventory-container" class="pb-4">
-                            <!-- Productos cargados vía JS -->
-                        </div>
+                        <div id="pos-inventory-container" class="pb-4"></div>
 
-                        <!-- Paginación POS -->
                         <div class="mt-4 pt-4 border-t border-border flex justify-between items-center" id="pos-pagination-controls">
-                            <button onclick="changePosPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light transition-colors" id="pos-btn-prev">Anterior</button>
+                            <button onclick="changePosPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 hover:bg-light transition-colors" id="pos-btn-prev">Anterior</button>
                             <span class="text-xs text-muted font-semibold">Pág <span id="pos-page-indicator" class="text-dark">1</span></span>
                             <div class="flex items-center gap-3">
                                 <select onchange="posCurrentPage=1; posItemsPerPage=parseInt(this.value); renderPosInventory();" class="admin-input text-xs py-2 w-auto hidden sm:block bg-white">
@@ -263,12 +249,11 @@
                                     <option value="20">20 items</option>
                                     <option value="50">50 items</option>
                                 </select>
-                                <button onclick="changePosPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light transition-colors" id="pos-btn-next">Siguiente</button>
+                                <button onclick="changePosPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 hover:bg-light transition-colors" id="pos-btn-next">Siguiente</button>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Ticket / Pedido Actual -->
                     <div class="bg-white p-6 border border-border rounded-3xl shadow-soft flex flex-col lg:sticky lg:top-4 z-10">
                         <div class="flex justify-between items-center border-b border-border pb-4 mb-4">
                             <h3 class="text-primary text-lg font-bold" id="pos-ticket-title">Venta Nueva</h3>
@@ -323,9 +308,8 @@
                         <div class="text-center py-10"><div class="loader !block border-t-primary w-8 h-8 mx-auto"></div></div>
                     </div>
 
-                    <!-- Paginación Pedidos -->
                     <div class="mt-6 pt-4 border-t border-border flex justify-between items-center" id="ped-pagination-controls">
-                        <button onclick="changePedPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light" id="ped-btn-prev">Anterior</button>
+                        <button onclick="changePedPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 hover:bg-light" id="ped-btn-prev">Anterior</button>
                         <span class="text-xs text-muted font-semibold">Pág <span id="ped-page-indicator" class="text-dark">1</span></span>
                         <div class="flex items-center gap-3">
                             <select onchange="pedCurrentPage=1; pedItemsPerPage=parseInt(this.value); renderPedidosList();" class="admin-input text-xs py-2 w-auto hidden sm:block bg-white">
@@ -333,7 +317,7 @@
                                 <option value="20">20 items</option>
                                 <option value="50">50 items</option>
                             </select>
-                            <button onclick="changePedPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light" id="ped-btn-next">Siguiente</button>
+                            <button onclick="changePedPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 hover:bg-light" id="ped-btn-next">Siguiente</button>
                         </div>
                     </div>
                 </div>
@@ -362,9 +346,8 @@
                         <div class="text-center py-10"><p class="text-sm text-muted font-semibold">Cargando facturas...</p></div>
                     </div>
 
-                    <!-- Paginación Facturas -->
                     <div class="mt-6 pt-4 border-t border-border flex justify-between items-center" id="fac-pagination-controls">
-                        <button onclick="changeFacPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light" id="fac-btn-prev">Anterior</button>
+                        <button onclick="changeFacPage(-1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 hover:bg-light" id="fac-btn-prev">Anterior</button>
                         <span class="text-xs text-muted font-semibold">Pág <span id="fac-page-indicator" class="text-dark">1</span></span>
                         <div class="flex items-center gap-3">
                             <select onchange="facCurrentPage=1; facItemsPerPage=parseInt(this.value); renderFacturasList();" class="admin-input text-xs py-2 w-auto hidden sm:block bg-white">
@@ -372,7 +355,7 @@
                                 <option value="20">20 items</option>
                                 <option value="50">50 items</option>
                             </select>
-                            <button onclick="changeFacPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light" id="fac-btn-next">Siguiente</button>
+                            <button onclick="changeFacPage(1)" class="text-xs text-dark font-bold px-4 py-2 bg-white border border-border rounded-xl disabled:opacity-50 hover:bg-light" id="fac-btn-next">Siguiente</button>
                         </div>
                     </div>
                 </div>
@@ -388,7 +371,6 @@
                         </div>
                         
                         <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                            <!-- C5: Filtro por categoría en Inventario -->
                             <div class="flex items-center gap-2">
                                 <label class="text-xs text-muted font-bold"><i class="fas fa-filter"></i></label>
                                 <select id="inv-filter-cat" onchange="invCurrentPage=1; renderAdminList();" class="admin-input text-xs py-2 w-auto px-3 bg-white">
@@ -414,11 +396,10 @@
                 
                 <div id="admin-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"></div>
                 
-                <!-- Paginación Inventario -->
                 <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-border shadow-sm" id="inv-pagination-controls">
-                    <button onclick="changeInvPage(-1)" class="text-xs text-dark font-bold px-5 py-2.5 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light transition-colors shadow-sm" id="inv-btn-prev">Anterior</button>
+                    <button onclick="changeInvPage(-1)" class="text-xs text-dark font-bold px-5 py-2.5 bg-white border border-border rounded-xl disabled:opacity-50 hover:bg-light transition-colors shadow-sm" id="inv-btn-prev">Anterior</button>
                     <span class="text-xs text-muted font-semibold">Página <span id="inv-page-indicator" class="text-dark">1</span></span>
-                    <button onclick="changeInvPage(1)" class="text-xs text-dark font-bold px-5 py-2.5 bg-white border border-border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-light transition-colors shadow-sm" id="inv-btn-next">Siguiente</button>
+                    <button onclick="changeInvPage(1)" class="text-xs text-dark font-bold px-5 py-2.5 bg-white border border-border rounded-xl disabled:opacity-50 hover:bg-light transition-colors shadow-sm" id="inv-btn-next">Siguiente</button>
                 </div>
             </div>
 
@@ -432,7 +413,6 @@
                     <div class="flex flex-col gap-10">
                         <div class="space-y-6">
                             
-                            <!-- Controles Top -->
                             <div class="flex flex-col sm:flex-row flex-wrap gap-4 bg-white p-5 border border-border rounded-2xl items-start shadow-sm">
                                 <div class="flex-1 min-w-[120px]">
                                     <label class="text-xs font-bold text-dark mb-2 block" title="Stock por defecto es 0">Stock / Cantidad</label>
@@ -504,7 +484,6 @@
                                 </div>
                             </div>
 
-                            <!-- CONFIGURADOR DE PROMOCIONES ESPECIALES -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 bg-white p-5 border border-promo/30 rounded-2xl shadow-sm">
                                 <div>
                                     <label class="text-xs font-bold text-promo block mb-2"><i class="fas fa-gift"></i> Tipo de Promoción Especial</label>
@@ -524,7 +503,19 @@
                                 </div>
                             </div>
 
-                            <!-- GUIA DE MEDIDAS -->
+                            <!-- MEJORA CRO: Integración de Reseñas / Calificación para Social Proof -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 bg-white p-5 border border-border rounded-2xl shadow-sm">
+                                <div>
+                                    <label class="text-xs font-bold text-muted mb-2 block"><i class="fas fa-star text-[#F59E0B]"></i> Calificación Mostrada (1.0 - 5.0)</label>
+                                    <input type="number" id="new-rating" step="0.1" min="1" max="5" placeholder="5.0" class="admin-input bg-white">
+                                    <p class="text-[10px] text-muted mt-1 font-medium">Dejar vacío para no mostrar calificación.</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-muted mb-2 block"><i class="fas fa-users text-primary"></i> Cantidad de Reseñas (Ficticias o Reales)</label>
+                                    <input type="number" id="new-review-count" min="0" placeholder="Ej: 24" class="admin-input bg-white">
+                                </div>
+                            </div>
+
                             <div class="flex items-center justify-between bg-white p-4 border border-border rounded-xl shadow-sm">
                                 <span class="text-sm font-bold text-dark">Activar Guía de Tallas / Variantes</span>
                                 <label class="switch switch-accent">
@@ -589,7 +580,6 @@
                         <input type="text" id="new-category-name" placeholder="Ej. Peluches, Figuras, Llaveros..." class="admin-input flex-1 bg-white">
                         <button onclick="addNewCategory()" class="bg-white border border-primary text-primary px-8 py-3 text-sm font-bold hover:bg-primary hover:text-white transition-all rounded-xl shadow-sm"><i class="fas fa-plus"></i> Añadir</button>
                     </div>
-                    <!-- C4: Lista de Categorías (Con opción a editar) -->
                     <div id="categories-manager-list" class="flex flex-wrap gap-3"></div>
                 </div>
             </div>
@@ -603,7 +593,7 @@
                     </div>
                     <p class="text-muted text-sm mb-8 font-medium">Aplica un descuento masivo a todo el catálogo. <br><span class="text-primary bg-primary/10 px-2 py-0.5 rounded text-xs">Nota: Productos con descuentos individuales o 2x1 ignoran el descuento global automáticamente.</span></p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white p-8 rounded-2xl border border-border shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center bg-white p-8 rounded-2xl border border-border shadow-sm">
                         <div>
                             <label class="text-sm text-dark font-bold mb-3 block">Activar Descuento Store-Wide</label>
                             <label class="switch switch-promo mt-1">
@@ -615,6 +605,13 @@
                             <label class="text-sm text-promo font-bold mb-3 block">Porcentaje de Descuento (%)</label>
                             <input type="number" id="global-promo-val" placeholder="Ej: 15" min="1" max="99" class="w-full bg-white border border-promo/40 text-promo text-2xl font-bold px-4 py-4 outline-none text-center rounded-xl shadow-inner focus:border-promo focus:ring-2 focus:ring-promo/20 transition-all">
                         </div>
+                        <div>
+                            <label class="text-sm text-accent font-bold mb-3 block" title="Ocultar o mostrar el badge de urgencia en productos con stock 1-5">Alerta "Poco Stock" (1-5 uds)</label>
+                            <label class="switch switch-accent mt-1">
+                                <input type="checkbox" id="global-scarcity-active">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                     </div>
                     
                     <button onclick="saveGlobalPromo()" class="w-full bg-promo text-white py-4 font-bold text-lg rounded-xl shadow-md mt-8 hover:bg-[#C92A36] transition-colors"><i class="fas fa-check-circle mr-2"></i>Guardar y Aplicar a Tienda</button>
@@ -624,7 +621,6 @@
             <!-- TAB: AJUSTES GLOBALES -->
             <div id="tab-config" class="admin-tab hidden space-y-10">
                 
-                <!-- Ajustes del Sistema e Impuestos -->
                 <div class="bg-white p-8 border border-border rounded-3xl shadow-soft">
                     <h3 class="text-dark text-xl font-bold mb-8 border-b border-border pb-4 flex items-center gap-2"><i class="fas fa-sliders-h text-primary"></i> Configuración del Sistema</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
@@ -666,14 +662,11 @@
                     </div>
                 </div>
 
-                <!-- C3 y C9: Apariencia, Logo y Banner -->
                 <div class="bg-white p-8 border border-border rounded-3xl shadow-soft">
                     <h3 class="text-dark text-xl font-bold mb-8 border-b border-border pb-4 flex items-center gap-2"><i class="fas fa-paint-brush text-primary"></i> Apariencia de la Tienda (Logo y Banner)</h3>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                        <!-- Configuraciones de Textos y Toggles -->
                         <div class="space-y-6">
                             
-                            <!-- Toggle Banner -->
                             <div class="flex items-center justify-between bg-white border border-border p-4 rounded-xl shadow-sm">
                                 <div>
                                     <h4 class="text-sm font-bold text-dark">Activar Banner Promocional</h4>
@@ -691,9 +684,7 @@
                             <button onclick="saveAppearanceConfig()" id="btn-save-appearance" class="w-full mt-4 bg-primary text-white py-4 font-bold text-sm hover:bg-[#A6763A] transition-all shadow-md rounded-xl"><i class="fas fa-save mr-2"></i> Guardar Cambios de Apariencia</button>
                         </div>
                         
-                        <!-- Zonas de Subida de Imagen -->
                         <div class="space-y-6 flex flex-col h-full">
-                            <!-- Logo de la Tienda -->
                             <div class="flex-1 flex flex-col justify-center items-center border-2 border-dashed border-border rounded-2xl p-4 hover:border-primary transition-colors cursor-pointer relative bg-white" onclick="document.getElementById('new-logo-img').click()">
                                 <input type="file" id="new-logo-img" class="hidden" accept="image/png, image/jpeg, image/webp" onchange="compressLogoImage(this)">
                                 <div id="logo-preview-container" class="text-center z-10 relative">
@@ -704,7 +695,6 @@
                                 <img id="logo-preview" class="hidden absolute inset-0 w-full h-full object-contain p-4 rounded-2xl opacity-90" src="">
                                 <div id="logo-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20"><div class="loader !block"></div></div>
                             </div>
-                            <!-- Fondo del Banner -->
                             <div class="flex-1 flex flex-col justify-center items-center border-2 border-dashed border-border rounded-2xl p-4 hover:border-primary transition-colors cursor-pointer relative bg-white" onclick="document.getElementById('new-hero-img').click()">
                                 <input type="file" id="new-hero-img" class="hidden" accept="image/png, image/jpeg, image/webp" onchange="compressHeroImage(this)">
                                 <div id="hero-preview-container" class="text-center z-10 relative bg-white/80 p-4 rounded-2xl backdrop-blur-sm shadow-sm">
@@ -719,7 +709,6 @@
                     </div>
                 </div>
 
-                <!-- Textos y Redes Sociales Split -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
                     <div class="bg-white p-8 border border-border shadow-soft rounded-3xl flex flex-col justify-between h-full">
                         <div class="space-y-5">
@@ -744,14 +733,12 @@
                             <div><label class="text-xs font-bold text-muted mb-1 block"><i class="fab fa-whatsapp text-green-500 mr-1"></i> Número WhatsApp</label><input type="text" id="config-whatsapp" placeholder="Ej. +50499999999 sin espacios" class="admin-input bg-white"></div>
                             <div><label class="text-xs font-bold text-muted mb-1 block"><i class="fab fa-instagram text-pink-500 mr-1"></i> Instagram URL</label><input type="text" id="config-instagram" class="admin-input bg-white"></div>
                             <div><label class="text-xs font-bold text-muted mb-1 block"><i class="fab fa-facebook text-blue-500 mr-1"></i> Facebook URL</label><input type="text" id="config-facebook" class="admin-input bg-white"></div>
-                            <!-- C1: Campo TikTok -->
                             <div><label class="text-xs font-bold text-muted mb-1 block"><i class="fab fa-tiktok text-dark mr-1"></i> TikTok URL</label><input type="text" id="config-tiktok" placeholder="Ej. https://www.tiktok.com/@tu_cuenta" class="admin-input bg-white"></div>
                         </div>
                         <button onclick="saveSocials()" class="w-full mt-8 bg-white border border-primary text-primary py-3 font-bold text-sm hover:bg-primary hover:text-white transition-all shadow-sm rounded-xl">Guardar Redes</button>
                     </div>
                 </div>
 
-                <!-- Seguridad y Gestor de Accesos -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
                     <div class="bg-white p-8 border border-border shadow-soft rounded-3xl flex flex-col justify-between h-full">
                         <div class="space-y-5">
@@ -795,13 +782,11 @@
         </div>
     </div>
 
-    <!-- EL CEREBRO JS COMPLETO MIGRADO -->
     <script>
-        // Utilidades Visuales Adaptadas a Pinkitos
         const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000, background: '#FFFFFF', color: '#2C2421', iconColor: '#B88645', customClass: { popup: 'border border-[#E5E7EB] rounded-xl shadow-float !py-3 !px-5', title: '!text-sm !font-bold' }});
         const DarkAlert = Swal.mixin({ background: '#FFFFFF', color: '#2C2421', confirmButtonColor: '#B88645', cancelButtonColor: '#E63946', customClass: { popup: 'border border-[#E5E7EB] rounded-3xl shadow-float', confirmButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm', cancelButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm' } });
 
-        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", categories: ["figuras"], heroTitle: "", heroSubtitle: "", heroImage: "", logoUrl: "", heroActive: true, invoiceHeader: "", invoiceFooter: "", shareText: "", currency: "$", posTimeout: "0", taxEnabled: false, taxRate: 15, posPin: "", globalDiscountActivo: false, globalDiscountValue: 0 };
+        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", categories: ["figuras"], heroTitle: "", heroSubtitle: "", heroImage: "", logoUrl: "", heroActive: true, invoiceHeader: "", invoiceFooter: "", shareText: "", currency: "$", posTimeout: "0", taxEnabled: false, taxRate: 15, posPin: "", globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false };
         const DEFAULT_MEASURES = { "Pequeño": { medida: "" }, "Mediano": { medida: "" }, "Grande": { medida: "" } };
 
         let inventario = []; let pedidosList = []; let config = { ...DEFAULT_CONFIG };
@@ -811,7 +796,6 @@
 
         let posCart = []; let posEditingOrderId = null;
         
-        // Estado Global App
         let posViewMode = 'grid'; 
         let posCurrentPage = 1; let posItemsPerPage = 10;
         let pedCurrentPage = 1; let pedItemsPerPage = 10;
@@ -852,7 +836,6 @@
             if (origNum > finalNum && finalNum > 0) return Math.round((1 - (finalNum / origNum)) * 100); return 0;
         }
 
-        // SEGURIDAD E IDLE TIMER
         let lastActivityTime = Date.now(); let idleInterval; let systemLocked = false;
         function resetIdleTimer() { if(!systemLocked) lastActivityTime = Date.now(); }
         function startIdleTimer() {
@@ -887,19 +870,17 @@
             }).catch(() => document.getElementById('lock-error').classList.remove('hidden') );
         }
 
-        // C9: Actualizar Logo en Header Admin
         function updateAdminHeaderLogo() {
             const logoContainer = document.getElementById('admin-logo-container');
             if(config.logoUrl) {
                 logoContainer.innerHTML = `<img src="${config.logoUrl}" class="w-10 h-10 object-contain rounded-full shadow-sm">`;
-                logoContainer.classList.remove('bg-accent/20'); // Remove background color if image exists
+                logoContainer.classList.remove('bg-accent/20'); 
             } else {
                 logoContainer.innerHTML = `<i class="fas fa-cat"></i>`;
                 logoContainer.classList.add('bg-accent/20');
             }
         }
 
-        // INICIALIZACIÓN Y AUTH
         function init() {
             auth.onAuthStateChanged((user) => {
                 currentFirebaseUser = user;
@@ -962,9 +943,8 @@
                 title.innerHTML = '<div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center text-primary text-sm shadow-sm"><i class="fas fa-cash-register"></i></div> Terminal POS<span class="text-primary">.</span>';
                 navGroupPos.classList.remove('hidden'); navGroupPos.classList.add('flex'); navGroupAdmin.classList.add('hidden'); navGroupAdmin.classList.remove('flex'); showAdminTab('pos');
             } else if (module === 'ADMIN') {
-                // Reconstruir con el div del logo dinámico
                 title.innerHTML = `<div id="admin-logo-container" class="w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-sm transition-all"></div> Pinkitos<span class="text-primary">.</span>`;
-                updateAdminHeaderLogo(); // Asegura que cargue correcto
+                updateAdminHeaderLogo();
                 navGroupAdmin.classList.remove('hidden'); navGroupAdmin.classList.add('flex'); navGroupPos.classList.add('hidden'); navGroupPos.classList.remove('flex'); showAdminTab('inventario');
             }
         }
@@ -986,7 +966,6 @@
             if(tab === 'pos') renderPosInventory();
         }
 
-        // --- LÓGICA POS TERMINAL ---
         function changePosView(mode) {
             posViewMode = mode;
             if(mode === 'grid') { document.getElementById('pos-view-grid').className = 'px-4 py-2.5 text-primary bg-white transition-colors'; document.getElementById('pos-view-list').className = 'px-4 py-2.5 text-muted hover:text-dark transition-colors'; } 
@@ -1031,7 +1010,6 @@
                 }
             }
 
-            // REMODELACIÓN 1: Quitar filtro borroso y hacer que la tarjeta "Agotado" destaque
             let overlayBadges = ''; const isPrevActiva = esPreventaActiva(p);
             if (isOut) overlayBadges += '<div class="absolute inset-0 bg-white/20 flex items-center justify-center z-10"><span class="bg-dark/80 backdrop-blur-md text-white text-[10px] px-3 py-1.5 uppercase font-bold rounded-lg shadow-md border border-white/20">Agotado</span></div>';
             else if (isPrevActiva) overlayBadges += `<div class="absolute top-2 right-2 bg-accent/90 text-white text-[9px] px-2 py-1 uppercase font-bold rounded-lg shadow-sm text-center z-10">Pronto</div>`;
@@ -1172,7 +1150,6 @@
             posCart._origIdPedido = pedido.idPedido; document.getElementById('pos-client-name').value = pedido.cliente || ''; document.getElementById('pos-ticket-title').innerText = `Editando: ${pedido.idPedido || 'S/N'}`; showAdminTab('pos'); renderPosCart();
         }
 
-        // --- LÓGICA PEDIDOS ---
         function escucharPedidos() { db.collection("pedidos").orderBy("createdAt", "desc").onSnapshot((snapshot) => { pedidosList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); renderPedidosList(); renderFacturasList(); }, (error) => console.error(error)); }
         window.toggleAccordion = function(id) { const content = document.getElementById(id); const icon = document.getElementById('icon-' + id); if(content.classList.contains('hidden')) { content.classList.remove('hidden'); icon.style.transform = 'rotate(180deg)'; } else { content.classList.add('hidden'); icon.style.transform = 'rotate(0deg)'; } }
         function changePedPage(dir) { pedCurrentPage += dir; renderPedidosList(); }
@@ -1388,14 +1365,13 @@
             printDiv.innerHTML = `<div style="font-family: 'Courier New', Courier, monospace; max-width: 350px; margin: 0 auto; padding: 20px;"><h2 style="text-align: center; margin-bottom: 5px; font-size: 24px;">PINKITOS SHOP</h2><p style="text-align: center; margin-top: 0; font-size: 12px; color: #333;">${invHeader}</p><hr style="border: 1px dashed #000; margin: 15px 0;"><p style="font-size: 13px; margin: 5px 0;"><strong>FACTURA:</strong> ${f.idPedido}</p><p style="font-size: 13px; margin: 5px 0;"><strong>CLIENTE:</strong> ${f.cliente}</p><p style="font-size: 13px; margin: 5px 0;"><strong>FECHA:</strong> ${dateStr}</p><hr style="border: 1px dashed #000; margin: 15px 0;"><table style="width: 100%; border-collapse: collapse;"><thead><tr style="border-bottom: 2px solid #000;"><th style="text-align: left; padding-bottom: 5px; font-size: 12px;">DESC.</th><th style="text-align: center; padding-bottom: 5px; font-size: 12px;">CANT</th><th style="text-align: right; padding-bottom: 5px; font-size: 12px;">SUB</th></tr></thead><tbody>${itemsHtml}</tbody></table><hr style="border: 1px dashed #000; margin: 15px 0;">${extraTotals}<h3 style="text-align: right; font-size: 18px; margin: 0;">TOTAL: ${config.currency||'$'}${(f.total || 0).toFixed(2)}</h3><p style="text-align: center; margin-top: 30px; font-size: 11px;">${invFooter}</p></div>`; window.print();
         }
 
-        // --- LÓGICA INVENTARIO ---
         function escucharFirebase() { db.collection("productos").orderBy("createdAt", "desc").onSnapshot((snapshot) => { inventario = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); renderAdminList(); renderPosInventory(); }, (error) => console.error(error)); }
         function changeInvPage(dir) { invCurrentPage += dir; renderAdminList(); }
 
         function renderAdminList() {
             const list = document.getElementById('admin-list'); 
             const term = (document.getElementById('search-inventory').value || "").toLowerCase();
-            const filterCat = document.getElementById('inv-filter-cat').value; // C5: Obtener Categoría a Filtrar
+            const filterCat = document.getElementById('inv-filter-cat').value;
 
             const filt = inventario.filter(p => {
                 const matchTerm = (p.titulo || "").toLowerCase().includes(term) || (p.sku || "").toLowerCase().includes(term) || (p.categoria || "").toLowerCase().includes(term);
@@ -1421,9 +1397,11 @@
                 else if(prod.stock <= 0) statusInfo += `<span class="bg-muted text-white text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-ban"></i> Agotado</span>`;
                 else statusInfo += `<span class="bg-[#20b858]/10 text-[#20b858] text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm"><i class="fas fa-check"></i> Stock: ${prod.stock}</span>`;
 
-                // REMODELACIÓN 5: Prevenir visualización negativa garantizando el máximo con 0
                 const safeFavCount = Math.max(0, prod.favCount || 0);
-                const favCountInfo = `<span class="bg-promo/10 text-promo text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm flex items-center gap-1" title="Veces añadido a favoritos por clientes"><i class="fas fa-heart"></i> ${safeFavCount}</span>`;
+                const favCountInfo = `<span class="bg-promo/10 text-promo text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm flex items-center gap-1" title="Favoritos"><i class="fas fa-heart"></i> ${safeFavCount}</span>`;
+
+                // CRO: Rating admin view
+                const ratingInfo = prod.rating ? `<span class="bg-light text-dark text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase mr-1 mb-1 shadow-sm flex items-center gap-1" title="Calificación"><i class="fas fa-star text-[#F59E0B]"></i> ${prod.rating} (${prod.reviewCount || '0'})</span>` : '';
 
                 return `<div class="bg-white p-4 flex items-center justify-between border border-border rounded-2xl hover:shadow-soft hover:border-primary/40 transition-all">
                     <div class="flex items-center gap-4 truncate min-w-0 flex-1">
@@ -1435,7 +1413,7 @@
                                 <span class="bg-white border border-border text-muted text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase shrink-0">${prod.categoria || 'Gen'}</span>
                                 <p class="text-dark text-sm font-bold truncate">${prod.titulo} <span class="text-muted font-normal text-[10px]">#${prod.sku||''}</span></p>
                             </div>
-                            <div class="flex flex-wrap items-center mt-1">${statusInfo}${favCountInfo}</div>
+                            <div class="flex flex-wrap items-center mt-1">${statusInfo}${ratingInfo}${favCountInfo}</div>
                         </div>
                     </div>
                     <div class="flex flex-col gap-2 flex-shrink-0 ml-4">
@@ -1460,7 +1438,6 @@
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Inventario"); XLSX.writeFile(wb, `Inventario_Pinkitos_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`);
         }
 
-        // --- LÓGICA PRODUCT FORM ---
         function renderCategoryInputs() { 
             const sel = document.getElementById('new-cat'); 
             const filterSel = document.getElementById('inv-filter-cat');
@@ -1493,7 +1470,6 @@
         function addNewCategory() { const input = document.getElementById('new-category-name'); const name = input.value.trim().toLowerCase(); if(!name || (config.categories||[]).includes(name)) return; db.collection("config").doc("global").set({ categories: [...(config.categories||[]), name] }, { merge: true }).then(() => input.value = ""); }
         function removeCategory(cat) { if((config.categories||[]).length <= 1) return Toast.fire({ icon: 'warning', title: 'Mínimo una categoría' }); db.collection("config").doc("global").set({ categories: config.categories.filter(c => c !== cat) }, { merge: true }); }
 
-        // C4: Función para Editar Categoría Global
         async function editCategory(oldCat) {
             const { value: newCat } = await Swal.fire({
                 title: 'Editar Categoría',
@@ -1575,11 +1551,21 @@
                 const hasMeasures = document.getElementById('toggle-measures').checked; const tallas = []; const medidas = {};
                 if(hasMeasures) { currentFormSizes.forEach(t => { const safeT = t.replace(/[^a-zA-Z0-9_-]/g, ''); const checkbox = document.getElementById(`t-${safeT}`); if(checkbox && checkbox.checked) { tallas.push(t); medidas[t] = {}; currentFormColumns.forEach(c => { const safeC = c.replace(/[^a-zA-Z0-9_-]/g, ''); const inputEl = document.getElementById(`measure-${safeT}-${safeC}`); medidas[t][c] = inputEl ? inputEl.value : ""; }); } }); }
                 
-                const productData = { sku: skuVal, categoria: catVal, titulo: title, descripcion: document.getElementById('new-desc').value.trim() || "", precio: finalPrice, precioOriginal: finalComparePrice, fechaLanzamiento: document.getElementById('new-release-date').value || null, promoType: document.getElementById('new-promo-type').value, ofertaInicio: document.getElementById('new-offer-start').value || null, ofertaFin: document.getElementById('new-offer-end').value || null, stock: parseInt(document.getElementById('new-stock').value) || 0, isPresale: document.getElementById('toggle-presale').checked, taxable: document.getElementById('toggle-taxable').checked, isPinned: document.getElementById('toggle-pinned').checked, hasMeasures, tallas, medidas, columnas: currentFormColumns, imagen: imageUrls[0] || "", imagenes: imageUrls || [] };
+                const productData = { 
+                    sku: skuVal, categoria: catVal, titulo: title, descripcion: document.getElementById('new-desc').value.trim() || "", 
+                    precio: finalPrice, precioOriginal: finalComparePrice, fechaLanzamiento: document.getElementById('new-release-date').value || null, 
+                    promoType: document.getElementById('new-promo-type').value, ofertaInicio: document.getElementById('new-offer-start').value || null, 
+                    ofertaFin: document.getElementById('new-offer-end').value || null, stock: parseInt(document.getElementById('new-stock').value) || 0, 
+                    isPresale: document.getElementById('toggle-presale').checked, taxable: document.getElementById('toggle-taxable').checked, 
+                    isPinned: document.getElementById('toggle-pinned').checked, hasMeasures, tallas, medidas, columnas: currentFormColumns, 
+                    imagen: imageUrls[0] || "", imagenes: imageUrls || [],
+                    rating: parseFloat(document.getElementById('new-rating').value) || null, // CRO Stars
+                    reviewCount: parseInt(document.getElementById('new-review-count').value) || null // CRO Stars
+                };
                 
                 if (!editId) {
                     productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    productData.favCount = 0; // Inicializar contador de favoritos
+                    productData.favCount = 0; 
                 }
                 
                 await docRef.set(productData, { merge: true }); Toast.fire({ icon: 'success', title: 'Producto Guardado' }); 
@@ -1606,6 +1592,10 @@
             document.getElementById('new-promo-type').value = p.promoType || 'normal'; document.getElementById('new-offer-start').value = p.ofertaInicio || ''; document.getElementById('new-offer-end').value = p.ofertaFin || '';
             document.getElementById('new-stock').value = p.stock !== undefined ? p.stock : 0; document.getElementById('toggle-taxable').checked = p.taxable !== undefined ? p.taxable : !!config.taxEnabled; document.getElementById('toggle-pinned').checked = !!p.isPinned; document.getElementById('toggle-measures').checked = !!p.hasMeasures; toggleMeasuresVisibility();
             
+            // CRO Stars
+            document.getElementById('new-rating').value = p.rating !== undefined && p.rating !== null ? p.rating : "";
+            document.getElementById('new-review-count').value = p.reviewCount !== undefined && p.reviewCount !== null ? p.reviewCount : "";
+
             const isPlaceholder = p.imagen && p.imagen.includes('via.placeholder.com');
             selectedBase64Imgs = p.imagenes && p.imagenes.length > 0 && !isPlaceholder ? [...p.imagenes] : (p.imagen && !isPlaceholder ? [p.imagen] : []); renderThumbnails();
             currentFormSizes = ["Pequeño", "Mediano", "Grande"]; currentFormColumns = p.columnas && p.columnas.length > 0 ? p.columnas : ["Medida"]; if(p.hasMeasures && p.tallas) { p.tallas.forEach(t => { if(!currentFormSizes.includes(t)) currentFormSizes.push(t); }); }
@@ -1617,43 +1607,15 @@
             const wasEditing = !!editId; editId = null; document.getElementById('admin-form-container').classList.remove('editing-mode'); document.getElementById('btn-cancel-edit').classList.add('hidden');
             document.getElementById('admin-form-title').innerHTML = '<i class="fas fa-box-open text-primary"></i> Crear / Editar Producto';
             document.getElementById('new-title').value = ""; document.getElementById('new-sku').value = ""; document.getElementById('new-price').value = ""; document.getElementById('new-desc').value = ""; document.getElementById('new-stock').value = "0"; document.getElementById('toggle-presale').checked = false; document.getElementById('new-price-compare').value = ""; document.getElementById('new-discount-percent').value = ""; document.getElementById('new-release-date').value = ""; document.getElementById('new-promo-type').value = 'normal'; document.getElementById('new-offer-start').value = ''; document.getElementById('new-offer-end').value = ''; document.getElementById('toggle-taxable').checked = !!config.taxEnabled; document.getElementById('toggle-pinned').checked = false; document.getElementById('toggle-measures').checked = true; toggleMeasuresVisibility();
+            document.getElementById('new-rating').value = ""; document.getElementById('new-review-count').value = ""; // CRO Stars
             selectedBase64Imgs = []; renderThumbnails(); currentFormSizes = ["Pequeño", "Mediano", "Grande"]; currentFormColumns = ["Medida"]; renderMedidasForm();
             if (wasEditing) showAdminTab('inventario');
-        }
-
-        // --- LÓGICA DE CONFIGURACIONES ---
-        function escucharConfigGlobal() { 
-            db.collection("config").doc("global").onSnapshot((doc) => { 
-                if (doc.exists) { 
-                    config = { ...config, ...doc.data() }; 
-                    renderConfig(); 
-                    renderCategoryInputs(); 
-                    renderCategoriesManager(); 
-                    updateAdminHeaderLogo();
-                    document.getElementById('form-currency-display').innerText = config.currency || '$'; 
-                    if(document.getElementById('form-currency-display-compare')) document.getElementById('form-currency-display-compare').innerText = config.currency || '$'; 
-                } 
-            }); 
-        }
-        function escucharHero() { db.collection("config").doc("hero").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; renderHeroConfig(); } }); }
-
-        function renderConfig() { 
-            document.getElementById('config-slogan').value = config.slogan || ""; document.getElementById('config-about-title').value = config.aboutTitle || ""; document.getElementById('config-about-desc').value = config.aboutDesc || ""; document.getElementById('config-whatsapp').value = config.whatsapp || ""; document.getElementById('config-instagram').value = config.instagram || ""; document.getElementById('config-facebook').value = config.facebook || ""; document.getElementById('config-tiktok').value = config.tiktok || ""; document.getElementById('config-invoice-header').value = config.invoiceHeader || ""; document.getElementById('config-invoice-footer').value = config.invoiceFooter || ""; document.getElementById('config-share-text').value = config.shareText || ""; document.getElementById('config-currency').value = config.currency || "$"; document.getElementById('config-pos-timeout').value = config.posTimeout || "0"; document.getElementById('config-tax-enabled').checked = !!config.taxEnabled; document.getElementById('config-tax-rate').value = config.taxRate || 15; document.getElementById('config-pin').value = config.posPin || "";
-            if(document.getElementById('global-promo-active')) { document.getElementById('global-promo-active').checked = config.globalDiscountActivo || false; document.getElementById('global-promo-val').value = config.globalDiscountValue || 0; }
-            if(document.getElementById('config-hero-active')) { document.getElementById('config-hero-active').checked = config.heroActive !== false; } // Por defecto es true
-            
-            // Render Logo actual
-            if(config.logoUrl) {
-                document.getElementById('logo-preview').src = config.logoUrl;
-                document.getElementById('logo-preview').classList.remove('hidden');
-                document.getElementById('logo-preview-container').classList.add('opacity-0', 'group-hover:opacity-100', 'transition-opacity', 'bg-white/90', 'p-4', 'rounded-2xl', 'backdrop-blur-sm'); // Muestra overlay al hacer hover
-            }
         }
 
         function saveBrandTexts() { db.collection("config").doc("global").set({ slogan: document.getElementById('config-slogan').value, aboutTitle: document.getElementById('config-about-title').value, aboutDesc: document.getElementById('config-about-desc').value, invoiceHeader: document.getElementById('config-invoice-header').value, invoiceFooter: document.getElementById('config-invoice-footer').value }, { merge: true }).then(()=> Toast.fire({ icon:'success', title:'Textos Guardadas' })); }
         function saveSocials() { db.collection("config").doc("global").set({ whatsapp: document.getElementById('config-whatsapp').value, instagram: document.getElementById('config-instagram').value, facebook: document.getElementById('config-facebook').value, tiktok: document.getElementById('config-tiktok').value, shareText: document.getElementById('config-share-text').value }, { merge: true }).then(()=> Toast.fire({ icon:'success', title:'Redes Guardadas' })); }
         function saveSystemConfig() { db.collection("config").doc("global").set({ currency: document.getElementById('config-currency').value, posTimeout: document.getElementById('config-pos-timeout').value, taxEnabled: document.getElementById('config-tax-enabled').checked, taxRate: parseFloat(document.getElementById('config-tax-rate').value) || 0 }, { merge: true }).then(()=> { Toast.fire({ icon:'success', title:'Sistema Actualizado' }); resetIdleTimer(); }); }
-        function saveGlobalPromo() { const activo = document.getElementById('global-promo-active').checked; const val = parseFloat(document.getElementById('global-promo-val').value) || 0; db.collection("config").doc("global").set({ globalDiscountActivo: activo, globalDiscountValue: val }, {merge:true}).then(()=>Toast.fire({icon:'success', title:'Promo Global Activa'})); }
+        function saveGlobalPromo() { const activo = document.getElementById('global-promo-active').checked; const val = parseFloat(document.getElementById('global-promo-val').value) || 0; const scarcityActivo = document.getElementById('global-scarcity-active').checked; db.collection("config").doc("global").set({ globalDiscountActivo: activo, globalDiscountValue: val, globalScarcityActivo: scarcityActivo }, {merge:true}).then(()=>Toast.fire({icon:'success', title:'Preferencias Guardadas'})); }
 
         function saveSecurity() { 
             const pinVal = document.getElementById('config-pin').value; db.collection("config").doc("global").set({ posPin: pinVal }, { merge: true }).then(()=> Toast.fire({ icon:'success', title:'Seguridad Actualizada' })); 
@@ -1674,7 +1636,6 @@
             secondaryApp.auth().createUserWithEmailAndPassword(email, pass).then(() => { secondaryApp.auth().signOut(); Toast.fire({ icon: 'success', title: 'Usuario Registrado Correctamente' }); document.getElementById('new-user-email').value = ""; document.getElementById('new-user-pass').value = ""; }).catch((error) => { let msg = error.message; if (error.code === 'auth/email-already-in-use') msg = 'Este correo ya está en uso.'; DarkAlert.fire({ icon: 'error', title: 'Error al crear', text: msg }); }).finally(() => { btn.disabled = false; btn.innerHTML = `<i class="fas fa-user-plus"></i> Registrar Usuario`; });
         }
 
-        // C9: Cargar y Guardar Logo
         function compressLogoImage(input) {
             if (!input.files || !input.files[0]) return; const reader = new FileReader(); reader.readAsDataURL(input.files[0]); reader.onload = function(e) { const img = new Image(); img.src = e.target.result; img.onload = function() { const canvas = document.createElement('canvas'); let w = img.width > 500 ? 500 : img.width; canvas.width = w; canvas.height = img.height * (w / img.width); canvas.getContext('2d').drawImage(img, 0, 0, w, canvas.height); selectedLogoImg = canvas.toDataURL('image/png', 0.9); document.getElementById('logo-preview').src = selectedLogoImg; document.getElementById('logo-preview').classList.remove('hidden'); document.getElementById('logo-preview-container').classList.add('opacity-0', 'group-hover:opacity-100', 'transition-opacity', 'bg-white/90', 'p-4', 'rounded-2xl', 'backdrop-blur-sm'); } }
         }
@@ -1711,7 +1672,76 @@
             } 
         }
 
-        function renderHeroConfig() { document.getElementById('config-hero-title').value = config.heroTitle || ""; document.getElementById('config-hero-subtitle').value = config.heroSubtitle || ""; if(config.heroImage) { document.getElementById('hero-preview').src = config.heroImage; document.getElementById('hero-preview').classList.remove('hidden'); document.getElementById('hero-preview-container').classList.add('bg-white/90'); } }
+        // ==========================================
+        // 🔥 LÓGICA DE CONFIGURACIONES (AQUÍ ESTABA EL CORTE)
+        // ==========================================
+        function escucharConfigGlobal() { 
+            db.collection("config").doc("global").onSnapshot((doc) => { 
+                if (doc.exists) { 
+                    config = { ...config, ...doc.data() }; 
+                    renderConfig(); 
+                    renderCategoryInputs(); 
+                    renderCategoriesManager(); 
+                    updateAdminHeaderLogo();
+                    document.getElementById('form-currency-display').innerText = config.currency || '$'; 
+                    if(document.getElementById('form-currency-display-compare')) document.getElementById('form-currency-display-compare').innerText = config.currency || '$'; 
+                } 
+            }); 
+        }
+        
+        function escucharHero() { 
+            db.collection("config").doc("hero").onSnapshot((doc) => { 
+                if (doc.exists) { 
+                    config = { ...config, ...doc.data() }; 
+                    renderHeroConfig(); 
+                } 
+            }); 
+        }
+
+        function renderConfig() { 
+            document.getElementById('config-slogan').value = config.slogan || ""; 
+            document.getElementById('config-about-title').value = config.aboutTitle || ""; 
+            document.getElementById('config-about-desc').value = config.aboutDesc || ""; 
+            document.getElementById('config-whatsapp').value = config.whatsapp || ""; 
+            document.getElementById('config-instagram').value = config.instagram || ""; 
+            document.getElementById('config-facebook').value = config.facebook || ""; 
+            document.getElementById('config-tiktok').value = config.tiktok || ""; 
+            document.getElementById('config-invoice-header').value = config.invoiceHeader || ""; 
+            document.getElementById('config-invoice-footer').value = config.invoiceFooter || ""; 
+            document.getElementById('config-share-text').value = config.shareText || ""; 
+            document.getElementById('config-currency').value = config.currency || "$"; 
+            document.getElementById('config-pos-timeout').value = config.posTimeout || "0"; 
+            document.getElementById('config-tax-enabled').checked = !!config.taxEnabled; 
+            document.getElementById('config-tax-rate').value = config.taxRate || 15; 
+            document.getElementById('config-pin').value = config.posPin || "";
+            
+            if(document.getElementById('global-promo-active')) { 
+                document.getElementById('global-promo-active').checked = config.globalDiscountActivo || false; 
+                document.getElementById('global-promo-val').value = config.globalDiscountValue || 0; 
+            }
+            if(document.getElementById('global-scarcity-active')) { 
+                document.getElementById('global-scarcity-active').checked = config.globalScarcityActivo || false; 
+            }
+            if(document.getElementById('config-hero-active')) { 
+                document.getElementById('config-hero-active').checked = config.heroActive !== false; 
+            }
+            
+            if(config.logoUrl) {
+                document.getElementById('logo-preview').src = config.logoUrl;
+                document.getElementById('logo-preview').classList.remove('hidden');
+                document.getElementById('logo-preview-container').classList.add('opacity-0', 'group-hover:opacity-100', 'transition-opacity', 'bg-white/90', 'p-4', 'rounded-2xl', 'backdrop-blur-sm');
+            }
+        }
+
+        function renderHeroConfig() { 
+            document.getElementById('config-hero-title').value = config.heroTitle || ""; 
+            document.getElementById('config-hero-subtitle').value = config.heroSubtitle || ""; 
+            if(config.heroImage) { 
+                document.getElementById('hero-preview').src = config.heroImage; 
+                document.getElementById('hero-preview').classList.remove('hidden'); 
+                document.getElementById('hero-preview-container').classList.add('bg-white/90'); 
+            } 
+        }
 
         window.onload = init;
     </script>
