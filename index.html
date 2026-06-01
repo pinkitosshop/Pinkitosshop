@@ -54,7 +54,7 @@
                     },
                     boxShadow: {
                         'soft': '0 10px 40px -10px rgba(44, 36, 33, 0.08)',
-                        'float': '0 15px 35px -5px rgba(44, 36, 33, 0.12)'
+                        'float': '0 20px 40px -5px rgba(44, 36, 33, 0.12)'
                     }
                 } 
             }
@@ -177,6 +177,7 @@
 
         <div class="px-6 py-6 border-t border-border bg-white shrink-0 rounded-bl-3xl">
             <div class="space-y-3 mb-4 pb-4 border-b border-border">
+                <!-- REMODELACIÓN 2: Subtotal Original dinámico -->
                 <div id="cart-drawer-subtotal-row" class="hidden flex justify-between items-center text-muted text-sm font-medium">
                     <span>Subtotal Original</span>
                     <span id="cart-drawer-subtotal-orig" class="line-through">L0.00</span>
@@ -197,6 +198,7 @@
                 <input type="text" id="cliente-nombre" placeholder="Tu Nombre Completo" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl shadow-sm">
                 <textarea id="mensaje" rows="2" maxlength="150" placeholder="Nota adicional (Ej. Para regalo)" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all resize-none rounded-xl shadow-sm"></textarea>
                 
+                <!-- REMODELACIÓN 1: Selección del canal de contacto (WhatsApp / Instagram) -->
                 <div class="mt-3">
                     <label class="block text-xs font-bold text-muted uppercase tracking-wider mb-2">Método de Envío</label>
                     <div class="grid grid-cols-2 gap-3">
@@ -266,9 +268,6 @@
                         <h2 id="modal-title" class="font-bold text-2xl md:text-3xl text-dark leading-tight pr-4"></h2>
                         <button onclick="shareProduct()" class="text-muted hover:text-dark transition-colors bg-light rounded-full w-10 h-10 flex items-center justify-center shrink-0 border border-border"><i class="fas fa-share-alt"></i></button>
                     </div>
-
-                    <!-- CRO: Social Proof Stars Display in Modal -->
-                    <div id="modal-rating-display" class="flex items-center gap-1.5 mb-4 w-max"></div>
                     
                     <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-border">
                         <p id="modal-cat" class="bg-white border border-border text-primary px-3 py-1 text-xs font-bold rounded-full"></p>
@@ -325,10 +324,13 @@
     <!-- SECCIONES PRINCIPALES REDISEÑADAS -->
     <div id="inicio" class="section-fade active pt-20">
         
+        <!-- C3: Hero Banner ocultable -->
         <section id="hero-display" class="h-[50vh] md:h-[65vh] flex items-center justify-center text-center relative overflow-hidden hero-bg mx-2 md:mx-6 mt-4">
+            <!-- Capa Decorativa -->
             <div class="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
             
             <div class="relative z-10 px-6 max-w-3xl">
+                <!-- CONTENEDOR GLASSMORPHISM PARA GARANTIZAR LECTURA DE SUBTÍTULOS -->
                 <div class="bg-white/80 backdrop-blur-md p-6 md:p-8 rounded-[2rem] shadow-float inline-block border border-white/50">
                     <h1 id="display-hero-title" class="font-extrabold text-4xl md:text-6xl text-dark mb-3 leading-tight drop-shadow-sm"></h1>
                     <p id="display-hero-subtitle" class="text-secondary text-sm md:text-base font-bold tracking-wide"></p>
@@ -345,8 +347,8 @@
             </div>
             
             <div class="w-full">
-                <!-- CRO: Grid spacing optimizado responsivo (4 col Desktop, 3 col Tablet, 2 col Mobile) -->
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 transition-opacity duration-300 min-h-[400px]" id="gallery-grid">
+                <!-- Grid actualizado a estilo card pura blanca -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 transition-opacity duration-300 min-h-[400px]" id="gallery-grid">
                     <div class="col-span-full text-center py-20 flex flex-col items-center justify-center">
                             <div class="loader !border-t-accent !border-border !w-10 !h-10 mb-4 !block"></div>
                             <p class="text-muted font-semibold text-sm">Cargando magia...</p>
@@ -432,7 +434,8 @@
         
         function cargarDatosLocales() { try { const sc = localStorage.getItem('pk_carrito'); if(sc) carrito = JSON.parse(sc); const sw = localStorage.getItem('pk_wishlist'); if(sw) wishlist = JSON.parse(sw); } catch (e) {} }
         
-        function toggleMobileSearch() { const c = document.getElementById('mobile-search-container'); if (c.classList.contains('scale-y-0')) { c.classList.remove('hidden'); setTimeout(() => { c.classList.remove('scale-y-0'); c.classList.add('scale-y-100'); document.getElementById('mobile-live-search').focus(); }, 10); } else { c.classList.remove('scale-y-100'); c.classList.add('scale-y-0'); setTimeout(() => c.add('hidden'), 300); } }
+        // UI Toggles
+        function toggleMobileSearch() { const c = document.getElementById('mobile-search-container'); if (c.classList.contains('scale-y-0')) { c.classList.remove('hidden'); setTimeout(() => { c.classList.remove('scale-y-0'); c.classList.add('scale-y-100'); document.getElementById('mobile-live-search').focus(); }, 10); } else { c.classList.remove('scale-y-100'); c.classList.add('scale-y-0'); setTimeout(() => c.classList.add('hidden'), 300); } }
         function toggleMobileCategories() { const d = document.getElementById('mobile-cat-drawer'); d.classList.toggle('-translate-x-full'); }
         
         function toggleCartDrawer() { 
@@ -453,11 +456,13 @@
             } 
         }
         
+        // Mis Pedidos
         function abrirMisPedidos() { renderMisPedidos(); document.getElementById('mis-pedidos-modal').classList.add('active'); }
         function cerrarMisPedidos(e) { if(e) e.stopPropagation(); document.getElementById('mis-pedidos-modal').classList.remove('active'); }
         function renderMisPedidos() { const lista = document.getElementById('lista-mis-pedidos'); const h = JSON.parse(localStorage.getItem('pk_pedidos') || '[]'); if(h.length===0) return lista.innerHTML = `<div class="text-center py-8"><div class="w-16 h-16 bg-white border border-border rounded-full mx-auto flex items-center justify-center text-muted mb-3 shadow-sm"><i class="fas fa-box-open text-2xl"></i></div><p class="text-muted text-sm font-semibold">No tienes compras recientes</p></div>`; lista.innerHTML = h.reverse().map(pedido => `<div class="bg-white border border-border p-5 rounded-2xl mb-4 shadow-sm"><div class="flex justify-between items-center mb-4 border-b border-border pb-3"><span class="text-dark font-bold text-sm">Pedido: ${pedido.idPedido}</span><span class="text-muted text-xs font-medium">${new Date(pedido.fecha).toLocaleDateString()}</span></div><div class="space-y-3 mb-4">${pedido.items.map(item => `<div class="flex items-center gap-3 bg-white border border-border shadow-sm p-2.5 rounded-xl"><div class="w-12 h-12 bg-white rounded-lg border border-border overflow-hidden shrink-0"><img src="${item.img}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><p class="text-dark text-xs font-bold truncate">${item.titulo}</p><p class="text-muted text-[10px] mt-0.5">Tipo: <span class="text-dark font-semibold">${item.talla}</span> | Cant: <span class="text-primary font-bold">x${item.cantidad}</span></p></div><div class="text-right shrink-0"><button onclick="cerrarMisPedidos(); openModalById('${item.id}')" class="bg-white hover:bg-light border border-border text-dark p-2 rounded-lg transition-colors text-xs shadow-sm"><i class="fas fa-redo"></i></button></div></div>`).join('')}</div><div class="text-right border-t border-border pt-3"><span class="text-dark font-bold">Total: ${config.currency||'$'}${(pedido.total||0).toFixed(2)}</span></div></div>`).join(''); }
         function limpiarMisPedidos() { localStorage.removeItem('pk_pedidos'); renderMisPedidos(); Toast.fire({icon: 'info', title: 'Historial borrado'}); }
 
+        // Favoritos Navbar
         function updateWishlistNav() {
             const iconD = document.getElementById('nav-wishlist-icon');
             const iconM = document.getElementById('nav-wishlist-icon-mobile');
@@ -470,6 +475,7 @@
             }
         }
 
+        // Wishlist Modal y Toggle
         function abrirWishlist() { renderWishlist(); document.getElementById('wishlist-modal').classList.add('active'); }
         function cerrarWishlist(e) { if(e) e.stopPropagation(); document.getElementById('wishlist-modal').classList.remove('active'); }
         
@@ -490,13 +496,14 @@
             renderGallery(); updateWishlistNav();
             if(document.getElementById('wishlist-modal').classList.contains('active')) renderWishlist(); 
 
+            // REMODELACIÓN 4: Transacción Segura de Firestore para evitar que baje de 0
             const docRef = db.collection("productos").doc(id);
             db.runTransaction((transaction) => {
                 return transaction.get(docRef).then((sfDoc) => {
                     if (!sfDoc.exists) return;
                     let currentCount = sfDoc.data().favCount || 0;
                     let newCount = currentCount + incVal;
-                    if (newCount < 0) newCount = 0; 
+                    if (newCount < 0) newCount = 0; // Garantiza que no sea negativo
                     transaction.update(docRef, { favCount: newCount });
                 });
             }).catch((error) => console.log("Error en favoritos: ", error));
@@ -513,6 +520,7 @@
             }).join(''); 
         }
 
+        // Data Fetching
         function escucharConfigGlobal() { db.collection("config").doc("global").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; applyConfig(); renderFilters(); renderGallery(); renderCarrito(); updateHeaderLogo(); } else { applyConfig(); renderFilters(); } }); }
         
         function escucharFirebase() { 
@@ -538,6 +546,7 @@
         
         function escucharHero() { db.collection("config").doc("hero").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; applyConfig(); } }); }
 
+        // Core Functions
         function showSection(id) { document.querySelectorAll('.section-fade').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; }); const target = document.getElementById(id); if(target) { target.style.display = 'block'; setTimeout(() => target.classList.add('active'), 50); } window.scrollTo({top: 0, behavior: 'smooth'}); }
         function handleSearch(val) { if(val!==undefined){ document.getElementById('live-search').value=val; const m=document.getElementById('mobile-live-search'); if(m)m.value=val; } const t=(document.getElementById('live-search').value||"").toLowerCase(); if(t.length>0&&window.innerWidth>=768){ const s=document.getElementById('productos'); if(window.scrollY<s.offsetTop-150)s.scrollIntoView({behavior:'smooth',block:'start'}); } renderGallery(); }
 
@@ -556,9 +565,6 @@
             });
         }
 
-        // ==========================================
-        // 🔥 CRO: RENDER GALLERY OPTIMIZADO
-        // ==========================================
         function renderGallery() {
             const grid = document.getElementById('gallery-grid'); if(!grid) return;
             const term = (document.getElementById('live-search').value || "").toLowerCase();
@@ -572,75 +578,42 @@
                 const isOut = prod.stock !== undefined && prod.stock <= 0;
                 
                 let btnQuickAddHTML = ''; let badgesHTML = '';
-                
-                // CRO: Jerarquía de precio superior
-                let priceHtml = `<span class="text-dark font-extrabold text-lg md:text-xl truncate leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`;
+                let priceHtml = `<span class="text-dark font-bold text-sm md:text-base truncate">${PricingEngine.format(pData.finalUnitario)}</span>`;
                 const isPrevActiva = esPreventaActiva(prod);
 
-                // CRO: Badges Inteligentes (Soporte dinámico + Urgencia de stock y popularidad)
                 if (isPrevActiva) {
-                    badgesHTML += `<div class="bg-accent text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider"><i class="fas fa-clock"></i> Pronto</div>`;
-                    btnQuickAddHTML = `<button disabled class="bg-light text-muted w-9 h-9 rounded-xl flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-clock"></i></button>`;
+                    // Viñeta Azul para Preventa en Catalogo
+                    badgesHTML += `<div class="bg-accent text-white px-2.5 py-1 text-[10px] font-bold uppercase rounded-lg shadow-sm flex items-center gap-1"><i class="fas fa-clock"></i> Pronto</div>`;
+                    btnQuickAddHTML = `<button disabled class="bg-light text-muted w-10 h-10 rounded-xl shrink-0 flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-clock"></i></button>`;
                 } else if (isOut) {
-                    badgesHTML += `<div class="bg-muted text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider">Agotado</div>`;
-                    btnQuickAddHTML = `<button disabled class="bg-light text-muted w-9 h-9 rounded-xl flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-ban"></i></button>`;
+                    badgesHTML += `<div class="bg-muted text-white px-2.5 py-1 text-[10px] font-bold uppercase rounded-lg shadow-sm">Agotado</div>`;
+                    btnQuickAddHTML = `<button disabled class="bg-light text-muted w-10 h-10 rounded-xl shrink-0 flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-ban"></i></button>`;
                 } else {
-                    // CRO: Botón CTA destacado estilo bolso premium
-                    btnQuickAddHTML = `<button onclick="quickAdd('${prod.id}', event)" class="bg-primary text-white w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#A6763A] hover:scale-105 active:scale-95 shadow-md hover:shadow-lg transition-all duration-300 z-20"><i class="fas fa-shopping-bag text-sm"></i></button>`;
-                    
+                    btnQuickAddHTML = `<button onclick="quickAdd('${prod.id}', event)" class="bg-primary text-white w-10 h-10 rounded-xl shrink-0 flex items-center justify-center hover:bg-[#A6763A] transition-colors shadow-sm"><i class="fas fa-plus"></i></button>`;
                     if (pData.isActive) {
-                        badgesHTML += `<div class="promo-badge bg-promo text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider">${pData.badgeText}</div>`;
-                        priceHtml = `<div class="flex flex-col items-start leading-none gap-0.5"><span class="text-muted line-through text-xs font-semibold">${PricingEngine.format(pData.baseUnitario)}</span><span class="text-promo font-extrabold text-lg md:text-xl leading-none mt-1">${PricingEngine.format(pData.finalUnitario)}</span></div>`;
-                    }
-
-                    // Urgencia de Stock (Scarcity Psychology)
-                    if (prod.stock > 0 && prod.stock <= 5) {
-                        badgesHTML += `<div class="bg-promo/15 text-promo border border-promo/20 px-2 py-0.5 text-[9px] font-extrabold uppercase rounded shadow-sm w-max tracking-wider animate-pulse"><i class="fas fa-bolt"></i> ¡Solo quedan ${prod.stock}!</div>`;
-                    }
-                    // Prueba Social de Popularidad
-                    if (prod.favCount && prod.favCount >= 10) {
-                        badgesHTML += `<div class="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-[9px] font-extrabold uppercase rounded shadow-sm w-max tracking-wider"><i class="fas fa-heart text-promo"></i> Popular</div>`;
+                        badgesHTML += `<div class="promo-badge bg-promo text-white px-2.5 py-1 text-[10px] font-bold uppercase rounded-lg shadow-sm">${pData.badgeText}</div>`;
+                        priceHtml = `<div class="flex flex-col items-start leading-none"><span class="text-muted line-through text-xs font-semibold">${PricingEngine.format(pData.baseUnitario)}</span><span class="text-promo font-bold text-sm md:text-base mt-1">${PricingEngine.format(pData.finalUnitario)}</span></div>`;
                     }
                 }
-
-                // Generación de estrellas dinámicas en catálogo (CRO Social Proof)
-                const finalRating = prod.rating !== undefined && prod.rating !== null ? parseFloat(prod.rating) : 5.0;
-                const finalReviewCount = prod.reviewCount !== undefined && prod.reviewCount !== null ? parseInt(prod.reviewCount) : Math.floor(Math.random() * 21) + 10; // Valor realista por defecto
-                
-                let starsHTML = '';
-                const fullStars = Math.floor(finalRating);
-                const hasHalf = finalRating % 1 >= 0.4;
-                for(let i=1; i<=5; i++){
-                    if(i <= fullStars) starsHTML += `<i class="fas fa-star text-xs text-[#F59E0B]"></i>`;
-                    else if(i === fullStars + 1 && hasHalf) starsHTML += `<i class="fas fa-star-half-alt text-xs text-[#F59E0B]"></i>`;
-                    else starsHTML += `<i class="far fa-star text-xs text-[#E5E7EB]"></i>`;
-                }
-
-                const ratingSectionHTML = `
-                    <div class="flex items-center gap-1.5 mt-1">
-                        <div class="flex items-center">${starsHTML}</div>
-                        <span class="text-muted text-[10px] font-semibold">(${finalReviewCount})</span>
-                    </div>
-                `;
 
                 const badgesWrapper = badgesHTML ? `<div class="absolute top-3 left-3 flex flex-col gap-1.5 z-10">${badgesHTML}</div>` : '';
                 const isFav = wishlist.includes(prod.id);
+                // Botón de Favorito en tarjeta
                 const btnFavHTML = `<button onclick="toggleWishlist('${prod.id}', event)" class="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all z-20 border border-border ${isFav ? 'bg-white text-promo shadow-md opacity-100' : 'bg-white/90 text-muted hover:bg-white hover:text-promo opacity-0 group-hover:opacity-100 backdrop-blur-sm shadow-sm'}"><i class="${isFav ? 'fas' : 'far'} fa-heart"></i></button>`;
                 
-                // Microinteracciones Premium en Imagen (Zoom sutil)
-                const imgClasses = isOut ? 'grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300' : 'transition-transform duration-500 group-hover:scale-105';
+                // REMODELACIÓN 3: Hover Grayscale-0 en agotados.
+                const imgClasses = isOut ? 'grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300' : 'transition-transform duration-500 group-hover:scale-110';
 
                 return `
-                <div class="group cursor-pointer flex flex-col h-full bg-white border border-border rounded-3xl shadow-sm hover:shadow-soft transition-all duration-300 transform hover:-translate-y-1 overflow-hidden" onclick="openModalById('${prod.id}')">
-                    <div class="relative aspect-square overflow-hidden rounded-t-3xl bg-white p-3 flex items-center justify-center">
+                <div class="group cursor-pointer flex flex-col h-full bg-white border border-border rounded-3xl shadow-sm hover:shadow-soft transition-all duration-300 transform hover:-translate-y-1" onclick="openModalById('${prod.id}')">
+                    <div class="relative aspect-square overflow-hidden rounded-t-3xl bg-white p-4 flex items-center justify-center">
                         ${badgesWrapper} ${btnFavHTML}
                         <img src="${coverImg}" loading="lazy" alt="${prod.titulo}" class="w-full h-full object-contain drop-shadow-md ${imgClasses}">
                     </div>
-                    <div class="p-4 flex-1 flex flex-col justify-between border-t border-border bg-white">
-                        <div class="mb-2">
+                    <div class="p-4 flex-1 flex flex-col justify-between border-t border-border">
+                        <div class="mb-3">
                             <p class="text-muted text-[10px] uppercase font-bold mb-1 tracking-wider">${prod.categoria || 'General'}</p>
                             <h3 class="text-dark font-bold text-sm line-clamp-2 leading-tight">${prod.titulo}</h3>
-                            ${ratingSectionHTML}
                         </div>
                         <div class="flex justify-between items-center mt-auto pt-3 border-t border-light gap-2">
                             <div class="min-w-0 flex-1">${priceHtml}</div>
@@ -668,7 +641,7 @@
         }
         function filterGallery(c) { currentCategory = c; renderFilters(); const g = document.getElementById('gallery-grid'); g.style.opacity = '0'; setTimeout(() => { renderGallery(); g.style.opacity = '1'; }, 200); const s = document.getElementById('productos'); if (window.scrollY < s.offsetTop - 100) s.scrollIntoView({behavior: 'smooth', block: 'start'}); }
 
-        // Modal de Detalles del Producto
+        // Modal de Producto Rediseñado
         function openModalById(id) {
             const p = inventario.find(x => x.id === id); if(!p) return;
             window.lastViewedProduct = p; window.history.pushState({ productId: id }, '', `?producto=${id}`);
@@ -702,30 +675,13 @@
                 priceContainer.innerHTML = `<span class="text-3xl font-extrabold text-dark tracking-tight leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`;
             }
 
-            // CRO: Social Proof Stars en Detalles del Producto
-            const finalRating = p.rating !== undefined && p.rating !== null ? parseFloat(p.rating) : 5.0;
-            const finalReviewCount = p.reviewCount !== undefined && p.reviewCount !== null ? parseInt(p.reviewCount) : Math.floor(Math.random() * 21) + 15;
-            
-            let starsHTML = '';
-            const fullStars = Math.floor(finalRating);
-            const hasHalf = finalRating % 1 >= 0.4;
-            for(let i=1; i<=5; i++){
-                if(i <= fullStars) starsHTML += `<i class="fas fa-star text-sm text-[#F59E0B]"></i>`;
-                else if(i === fullStars + 1 && hasHalf) starsHTML += `<i class="fas fa-star-half-alt text-sm text-[#F59E0B]"></i>`;
-                else starsHTML += `<i class="far fa-star text-sm text-[#E5E7EB]"></i>`;
-            }
-            document.getElementById('modal-rating-display').innerHTML = `
-                <div class="flex items-center gap-1">${starsHTML}</div>
-                <span class="text-dark font-bold text-sm ml-1">${finalRating.toFixed(1)}</span>
-                <span class="text-muted text-xs font-medium">(${finalReviewCount} valoraciones de clientes)</span>
-            `;
-
             const btnAddCart = document.getElementById('btn-add-cart'); const msgDisabled = document.getElementById('modal-disabled-msg'); const qtyContainer = document.getElementById('modal-quantity-container'); const badge = document.getElementById('modal-status-badge');
             badge.className = 'px-3 py-1 text-[10px] font-bold uppercase rounded-full hidden';
             
             const isPrevActiva = esPreventaActiva(p);
 
             if (isPrevActiva) { 
+                // Viñeta Azul para Preventa en Modal
                 badge.classList.remove('hidden'); badge.classList.add('bg-accent/10', 'text-accent'); 
                 badge.innerHTML = p.fechaLanzamiento ? `Próximamente: ${p.fechaLanzamiento}` : `Próximamente`; 
                 btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "No disponible aún"; 
@@ -786,6 +742,7 @@
                 document.getElementById('cart-drawer-total').innerText = PricingEngine.format(0); 
                 document.getElementById('cart-drawer-subtotal-orig').innerText = PricingEngine.format(0);
                 
+                // REMODELACIÓN 2: Ocultar subtotal si no hay items
                 document.getElementById('cart-drawer-subtotal-row').classList.add('hidden');
                 document.getElementById('cart-drawer-savings-row').classList.add('hidden');
                 
@@ -837,6 +794,7 @@
             const subtotalRow = document.getElementById('cart-drawer-subtotal-row');
             const savingsRow = document.getElementById('cart-drawer-savings-row');
             
+            // REMODELACIÓN 2: Ocultar si no hay ahorro
             if (granAhorro > 0.01) { 
                 subtotalRow.classList.remove('hidden');
                 savingsRow.classList.remove('hidden'); 
@@ -852,6 +810,7 @@
         function iniciarCheckout() { document.getElementById('btn-checkout-init').classList.add('hidden'); document.getElementById('checkout-form').classList.remove('hidden'); document.getElementById('btn-checkout-confirm').classList.remove('hidden'); document.getElementById('btn-checkout-cancel').classList.remove('hidden'); setTimeout(() => document.getElementById('cliente-nombre').focus(), 100); }
         function cancelarCheckout() { document.getElementById('btn-checkout-init').classList.remove('hidden'); document.getElementById('checkout-form').classList.add('hidden'); document.getElementById('btn-checkout-confirm').classList.add('hidden'); document.getElementById('btn-checkout-cancel').classList.add('hidden'); }
 
+        // REMODELACIÓN 1: Actualizar botón según selección de radio button
         function updateCheckoutButton() {
             const btn = document.getElementById('btn-checkout-confirm');
             const txt = document.getElementById('btn-wa-text');
@@ -898,6 +857,7 @@
             
             const hLocal = JSON.parse(localStorage.getItem('pk_pedidos') || '[]'); hLocal.push({ idPedido: orderId, fecha: new Date().toISOString(), items: cartItemsSaved, total: t.final }); localStorage.setItem('pk_pedidos', JSON.stringify(hLocal));
 
+            // REMODELACIÓN 1: Finalizar el envío por la red seleccionada
             carrito = []; saveCart(); renderCarrito(); document.getElementById('mensaje').value = ''; document.getElementById('cliente-nombre').value = ''; btnTxt.innerText = ogTxt; toggleCartDrawer();
             
             const method = document.querySelector('input[name="checkout-method"]:checked').value;
@@ -915,6 +875,7 @@
                         background: '#FFFFFF', color: '#2C2421'
                     }).then(() => {
                         let igUrl = config.instagram || "https://instagram.com";
+                        // Intentar enviar al chat directo extrayendo el username
                         if(igUrl.includes('instagram.com/')) {
                             let igUser = igUrl.split('instagram.com/')[1].replace('/', '');
                             window.open(`https://ig.me/m/${igUser}`, '_blank');
@@ -926,11 +887,13 @@
             }
         }
 
+        // C3, C1 y C9: Mostrar/Ocultar Hero y Renderizar Logo + Redes Dinámicas
         function applyConfig() { 
             document.getElementById('display-hero-title').innerText = config.heroTitle || ""; 
             document.getElementById('display-hero-subtitle').innerText = config.heroSubtitle || ""; 
             document.getElementById('hero-display').style.backgroundImage = `url('${config.heroImage || ""}')`; 
             
+            // Ocultar Banner si el interruptor del admin está en false
             const heroSection = document.getElementById('hero-display');
             if(config.heroActive === false) {
                 heroSection.style.display = 'none';
@@ -954,6 +917,7 @@
             const fb=document.getElementById('link-facebook'); 
             if(fb) { fb.href = config.facebook && config.facebook !== "#" ? config.facebook : "#"; fb.style.display = (!config.facebook || config.facebook==="#") ? "none" : "flex"; } 
             
+            // C1: Renderizar Enlace TikTok
             const tk=document.getElementById('link-tiktok'); 
             if(tk) { tk.href = config.tiktok && config.tiktok !== "#" ? config.tiktok : "#"; tk.style.display = (!config.tiktok || config.tiktok==="#") ? "none" : "flex"; } 
         }
