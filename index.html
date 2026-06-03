@@ -194,8 +194,9 @@
             
             <div id="checkout-form" class="space-y-4 mb-4 hidden bg-light p-4 rounded-2xl border border-border">
                 <label class="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Datos de Envío</label>
-                <input type="text" id="cliente-nombre" placeholder="Tu Nombre Completo" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl shadow-sm">
-                <textarea id="mensaje" rows="2" maxlength="150" placeholder="Nota adicional (Ej. Para regalo)" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all resize-none rounded-xl shadow-sm"></textarea>
+                <input type="text" id="cliente-nombre" placeholder="Tu Nombre Completo" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl shadow-sm mb-3">
+                <input type="tel" id="cliente-telefono" placeholder="Número de Contacto" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl shadow-sm mb-3">
+                <textarea id="mensaje" rows="2" maxlength="150" placeholder="Nota adicional" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all resize-none rounded-xl shadow-sm"></textarea>
                 
                 <div class="mt-3">
                     <label class="block text-xs font-bold text-muted uppercase tracking-wider mb-2">Método de Envío</label>
@@ -539,7 +540,21 @@
         function escucharHero() { db.collection("config").doc("hero").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; applyConfig(); } }); }
 
         function showSection(id) { document.querySelectorAll('.section-fade').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; }); const target = document.getElementById(id); if(target) { target.style.display = 'block'; setTimeout(() => target.classList.add('active'), 50); } window.scrollTo({top: 0, behavior: 'smooth'}); }
-        function handleSearch(val) { if(val!==undefined){ document.getElementById('live-search').value=val; const m=document.getElementById('mobile-live-search'); if(m)m.value=val; } const t=(document.getElementById('live-search').value||"").toLowerCase(); if(t.length>0&&window.innerWidth>=768){ const s=document.getElementById('productos'); if(window.scrollY<s.offsetTop-150)s.scrollIntoView({behavior:'smooth',block:'start'}); } renderGallery(); }
+        
+        function handleSearch(val) { 
+            showSection('inicio'); 
+            if(val!==undefined){ document.getElementById('live-search').value=val; const m=document.getElementById('mobile-live-search'); if(m)m.value=val; } 
+            const t=(document.getElementById('live-search').value||"").toLowerCase(); 
+            if(t.length>0&&window.innerWidth>=768){ 
+                const s=document.getElementById('productos'); 
+                if(s) {
+                    const yOffset = -80; 
+                    const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    window.scrollTo({top: y, behavior: 'smooth'});
+                }
+            } 
+            renderGallery(); 
+        }
 
         function updateHeaderLogo() {
             const containers = document.querySelectorAll('.header-logo-container');
@@ -582,7 +597,7 @@
                     badgesHTML += `<div class="bg-accent text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider"><i class="fas fa-clock"></i> Pronto</div>`;
                     btnQuickAddHTML = `<button disabled class="bg-light text-muted w-9 h-9 rounded-xl flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-clock"></i></button>`;
                 } else if (isOut) {
-                    badgesHTML += `<div class="bg-muted text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider">Agotado</div>`;
+                    badgesHTML += `<div class="bg-promo text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider">Agotado</div>`;
                     btnQuickAddHTML = `<button disabled class="bg-light text-muted w-9 h-9 rounded-xl flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-ban"></i></button>`;
                 } else {
                     // CRO: Botón CTA destacado estilo bolso premium
@@ -630,8 +645,8 @@
                 const isFav = wishlist.includes(prod.id);
                 const btnFavHTML = `<button onclick="toggleWishlist('${prod.id}', event)" class="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all z-20 border border-border ${isFav ? 'bg-white text-promo shadow-md opacity-100' : 'bg-white/90 text-muted hover:bg-white hover:text-promo opacity-0 group-hover:opacity-100 backdrop-blur-sm shadow-sm'}"><i class="${isFav ? 'fas' : 'far'} fa-heart"></i></button>`;
                 
-                // Microinteracciones Premium en Imagen (Zoom sutil)
-                const imgClasses = isOut ? 'grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300' : 'transition-transform duration-500 group-hover:scale-105';
+                // Microinteracciones Premium en Imagen (Zoom sutil, sin gris)
+                const imgClasses = isOut ? 'opacity-90 transition-transform duration-500 group-hover:scale-105' : 'transition-transform duration-500 group-hover:scale-105';
 
                 return `
                 <div class="group cursor-pointer flex flex-col h-full bg-white border border-border rounded-3xl shadow-sm hover:shadow-soft transition-all duration-300 transform hover:-translate-y-1 overflow-hidden" onclick="openModalById('${prod.id}')">
@@ -669,7 +684,24 @@
             const mT = document.getElementById('mobile-nav-categories');
             if(mT) mT.innerHTML = `<button onclick="filterGallery('all'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all ${currentCategory === 'all' ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">Todos los artículos</button>` + cats.map(c => `<button onclick="filterGallery('${c}'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all capitalize ${currentCategory === c ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">${c}</button>`).join('');
         }
-        function filterGallery(c) { currentCategory = c; renderFilters(); const g = document.getElementById('gallery-grid'); g.style.opacity = '0'; setTimeout(() => { renderGallery(); g.style.opacity = '1'; }, 200); const s = document.getElementById('productos'); if (window.scrollY < s.offsetTop - 100) s.scrollIntoView({behavior: 'smooth', block: 'start'}); }
+        
+        function filterGallery(c) { 
+            showSection('inicio'); 
+            currentCategory = c; 
+            renderFilters(); 
+            const g = document.getElementById('gallery-grid'); 
+            if(g) g.style.opacity = '0'; 
+            setTimeout(() => { 
+                renderGallery(); 
+                if(g) g.style.opacity = '1'; 
+                const s = document.getElementById('productos'); 
+                if (s) {
+                    const yOffset = -80;
+                    const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    window.scrollTo({top: y, behavior: 'smooth'});
+                }
+            }, 200); 
+        }
 
         // Modal de Detalles del Producto
         function openModalById(id) {
@@ -743,7 +775,7 @@
                 btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "No disponible aún"; 
             } 
             else if (p.stock !== undefined && p.stock <= 0) { 
-                badge.classList.remove('hidden'); badge.classList.add('bg-muted', 'text-white'); badge.innerText = "Agotado"; 
+                badge.classList.remove('hidden'); badge.classList.add('bg-promo', 'text-white'); badge.innerText = "Agotado"; 
                 btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "Fuera de Stock"; 
             } 
             else { 
@@ -882,14 +914,18 @@
         }
 
         function procesarEnvioPedido() {
-            const n = document.getElementById('cliente-nombre').value.trim(); const m = document.getElementById('mensaje').value.trim();
+            const n = document.getElementById('cliente-nombre').value.trim(); 
+            const tel = document.getElementById('cliente-telefono').value.trim();
+            const m = document.getElementById('mensaje').value.trim();
+            
             if(!n) { Toast.fire({ icon: 'warning', title: 'Necesitamos tu nombre' }); return document.getElementById('cliente-nombre').focus(); }
+            if(!tel) { Toast.fire({ icon: 'warning', title: 'Necesitamos tu número de contacto' }); return document.getElementById('cliente-telefono').focus(); }
             if(carrito.length === 0) return Toast.fire({ icon: 'error', title: 'Cesta vacía' });
             
             const btnTxt = document.getElementById('btn-wa-text'); const ogTxt = btnTxt.innerText; btnTxt.innerText = "Preparando magia...";
             const orderId = `PK-${Math.floor(1000 + Math.random() * 9000)}`; 
             
-            let msg = `✨ *NUEVO PEDIDO: ${orderId}* ✨\n\n👤 *Nombre:* ${n}\n\n🛍️ *MI CESTA:*\n`;
+            let msg = `✨ *NUEVO PEDIDO: ${orderId}* ✨\n\n👤 *Nombre:* ${n}\n📞 *Contacto:* ${tel}\n\n🛍️ *MI CESTA:*\n`;
             const cartItemsSaved = [];
             
             carrito.forEach((item, index) => { 
@@ -905,12 +941,12 @@
             if (t.savings > 0) msg += `🎉 *AHORRO: ${PricingEngine.format(t.savings)}*\n`;
             if(m) msg += `\n💌 *Nota:*\n_${m}_\n`;
 
-            const pedidoData = { idPedido: orderId, cliente: n || 'Desconocido', mensaje: m, items: cartItemsSaved, total: t.final, ahorro: t.savings, estado: 'pendiente', createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+            const pedidoData = { idPedido: orderId, cliente: n, telefono: tel, mensaje: m, items: cartItemsSaved, total: t.final, ahorro: t.savings, estado: 'pendiente', createdAt: firebase.firestore.FieldValue.serverTimestamp() };
             db.collection("pedidos").add(pedidoData).catch(e => console.error(e));
             
             const hLocal = JSON.parse(localStorage.getItem('pk_pedidos') || '[]'); hLocal.push({ idPedido: orderId, fecha: new Date().toISOString(), items: cartItemsSaved, total: t.final }); localStorage.setItem('pk_pedidos', JSON.stringify(hLocal));
 
-            carrito = []; saveCart(); renderCarrito(); document.getElementById('mensaje').value = ''; document.getElementById('cliente-nombre').value = ''; btnTxt.innerText = ogTxt; toggleCartDrawer();
+            carrito = []; saveCart(); renderCarrito(); document.getElementById('mensaje').value = ''; document.getElementById('cliente-telefono').value = ''; document.getElementById('cliente-nombre').value = ''; btnTxt.innerText = ogTxt; toggleCartDrawer();
             
             const method = document.querySelector('input[name="checkout-method"]:checked').value;
             
