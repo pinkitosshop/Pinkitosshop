@@ -412,7 +412,13 @@
         document.getElementById('current-year').innerText = new Date().getFullYear();
         const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000, background: '#FFFFFF', color: '#2C2421', iconColor: '#B88645', customClass: { popup: 'border border-[#E5E7EB] rounded-xl shadow-float !py-3 !px-5', title: '!text-sm !font-bold' }});
 
-        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", categories: ["figuras", "peluches"], heroTitle: "Bienvenido a Pinkitos", heroSubtitle: "Coleccionables y Juguetes", heroImage: "", logoUrl: "", heroActive: true, shareText: "¡Mira este juguete!", currency: "$", taxEnabled: false, taxRate: 15, globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false };
+        const DEFAULT_CONFIG = { 
+            slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", 
+            categories: ["figuras", "peluches"], 
+            lobbyCategoryLimit: 4, 
+            categoryImages: {},
+            heroTitle: "Bienvenido a Pinkitos", heroSubtitle: "Coleccionables y Juguetes", heroImage: "", logoUrl: "", heroActive: true, shareText: "¡Mira este juguete!", currency: "$", taxEnabled: false, taxRate: 15, globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false 
+        };
 
         let inventario = []; let config = { ...DEFAULT_CONFIG };
         let carrito = []; let wishlist = []; let currentModalImages = [];
@@ -572,6 +578,7 @@
             showSection('inicio');
         }
 
+        // Auto-scroll adaptativo hacia la sección de productos
         function goToCatalogTop() {
             showSection('catalogo', true);
             const s = document.getElementById('productos');
@@ -600,7 +607,7 @@
         }
         
         function handleSearch(val) { 
-            showSection('catalogo', true); // <-- Dirige al usuario al catálogo al buscar sin resetear scroll forzado
+            showSection('catalogo', true); // Dirige al usuario al catálogo al buscar sin resetear scroll forzado
             if(val!==undefined){ document.getElementById('live-search').value=val; const m=document.getElementById('mobile-live-search'); if(m)m.value=val; } 
             renderGallery(); 
             const t=(document.getElementById('live-search').value||"").toLowerCase(); 
@@ -669,30 +676,40 @@
                 </div>
             `;
 
-            // Tarjetas dinámicas desde la DB
-            const dynamicCards = cats.map(c => `
+            // Aplicamos el límite de categorías en el lobby definido en ajustes (por defecto 4)
+            const limit = config.lobbyCategoryLimit || 4;
+            const visibleCats = cats.slice(0, limit);
+
+            // Tarjetas dinámicas desde la DB (Muestra Imagen de Categoría o Icono por defecto)
+            const dynamicCards = visibleCats.map(c => {
+                const catImg = (config.categoryImages && config.categoryImages[c]) ? config.categoryImages[c] : null;
+                const logoContent = catImg 
+                    ? `<img src="${catImg}" class="w-14 h-14 object-contain group-hover:scale-110 transition-transform duration-500">`
+                    : `<i class="${getIconForCategory(c)} group-hover:scale-110 transition-transform duration-500 text-3xl"></i>`;
+
+                return `
                 <div onclick="filterGallery('${c}')" class="bg-white rounded-[2rem] p-6 md:p-8 shadow-[0_8px_30px_rgba(44,36,33,0.06)] border-b-[6px] border-border hover:border-primary transform hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(184,134,69,0.15)] active:translate-y-1 active:border-b-2 active:shadow-sm transition-all duration-300 flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden">
                     <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div class="w-16 h-16 bg-light group-hover:bg-primary/10 rounded-full flex items-center justify-center text-3xl text-muted group-hover:text-primary transition-all duration-300 mb-4 relative z-10 shadow-inner group-hover:shadow-sm">
-                        <i class="${getIconForCategory(c)} group-hover:scale-110 transition-transform duration-500"></i>
+                    <div class="w-16 h-16 bg-light group-hover:bg-primary/10 rounded-full flex items-center justify-center text-muted group-hover:text-primary transition-all duration-300 mb-4 relative z-10 shadow-inner group-hover:shadow-sm overflow-hidden p-2">
+                        ${logoContent}
                     </div>
                     <h3 class="text-dark font-bold text-lg md:text-xl capitalize relative z-10 group-hover:text-primary transition-colors text-center leading-tight tracking-tight">${c}</h3>
                     <div class="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 relative z-10">
                         <span class="bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full shadow-md flex items-center gap-2">Explorar <i class="fas fa-arrow-right text-[9px]"></i></span>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
 
             lobbyGrid.innerHTML = allCatalogCard + dynamicCards;
         }
 
         // ==========================================
-        // 🔥 CRO: RENDER GALLERY OPTIMIZADO
+        // 🔥 RENDER GALLERY OPTIMIZADO
         // ==========================================
         function renderGallery() {
             const grid = document.getElementById('gallery-grid'); if(!grid) return;
             
-            // Actualizar Título del Catálogo dinámicamente
             const catalogTitle = document.getElementById('catalog-section-title');
             if (catalogTitle) {
                 catalogTitle.innerText = currentCategory === 'all' ? 'Todo el Catálogo' : currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1);
@@ -709,7 +726,6 @@
                 const isOut = prod.stock !== undefined && prod.stock <= 0;
                 
                 let btnQuickAddHTML = ''; let badgesHTML = '';
-                
                 let priceHtml = `<span class="text-dark font-extrabold text-lg md:text-xl truncate leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`;
                 const isPrevActiva = esPreventaActiva(prod);
 
@@ -805,9 +821,7 @@
         }
         
         function filterGallery(c) { 
-            // 1. Cambia de vista al catálogo y oculta el lobby de manera estática
             showSection('catalogo', true); 
-            
             currentCategory = c; 
             renderFilters(); 
             const g = document.getElementById('gallery-grid'); 
@@ -815,7 +829,6 @@
             setTimeout(() => { 
                 renderGallery(); 
                 if(g) g.style.opacity = '1'; 
-                // Hacer auto-scroll hacia la parte superior de la página o del catalogo
                 const s = document.getElementById('productos'); 
                 if (s) {
                     const yOffset = -80;
@@ -859,7 +872,6 @@
                 priceContainer.innerHTML = `<span class="text-3xl font-extrabold text-dark tracking-tight leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`;
             }
 
-            // CRO: Social Proof Stars en Detalles del Producto
             const ratingDisplay = document.getElementById('modal-rating-display');
             if (p.rating) {
                 const finalRating = parseFloat(p.rating);

@@ -574,13 +574,23 @@
                     </div>
                 </div>
                 
+                <!-- GESTIÓN DE CATEGORÍAS MODIFICADA -->
                 <div class="bg-white p-8 border border-border rounded-3xl mt-10 shadow-soft">
-                    <h3 class="text-dark text-xl font-bold mb-6 flex items-center gap-2"><i class="fas fa-tags text-primary"></i> Gestión de Categorías</h3>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <h3 class="text-dark text-xl font-bold flex items-center gap-2"><i class="fas fa-tags text-primary"></i> Gestión de Categorías</h3>
+                        <div class="flex items-center gap-3 bg-light px-4 py-2 rounded-xl border border-border shrink-0">
+                            <label class="text-xs font-bold text-dark"><i class="fas fa-th-large text-primary mr-1"></i> Mostrar en Lobby:</label>
+                            <input type="number" id="config-lobby-limit" min="1" max="20" class="admin-input !py-1 !px-2 w-16 text-center text-xs font-bold" onchange="saveCategoryLimit()">
+                        </div>
+                    </div>
+                    
                     <div class="flex flex-col md:flex-row gap-4 mb-6">
                         <input type="text" id="new-category-name" placeholder="Ej. Peluches, Figuras, Llaveros..." class="admin-input flex-1 bg-white">
                         <button onclick="addNewCategory()" class="bg-white border border-primary text-primary px-8 py-3 text-sm font-bold hover:bg-primary hover:text-white transition-all rounded-xl shadow-sm"><i class="fas fa-plus"></i> Añadir</button>
                     </div>
-                    <div id="categories-manager-list" class="flex flex-wrap gap-3"></div>
+                    
+                    <p class="text-xs text-muted mb-4 font-medium"><i class="fas fa-info-circle text-primary"></i> Las primeras categorías de esta lista (según tu límite configurado) serán las que se mostrarán en la pantalla de inicio (Lobby) de la tienda.</p>
+                    <div id="categories-manager-list" class="flex flex-wrap gap-4"></div>
                 </div>
             </div>
 
@@ -786,7 +796,7 @@
         const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000, background: '#FFFFFF', color: '#2C2421', iconColor: '#B88645', customClass: { popup: 'border border-[#E5E7EB] rounded-xl shadow-float !py-3 !px-5', title: '!text-sm !font-bold' }});
         const DarkAlert = Swal.mixin({ background: '#FFFFFF', color: '#2C2421', confirmButtonColor: '#B88645', cancelButtonColor: '#E63946', customClass: { popup: 'border border-[#E5E7EB] rounded-3xl shadow-float', confirmButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm', cancelButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm' } });
 
-        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", categories: ["figuras"], heroTitle: "", heroSubtitle: "", heroImage: "", logoUrl: "", heroActive: true, invoiceHeader: "", invoiceFooter: "", shareText: "", currency: "$", posTimeout: "0", taxEnabled: false, taxRate: 15, posPin: "", globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false };
+        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", categories: ["figuras"], lobbyCategoryLimit: 4, categoryImages: {}, heroTitle: "", heroSubtitle: "", heroImage: "", logoUrl: "", heroActive: true, invoiceHeader: "", invoiceFooter: "", shareText: "", currency: "$", posTimeout: "0", taxEnabled: false, taxRate: 15, posPin: "", globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false };
         const DEFAULT_MEASURES = { "Pequeño": { medida: "" }, "Mediano": { medida: "" }, "Grande": { medida: "" } };
 
         let inventario = []; let pedidosList = []; let config = { ...DEFAULT_CONFIG };
@@ -1447,28 +1457,91 @@
                 if(filterSel) filterSel.innerHTML = '<option value="all">Todas las Categorías</option>' + options;
             }
         }
+        
+        // ===============================================
+        // 🔥 LÓGICA DE CATEGORÍAS MEJORADA (Logo + Orden)
+        // ===============================================
         function renderCategoriesManager() { 
             const list = document.getElementById('categories-manager-list'); 
             if(list && config.categories) { 
                 list.innerHTML = config.categories.map((c, index) => { 
                     const isFirst = index === 0; const isLast = index === config.categories.length - 1; 
-                    return `<div class="flex items-center gap-3 bg-white border border-border px-4 py-2 rounded-xl shadow-sm">
-                        <span class="text-xs uppercase font-bold text-dark">${c}</span>
-                        <div class="flex items-center gap-2 border-l border-border pl-3">
-                            <button onclick="moveCategoryOrder(${index}, -1)" ${isFirst ? 'disabled class="opacity-30 cursor-not-allowed text-muted"' : 'class="text-primary hover:text-dark transition-colors"'}><i class="fas fa-chevron-left text-xs"></i></button>
-                            <button onclick="moveCategoryOrder(${index}, 1)" ${isLast ? 'disabled class="opacity-30 cursor-not-allowed text-muted"' : 'class="text-primary hover:text-dark transition-colors"'}><i class="fas fa-chevron-right text-xs"></i></button>
+                    const catImg = (config.categoryImages && config.categoryImages[c]) ? config.categoryImages[c] : null;
+                    return `<div class="flex flex-col bg-white border border-border px-4 py-3 rounded-xl shadow-sm w-full sm:w-auto min-w-[200px]">
+                        <div class="flex items-center gap-3 justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-light flex items-center justify-center overflow-hidden border border-border shrink-0">
+                                    ${catImg ? `<img src="${catImg}" class="w-full h-full object-contain p-1">` : `<i class="fas fa-image text-muted text-xs"></i>`}
+                                </div>
+                                <span class="text-xs uppercase font-bold text-dark">${c}</span>
+                            </div>
+                            <div class="flex items-center gap-1 border-l border-border pl-2 ml-1 shrink-0">
+                                <button onclick="editCategory('${c}')" class="text-muted hover:text-primary transition-colors px-1" title="Editar"><i class="fas fa-pencil-alt text-xs"></i></button>
+                                <button onclick="removeCategory('${c}')" class="text-muted hover:text-promo transition-colors px-1" title="Eliminar"><i class="fas fa-times-circle text-xs"></i></button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-1 border-l border-border pl-2 ml-1">
-                            <button onclick="editCategory('${c}')" class="text-muted hover:text-primary transition-colors px-1" title="Editar"><i class="fas fa-pencil-alt text-xs"></i></button>
-                            <button onclick="removeCategory('${c}')" class="text-muted hover:text-promo transition-colors px-1" title="Eliminar"><i class="fas fa-times-circle"></i></button>
+                        <div class="flex items-center justify-between border-t border-light pt-2 mt-2">
+                            <div class="flex items-center gap-1">
+                                <button onclick="moveCategoryOrder(${index}, -1)" ${isFirst ? 'disabled class="opacity-30 cursor-not-allowed text-muted"' : 'class="text-primary hover:text-dark transition-colors"'}><i class="fas fa-chevron-left text-xs"></i></button>
+                                <button onclick="moveCategoryOrder(${index}, 1)" ${isLast ? 'disabled class="opacity-30 cursor-not-allowed text-muted"' : 'class="text-primary hover:text-dark transition-colors"'}><i class="fas fa-chevron-right text-xs"></i></button>
+                            </div>
+                            <input type="file" id="img-cat-${index}" class="hidden" accept="image/png, image/jpeg, image/webp" onchange="uploadCatImage('${c}', this)">
+                            <button onclick="document.getElementById('img-cat-${index}').click()" class="text-[9px] font-bold uppercase tracking-wider bg-light text-primary px-2 py-1 rounded hover:bg-primary/10 transition-colors"><i class="fas fa-upload mr-1"></i> Logo</button>
                         </div>
                     </div>`; 
                 }).join(''); 
             } 
         }
+
+        function saveCategoryLimit() {
+            const limit = parseInt(document.getElementById('config-lobby-limit').value) || 4;
+            db.collection("config").doc("global").set({ lobbyCategoryLimit: limit }, { merge: true })
+              .then(() => Toast.fire({ icon: 'success', title: 'Límite actualizado' }));
+        }
+
+        function uploadCatImage(catName, input) {
+            if (!input.files || !input.files[0]) return;
+            Toast.fire({ icon: 'info', title: 'Comprimiendo y subiendo...' });
+            const reader = new FileReader();
+            reader.readAsDataURL(input.files[0]);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = async function() {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width > 200 ? 200 : img.width; // Redimensionamos ligero para logos
+                    canvas.width = w;
+                    canvas.height = img.height * (w / img.width);
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, canvas.height);
+                    const b64 = canvas.toDataURL('image/png', 0.9);
+                    
+                    try {
+                        const url = await uploadImageToStorage(b64, `config/cat_${catName.replace(/[^a-zA-Z0-9]/g,'')}_${Date.now()}.png`);
+                        const currentImages = config.categoryImages || {};
+                        currentImages[catName] = url;
+                        await db.collection("config").doc("global").set({ categoryImages: currentImages }, { merge: true });
+                        Toast.fire({ icon: 'success', title: 'Logo actualizado' });
+                        input.value = ""; // Limpiar input
+                    } catch(error) {
+                        DarkAlert.fire({ icon: 'error', title: 'Error al subir', text: error.message });
+                    }
+                }
+            }
+        }
+
         function moveCategoryOrder(index, direction) { if (!config.categories) return; const newIndex = index + direction; if (newIndex < 0 || newIndex >= config.categories.length) return; const cats = [...config.categories]; const temp = cats[index]; cats[index] = cats[newIndex]; cats[newIndex] = temp; db.collection("config").doc("global").set({ categories: cats }, { merge: true }).then(() => Toast.fire({ icon: 'success', title: 'Orden guardado' })); }
         function addNewCategory() { const input = document.getElementById('new-category-name'); const name = input.value.trim().toLowerCase(); if(!name || (config.categories||[]).includes(name)) return; db.collection("config").doc("global").set({ categories: [...(config.categories||[]), name] }, { merge: true }).then(() => input.value = ""); }
-        function removeCategory(cat) { if((config.categories||[]).length <= 1) return Toast.fire({ icon: 'warning', title: 'Mínimo una categoría' }); db.collection("config").doc("global").set({ categories: config.categories.filter(c => c !== cat) }, { merge: true }); }
+        
+        function removeCategory(cat) { 
+            if((config.categories||[]).length <= 1) return Toast.fire({ icon: 'warning', title: 'Mínimo una categoría' }); 
+            let updateData = { categories: config.categories.filter(c => c !== cat) };
+            if (config.categoryImages && config.categoryImages[cat]) {
+                const images = { ...config.categoryImages };
+                delete images[cat];
+                updateData.categoryImages = images;
+            }
+            db.collection("config").doc("global").set(updateData, { merge: true }); 
+        }
 
         async function editCategory(oldCat) {
             const { value: newCat } = await Swal.fire({
@@ -1493,7 +1566,16 @@
                     const snapshot = await db.collection("productos").where("categoria", "==", oldCat).get();
                     snapshot.forEach(doc => { batch.update(doc.ref, { categoria: newCatClean }); });
                     
-                    await db.collection("config").doc("global").update({ categories: newCats });
+                    let updateData = { categories: newCats };
+                    // Migramos la imagen a la nueva clave si existe
+                    if (config.categoryImages && config.categoryImages[oldCat]) {
+                        const images = { ...config.categoryImages };
+                        images[newCatClean] = images[oldCat];
+                        delete images[oldCat];
+                        updateData.categoryImages = images;
+                    }
+                    
+                    await db.collection("config").doc("global").update(updateData);
                     await batch.commit();
                     
                     Toast.fire({ icon: 'success', title: 'Categoría actualizada con éxito' });
@@ -1504,6 +1586,7 @@
                 Toast.fire({ icon: 'error', title: 'La categoría ya existe' });
             }
         }
+        // ===============================================
 
         function toggleMeasuresVisibility() { document.getElementById('measures-config-panel').style.display = document.getElementById('toggle-measures').checked ? 'block' : 'none'; }
         function addNewSizeToForm() { const input = document.getElementById('new-size-input'); const val = input.value.trim().charAt(0).toUpperCase() + input.value.trim().slice(1); if(!val) return; if(!currentFormSizes.includes(val)) { currentFormSizes.push(val); renderMedidasForm(); } else { Toast.fire({ icon: 'info', title: 'Ya existe' }); } input.value = ""; }
@@ -1673,7 +1756,7 @@
         }
 
         // ==========================================
-        // 🔥 LÓGICA DE CONFIGURACIONES (AQUÍ ESTABA EL CORTE)
+        // 🔥 LÓGICA DE CONFIGURACIONES
         // ==========================================
         function escucharConfigGlobal() { 
             db.collection("config").doc("global").onSnapshot((doc) => { 
@@ -1724,6 +1807,9 @@
             }
             if(document.getElementById('config-hero-active')) { 
                 document.getElementById('config-hero-active').checked = config.heroActive !== false; 
+            }
+            if(document.getElementById('config-lobby-limit')) {
+                document.getElementById('config-lobby-limit').value = config.lobbyCategoryLimit || 4;
             }
             
             if(config.logoUrl) {
