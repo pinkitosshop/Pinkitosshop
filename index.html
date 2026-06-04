@@ -119,8 +119,6 @@
             <nav class="hidden md:flex space-x-6 items-center shrink-0" id="desktop-nav-links">
                 <span onclick="goToCatalogTop()" class="cursor-pointer text-sm font-semibold text-dark hover:text-primary transition-colors">Inicio</span>
                 
-                <!-- [MODIFICACIÓN QUIRÚRGICA UX/UI]: Se retiró el onclick para evitar el ruteo forzado, 
-                     actuando solo como hover para desplegar filtros. Se mejoró la flecha indicadora -->
                 <div class="relative dropdown group">
                     <button class="cursor-default text-sm font-semibold text-dark group-hover:text-primary transition-colors py-4 flex items-center gap-1">
                         Catálogo <i class="fas fa-chevron-down text-[10px] opacity-50 transition-transform duration-300 group-hover:-rotate-180"></i>
@@ -375,7 +373,7 @@
             </div>
             
             <div class="w-full">
-                <!-- CRO: Grid spacing optimizado responsivo (4 col Desktop, 3 col Tablet, 2 col Mobile) -->
+                <!-- CRO: Grid spacing optimizado responsivo -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 transition-opacity duration-300 min-h-[400px]" id="gallery-grid">
                     <div class="col-span-full text-center py-20 flex flex-col items-center justify-center">
                             <div class="loader !border-t-accent !border-border !w-10 !h-10 mb-4 !block"></div>
@@ -410,24 +408,41 @@
     </footer>
 
     <script>
+        // =====================================================================
+        // 📦 1. ESTADO GLOBAL Y VARIABLES
+        // =====================================================================
         document.getElementById('current-year').innerText = new Date().getFullYear();
         const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000, background: '#FFFFFF', color: '#2C2421', iconColor: '#B88645', customClass: { popup: 'border border-[#E5E7EB] rounded-xl shadow-float !py-3 !px-5', title: '!text-sm !font-bold' }});
 
         const DEFAULT_CONFIG = { 
             slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", 
-            categories: ["figuras", "peluches"], 
-            lobbyCategoryLimit: 4, 
-            categoryImages: {},
+            categories: ["figuras", "peluches"], lobbyCategoryLimit: 4, categoryImages: {},
             heroTitle: "Bienvenido a Pinkitos", heroSubtitle: "Coleccionables y Juguetes", heroImage: "", logoUrl: "", heroActive: true, shareText: "¡Mira este juguete!", currency: "$", taxEnabled: false, taxRate: 15, globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false 
         };
 
-        let inventario = []; let config = { ...DEFAULT_CONFIG };
-        let carrito = []; let wishlist = []; let currentModalImages = [];
-        let currentImageIndex = 0; let hasCheckedUrlParams = false; 
-        let productQuantity = 1; let touchStartX = 0; let touchEndX = 0;
+        let inventario = []; 
+        let config = { ...DEFAULT_CONFIG };
+        let carrito = []; 
+        let wishlist = []; 
+        let currentModalImages = [];
+        let currentImageIndex = 0; 
+        let hasCheckedUrlParams = false; 
+        let productQuantity = 1; 
+        let touchStartX = 0; 
+        let touchEndX = 0;
         let currentCategory = 'all';
 
-        function esPreventaActiva(prod) { if (!prod.isPresale) return false; if (!prod.fechaLanzamiento) return true; const hoy = new Date(); hoy.setHours(0, 0, 0, 0); const partes = prod.fechaLanzamiento.split('-'); const fechaLanz = new Date(partes[0], partes[1] - 1, partes[2]); return fechaLanz > hoy; }
+        // =====================================================================
+        // ⚙️ 2. MOTOR DE PRECIOS Y UTILIDADES
+        // =====================================================================
+        function esPreventaActiva(prod) { 
+            if (!prod.isPresale) return false; 
+            if (!prod.fechaLanzamiento) return true; 
+            const hoy = new Date(); hoy.setHours(0, 0, 0, 0); 
+            const partes = prod.fechaLanzamiento.split('-'); 
+            const fechaLanz = new Date(partes[0], partes[1] - 1, partes[2]); 
+            return fechaLanz > hoy; 
+        }
 
         const PricingEngine = {
             calcular: function(prod, qty = 1) {
@@ -465,92 +480,31 @@
             format: function(num) { return (config.currency || '$') + Number(num).toFixed(2); }
         };
 
-        function init() { cargarDatosLocales(); applyConfig(); escucharFirebase(); escucharHero(); escucharConfigGlobal(); renderCarrito(); updateWishlistNav(); }
-        
-        function cargarDatosLocales() { try { const sc = localStorage.getItem('pk_carrito'); if(sc) carrito = JSON.parse(sc); const sw = localStorage.getItem('pk_wishlist'); if(sw) wishlist = JSON.parse(sw); } catch (e) {} }
-        
-        function toggleMobileSearch() { const c = document.getElementById('mobile-search-container'); if (c.classList.contains('scale-y-0')) { c.classList.remove('hidden'); setTimeout(() => { c.classList.remove('scale-y-0'); c.classList.add('scale-y-100'); document.getElementById('mobile-live-search').focus(); }, 10); } else { c.classList.remove('scale-y-100'); c.classList.add('scale-y-0'); setTimeout(() => c.add('hidden'), 300); } }
-        function toggleMobileCategories() { const d = document.getElementById('mobile-cat-drawer'); d.classList.toggle('-translate-x-full'); }
-        
-        function toggleCartDrawer() { 
-            const d = document.getElementById('cart-drawer'); 
-            const o = document.getElementById('cart-drawer-overlay'); 
-            if(d.classList.contains('translate-x-full')) { 
-                document.body.classList.add('overflow-hidden'); 
-                o.classList.remove('hidden'); 
-                setTimeout(() => o.classList.remove('opacity-0'), 10); 
-                d.classList.remove('translate-x-full'); 
-                cancelarCheckout(); 
-                renderCarrito(); 
-            } else { 
-                document.body.classList.remove('overflow-hidden'); 
-                o.classList.add('opacity-0'); 
-                d.classList.add('translate-x-full'); 
-                setTimeout(() => o.classList.add('hidden'), 300); 
+        function handleTouchStart(e) { touchStartX = e.changedTouches[0].screenX; } 
+        function handleTouchEnd(e) { 
+            touchEndX = e.changedTouches[0].screenX; 
+            if(currentModalImages.length>1) { 
+                if(touchEndX < touchStartX - 50) changeImage(1); 
+                if(touchEndX > touchStartX + 50) changeImage(-1); 
             } 
         }
-        
-        function abrirMisPedidos() { renderMisPedidos(); document.getElementById('mis-pedidos-modal').classList.add('active'); }
-        function cerrarMisPedidos(e) { if(e) e.stopPropagation(); document.getElementById('mis-pedidos-modal').classList.remove('active'); }
-        function renderMisPedidos() { const lista = document.getElementById('lista-mis-pedidos'); const h = JSON.parse(localStorage.getItem('pk_pedidos') || '[]'); if(h.length===0) return lista.innerHTML = `<div class="text-center py-8"><div class="w-16 h-16 bg-white border border-border rounded-full mx-auto flex items-center justify-center text-muted mb-3 shadow-sm"><i class="fas fa-box-open text-2xl"></i></div><p class="text-muted text-sm font-semibold">No tienes compras recientes</p></div>`; lista.innerHTML = h.reverse().map(pedido => `<div class="bg-white border border-border p-5 rounded-2xl mb-4 shadow-sm"><div class="flex justify-between items-center mb-4 border-b border-border pb-3"><span class="text-dark font-bold text-sm">Pedido: ${pedido.idPedido}</span><span class="text-muted text-xs font-medium">${new Date(pedido.fecha).toLocaleDateString()}</span></div><div class="space-y-3 mb-4">${pedido.items.map(item => `<div class="flex items-center gap-3 bg-white border border-border shadow-sm p-2.5 rounded-xl"><div class="w-12 h-12 bg-white rounded-lg border border-border overflow-hidden shrink-0"><img src="${item.img}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><p class="text-dark text-xs font-bold truncate">${item.titulo}</p><p class="text-muted text-[10px] mt-0.5">Tipo: <span class="text-dark font-semibold">${item.talla}</span> | Cant: <span class="text-primary font-bold">x${item.cantidad}</span></p></div><div class="text-right shrink-0"><button onclick="cerrarMisPedidos(); openModalById('${item.id}')" class="bg-white hover:bg-light border border-border text-dark p-2 rounded-lg transition-colors text-xs shadow-sm"><i class="fas fa-redo"></i></button></div></div>`).join('')}</div><div class="text-right border-t border-border pt-3"><span class="text-dark font-bold">Total: ${config.currency||'$'}${(pedido.total||0).toFixed(2)}</span></div></div>`).join(''); }
-        function limpiarMisPedidos() { localStorage.removeItem('pk_pedidos'); renderMisPedidos(); Toast.fire({icon: 'info', title: 'Historial borrado'}); }
-
-        function updateWishlistNav() {
-            const iconD = document.getElementById('nav-wishlist-icon');
-            const iconM = document.getElementById('nav-wishlist-icon-mobile');
-            if(wishlist.length > 0) {
-                if(iconD) iconD.className = 'fas fa-heart text-promo text-xl transition-all';
-                if(iconM) iconM.className = 'fas fa-heart text-promo text-lg mb-1 transition-all';
-            } else {
-                if(iconD) iconD.className = 'far fa-heart text-dark text-xl transition-all';
-                if(iconM) iconM.className = 'far fa-heart text-dark text-lg mb-1 transition-all';
-            }
+        function shareProduct() { 
+            const url = window.location.href; const sText = config.shareText || '¡Mira esto en Pinkitos Shop!'; 
+            if (navigator.share) navigator.share({ title: `Pinkitos Shop: ${window.lastViewedProduct.titulo}`, text: sText, url: url }).catch(e=>console.log(e)); 
+            else { navigator.clipboard.writeText(`${url}`).then(() => Toast.fire({ icon: 'success', title: 'Enlace copiado' })); } 
         }
 
-        function abrirWishlist() { renderWishlist(); document.getElementById('wishlist-modal').classList.add('active'); }
-        function cerrarWishlist(e) { if(e) e.stopPropagation(); document.getElementById('wishlist-modal').classList.remove('active'); }
-        
-        function toggleWishlist(id, event) { 
-            event.stopPropagation(); 
-            const idx = wishlist.indexOf(id); 
-            let incVal = 0;
-            if(idx > -1) { 
-                wishlist.splice(idx, 1); 
-                Toast.fire({icon: 'info', title: 'Removido de favoritos'}); 
-                incVal = -1;
-            } else { 
-                wishlist.push(id); 
-                Toast.fire({icon: 'success', title: 'Añadido a favoritos'}); 
-                incVal = 1;
-            } 
-            localStorage.setItem('pk_wishlist', JSON.stringify(wishlist)); 
-            renderGallery(); updateWishlistNav();
-            if(document.getElementById('wishlist-modal').classList.contains('active')) renderWishlist(); 
-
-            const docRef = db.collection("productos").doc(id);
-            db.runTransaction((transaction) => {
-                return transaction.get(docRef).then((sfDoc) => {
-                    if (!sfDoc.exists) return;
-                    let currentCount = sfDoc.data().favCount || 0;
-                    let newCount = currentCount + incVal;
-                    if (newCount < 0) newCount = 0; 
-                    transaction.update(docRef, { favCount: newCount });
-                });
-            }).catch((error) => console.log("Error en favoritos: ", error));
+        // =====================================================================
+        // 📡 3. CONEXIÓN A FIREBASE Y LISTENERS (Backend)
+        // =====================================================================
+        function escucharConfigGlobal() { 
+            db.collection("config").doc("global").onSnapshot((doc) => { 
+                if (doc.exists) { 
+                    config = { ...config, ...doc.data() }; 
+                    applyConfig(); renderFilters(); renderGallery(); renderCarrito(); updateHeaderLogo(); 
+                } else { applyConfig(); renderFilters(); } 
+            }); 
         }
-
-        function renderWishlist() { 
-            const lista = document.getElementById('lista-wishlist'); 
-            const items = inventario.filter(p => wishlist.includes(p.id)); 
-            if(items.length===0) return lista.innerHTML = `<div class="text-center py-8"><div class="w-16 h-16 bg-white border border-border rounded-full mx-auto flex items-center justify-center text-promo mb-3 shadow-sm"><i class="fas fa-heart text-2xl"></i></div><p class="text-muted text-sm font-semibold">Tu lista está vacía</p></div>`; 
-            lista.innerHTML = items.map(p => { 
-                const pData = PricingEngine.calcular(p); 
-                const img = p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen||'https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Sin+Imagen'); 
-                return `<div class="flex items-center gap-4 bg-white border border-border p-3 rounded-2xl cursor-pointer hover:shadow-md transition-shadow mb-3 shadow-sm" onclick="cerrarWishlist(); openModalById('${p.id}')"><div class="w-16 h-16 bg-white border border-border rounded-xl overflow-hidden shrink-0"><img src="${img}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><p class="text-dark text-sm font-bold truncate">${p.titulo}</p><p class="text-primary font-bold text-sm mt-1">${PricingEngine.format(pData.finalUnitario)}</p></div><button onclick="toggleWishlist('${p.id}', event)" class="w-10 h-10 text-promo hover:bg-light rounded-full flex items-center justify-center transition-colors border border-border"><i class="fas fa-heart"></i></button></div>` 
-            }).join(''); 
-        }
-
-        function escucharConfigGlobal() { db.collection("config").doc("global").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; applyConfig(); renderFilters(); renderGallery(); renderCarrito(); updateHeaderLogo(); } else { applyConfig(); renderFilters(); } }); }
         
         function escucharFirebase() { 
             db.collection("productos").orderBy("createdAt", "desc").onSnapshot((snapshot) => { 
@@ -573,98 +527,27 @@
             }, (e) => console.error(e)); 
         }
         
-        function escucharHero() { db.collection("config").doc("hero").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; applyConfig(); } }); }
-
-        function goLobby() {
-            showSection('inicio');
+        function escucharHero() { 
+            db.collection("config").doc("hero").onSnapshot((doc) => { 
+                if (doc.exists) { config = { ...config, ...doc.data() }; applyConfig(); } 
+            }); 
         }
 
-        // Auto-scroll adaptativo hacia la sección de productos
-        function goToCatalogTop() {
-            showSection('catalogo', true);
-            const s = document.getElementById('productos');
-            if (s) {
-                const yOffset = -80; 
-                const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                window.scrollTo({top: y, behavior: 'smooth'});
-            } else {
-                window.scrollTo({top: 0, behavior: 'smooth'});
-            }
-        }
-
-        function showSection(id, noScroll = false) { 
-            document.querySelectorAll('.section-fade').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; }); 
-            const target = document.getElementById(id); 
-            if(target) { target.style.display = 'block'; setTimeout(() => target.classList.add('active'), 50); } 
-            
-            // Administra la UI del encabezado según si estamos en Lobby o no
-            if (id === 'inicio') {
-                document.body.classList.add('lobby-mode');
-            } else {
-                document.body.classList.remove('lobby-mode');
-            }
-            
-            if (!noScroll) window.scrollTo({top: 0, behavior: 'smooth'}); 
-        }
-        
-        function handleSearch(val) { 
-            showSection('catalogo', true); // Dirige al usuario al catálogo al buscar sin resetear scroll forzado
-            if(val!==undefined){ document.getElementById('live-search').value=val; const m=document.getElementById('mobile-live-search'); if(m)m.value=val; } 
-            renderGallery(); 
-            const t=(document.getElementById('live-search').value||"").toLowerCase(); 
-            if(t.length>0&&window.innerWidth>=768){ 
-                const s=document.getElementById('productos'); 
-                if(s) {
-                    const yOffset = -80; 
-                    const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                    window.scrollTo({top: y, behavior: 'smooth'});
-                }
-            }
-        }
-
-        function updateHeaderLogo() {
-            const containers = document.querySelectorAll('.header-logo-container');
-            containers.forEach(c => {
-                if (config.logoUrl) {
-                    c.innerHTML = `<img src="${config.logoUrl}" alt="Logo" class="w-10 h-10 object-contain rounded-full shadow-sm">`;
-                    c.classList.remove('bg-accent/20');
-                    c.classList.add('bg-transparent');
-                } else {
-                    c.innerHTML = `<i class="fas fa-cat"></i>`;
-                    c.classList.add('bg-accent/20');
-                    c.classList.remove('bg-transparent');
-                }
-            });
-        }
-
-        // ==========================================
-        // 🔥 LOBBY DE BIENVENIDA Aislado (CRO)
-        // ==========================================
+        // =====================================================================
+        // 🎨 4. RENDERIZADO DE INTERFAZ (UI)
+        // =====================================================================
         function renderLobby() {
             const lobbyGrid = document.getElementById('lobby-grid');
             if(!lobbyGrid) return;
-
             const cats = config.categories || [];
-            if(cats.length === 0) {
-                document.getElementById('lobby-categorias').style.display = 'none';
-                return;
-            }
-            
+            if(cats.length === 0) { document.getElementById('lobby-categorias').style.display = 'none'; return; }
             document.getElementById('lobby-categorias').style.display = 'block';
 
             const getIconForCategory = (catName) => {
-                const map = {
-                    'figura': 'fas fa-user-astronaut', 'figuras': 'fas fa-user-astronaut',
-                    'peluche': 'fas fa-paw', 'peluches': 'fas fa-paw',
-                    'llavero': 'fas fa-key', 'llaveros': 'fas fa-key',
-                    'ropa': 'fas fa-tshirt', 'accesorio': 'fas fa-ring', 'accesorios': 'fas fa-ring',
-                    'juguete': 'fas fa-gamepad', 'juguetes': 'fas fa-gamepad'
-                };
+                const map = { 'figura': 'fas fa-user-astronaut', 'figuras': 'fas fa-user-astronaut', 'peluche': 'fas fa-paw', 'peluches': 'fas fa-paw', 'llavero': 'fas fa-key', 'llaveros': 'fas fa-key', 'ropa': 'fas fa-tshirt', 'accesorio': 'fas fa-ring', 'accesorios': 'fas fa-ring', 'juguete': 'fas fa-gamepad', 'juguetes': 'fas fa-gamepad' };
                 return map[catName.toLowerCase()] || 'fas fa-box-open';
             };
 
-            // Tarjeta estática de "Todo el catálogo" (la primera)
-            // CÓDIGO QUIRÚRGICO: Se modificó el w-16 h-16 a w-24 h-24 md:w-32 md:h-32 y los textos base de font awesome.
             const allCatalogCard = `
                 <div onclick="filterGallery('all')" class="bg-white rounded-[2rem] p-6 md:p-8 shadow-[0_8px_30px_rgba(44,36,33,0.06)] border-b-[6px] border-border hover:border-primary transform hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(184,134,69,0.15)] active:translate-y-1 active:border-b-2 active:shadow-sm transition-all duration-300 flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden">
                     <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -675,15 +558,11 @@
                     <div class="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 relative z-10">
                         <span class="bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full shadow-md flex items-center gap-2">Explorar <i class="fas fa-arrow-right text-[9px]"></i></span>
                     </div>
-                </div>
-            `;
+                </div>`;
 
-            // Aplicamos el límite de categorías en el lobby definido en ajustes (por defecto 4)
             const limit = config.lobbyCategoryLimit || 4;
             const visibleCats = cats.slice(0, limit);
 
-            // Tarjetas dinámicas desde la DB (Muestra Imagen de Categoría o Icono por defecto)
-            // CÓDIGO QUIRÚRGICO: Se modificó la proporción de la imagen (w-[85%] h-[85%]) para adaptarse al nuevo contenedor (w-32 h-32).
             const dynamicCards = visibleCats.map(c => {
                 const catImg = (config.categoryImages && config.categoryImages[c]) ? config.categoryImages[c] : null;
                 const logoContent = catImg 
@@ -700,23 +579,16 @@
                     <div class="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 relative z-10">
                         <span class="bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full shadow-md flex items-center gap-2">Explorar <i class="fas fa-arrow-right text-[9px]"></i></span>
                     </div>
-                </div>
-            `;
+                </div>`;
             }).join('');
 
             lobbyGrid.innerHTML = allCatalogCard + dynamicCards;
         }
 
-        // ==========================================
-        // 🔥 RENDER GALLERY OPTIMIZADO
-        // ==========================================
         function renderGallery() {
             const grid = document.getElementById('gallery-grid'); if(!grid) return;
-            
             const catalogTitle = document.getElementById('catalog-section-title');
-            if (catalogTitle) {
-                catalogTitle.innerText = currentCategory === 'all' ? 'Todo el Catálogo' : currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1);
-            }
+            if (catalogTitle) catalogTitle.innerText = currentCategory === 'all' ? 'Todo el Catálogo' : currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1);
 
             const term = (document.getElementById('live-search').value || "").toLowerCase();
             let filt = inventario.filter(p => (currentCategory === 'all' || p.categoria === currentCategory) && ((p.titulo || "").toLowerCase().includes(term) || (p.sku || "").toLowerCase().includes(term)));
@@ -745,7 +617,6 @@
                         badgesHTML += `<div class="promo-badge bg-promo text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider">${pData.badgeText}</div>`;
                         priceHtml = `<div class="flex flex-col items-start leading-none gap-0.5"><span class="text-muted line-through text-xs font-semibold">${PricingEngine.format(pData.baseUnitario)}</span><span class="text-promo font-extrabold text-lg md:text-xl leading-none mt-1">${PricingEngine.format(pData.finalUnitario)}</span></div>`;
                     }
-
                     if (config.globalScarcityActivo && prod.stock > 0 && prod.stock <= 5) {
                         badgesHTML += `<div class="bg-promo/15 text-promo border border-promo/20 px-2 py-0.5 text-[9px] font-extrabold uppercase rounded shadow-sm w-max tracking-wider animate-pulse"><i class="fas fa-bolt"></i> ¡Solo quedan ${prod.stock}!</div>`;
                     }
@@ -758,28 +629,18 @@
                 if (prod.rating) {
                     const finalRating = parseFloat(prod.rating);
                     const finalReviewCount = prod.reviewCount !== undefined && prod.reviewCount !== null && prod.reviewCount !== "" ? parseInt(prod.reviewCount) : Math.floor(Math.random() * 21) + 10;
-                    
-                    let starsHTML = '';
-                    const fullStars = Math.floor(finalRating);
-                    const hasHalf = finalRating % 1 >= 0.4;
+                    let starsHTML = ''; const fullStars = Math.floor(finalRating); const hasHalf = finalRating % 1 >= 0.4;
                     for(let i=1; i<=5; i++){
                         if(i <= fullStars) starsHTML += `<i class="fas fa-star text-xs text-[#F59E0B]"></i>`;
                         else if(i === fullStars + 1 && hasHalf) starsHTML += `<i class="fas fa-star-half-alt text-xs text-[#F59E0B]"></i>`;
                         else starsHTML += `<i class="far fa-star text-xs text-[#E5E7EB]"></i>`;
                     }
-
-                    ratingSectionHTML = `
-                        <div class="flex items-center gap-1.5 mt-1">
-                            <div class="flex items-center">${starsHTML}</div>
-                            <span class="text-muted text-[10px] font-semibold">(${finalReviewCount})</span>
-                        </div>
-                    `;
+                    ratingSectionHTML = `<div class="flex items-center gap-1.5 mt-1"><div class="flex items-center">${starsHTML}</div><span class="text-muted text-[10px] font-semibold">(${finalReviewCount})</span></div>`;
                 }
 
                 const badgesWrapper = badgesHTML ? `<div class="absolute top-3 left-3 flex flex-col gap-1.5 z-10">${badgesHTML}</div>` : '';
                 const isFav = wishlist.includes(prod.id);
                 const btnFavHTML = `<button onclick="toggleWishlist('${prod.id}', event)" class="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all z-20 border border-border ${isFav ? 'bg-white text-promo shadow-md opacity-100' : 'bg-white/90 text-muted hover:bg-white hover:text-promo opacity-0 group-hover:opacity-100 backdrop-blur-sm shadow-sm'}"><i class="${isFav ? 'fas' : 'far'} fa-heart"></i></button>`;
-                
                 const imgClasses = isOut ? 'opacity-90 transition-transform duration-500 group-hover:scale-105' : 'transition-transform duration-500 group-hover:scale-105';
 
                 return `
@@ -803,6 +664,47 @@
             }).join('');
         }
 
+        function renderFilters() {
+            const cats = config.categories || []; 
+            const dT = document.getElementById('desktop-nav-categories');
+            if(dT) dT.innerHTML = `<button onclick="filterGallery('all')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors">Todo el catálogo</button>` + cats.map(c => `<button onclick="filterGallery('${c}')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors capitalize">${c}</button>`).join('');
+            
+            const mT = document.getElementById('mobile-nav-categories');
+            if(mT) mT.innerHTML = `<button onclick="filterGallery('all'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all ${currentCategory === 'all' ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">Todos los artículos</button>` + cats.map(c => `<button onclick="filterGallery('${c}'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all capitalize ${currentCategory === c ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">${c}</button>`).join('');
+            renderLobby();
+        }
+
+        function applyConfig() { 
+            document.getElementById('display-hero-title').innerText = config.heroTitle || ""; 
+            document.getElementById('display-hero-subtitle').innerText = config.heroSubtitle || ""; 
+            document.getElementById('hero-display').style.backgroundImage = `url('${config.heroImage || ""}')`; 
+            
+            const heroSection = document.getElementById('hero-display');
+            if(config.heroActive === false) { heroSection.style.display = 'none'; } else { heroSection.style.display = 'flex'; }
+
+            document.getElementById('display-shop-slogan').innerText = config.slogan || ""; 
+            document.getElementById('display-about-title').innerText = config.aboutTitle || ""; 
+            document.getElementById('display-about-desc').innerText = config.aboutDesc || ""; 
+            
+            const w=document.getElementById('link-whatsapp'); if(w) w.href=`https://wa.me/${config.whatsapp}`; 
+            const ig=document.getElementById('link-instagram'); if(ig) { ig.href = config.instagram && config.instagram !== "#" ? config.instagram : "#"; ig.style.display = (!config.instagram || config.instagram==="#") ? "none" : "flex"; } 
+            const fb=document.getElementById('link-facebook'); if(fb) { fb.href = config.facebook && config.facebook !== "#" ? config.facebook : "#"; fb.style.display = (!config.facebook || config.facebook==="#") ? "none" : "flex"; } 
+            const tk=document.getElementById('link-tiktok'); if(tk) { tk.href = config.tiktok && config.tiktok !== "#" ? config.tiktok : "#"; tk.style.display = (!config.tiktok || config.tiktok==="#") ? "none" : "flex"; } 
+        }
+
+        function updateHeaderLogo() {
+            const containers = document.querySelectorAll('.header-logo-container');
+            containers.forEach(c => {
+                if (config.logoUrl) { c.innerHTML = `<img src="${config.logoUrl}" alt="Logo" class="w-10 h-10 object-contain rounded-full shadow-sm">`; c.classList.remove('bg-accent/20'); c.classList.add('bg-transparent'); } 
+                else { c.innerHTML = `<i class="fas fa-cat"></i>`; c.classList.add('bg-accent/20'); c.classList.remove('bg-transparent'); }
+            });
+        }
+
+        // =====================================================================
+        // 🛒 5. CARRITO DE COMPRAS Y CHECKOUT
+        // =====================================================================
+        function saveCart() { localStorage.setItem('pk_carrito', JSON.stringify(carrito)); }
+        
         function quickAdd(id, event) {
             event.stopPropagation(); const p = inventario.find(x => x.id === id); if(!p || esPreventaActiva(p) || p.stock <= 0) return;
             if (p.hasMeasures && p.tallas && p.tallas.length > 0) { openModalById(p.id); Toast.fire({ icon: 'info', title: 'Selecciona una variante' }); return; }
@@ -811,134 +713,6 @@
             Toast.fire({ icon: 'success', title: `Añadido` }); saveCart(); renderCarrito();
             if(window.innerWidth > 768 && document.getElementById('cart-drawer').classList.contains('translate-x-full')) toggleCartDrawer();
         }
-
-        function renderFilters() {
-            const cats = config.categories || []; 
-            const dT = document.getElementById('desktop-nav-categories');
-            if(dT) dT.innerHTML = `<button onclick="filterGallery('all')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors">Todo el catálogo</button>` + cats.map(c => `<button onclick="filterGallery('${c}')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors capitalize">${c}</button>`).join('');
-            
-            const mT = document.getElementById('mobile-nav-categories');
-            if(mT) mT.innerHTML = `<button onclick="filterGallery('all'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all ${currentCategory === 'all' ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">Todos los artículos</button>` + cats.map(c => `<button onclick="filterGallery('${c}'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all capitalize ${currentCategory === c ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">${c}</button>`).join('');
-            
-            renderLobby();
-        }
-        
-        function filterGallery(c) { 
-            showSection('catalogo', true); 
-            currentCategory = c; 
-            renderFilters(); 
-            const g = document.getElementById('gallery-grid'); 
-            if(g) g.style.opacity = '0'; 
-            setTimeout(() => { 
-                renderGallery(); 
-                if(g) g.style.opacity = '1'; 
-                const s = document.getElementById('productos'); 
-                if (s) {
-                    const yOffset = -80;
-                    const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                    window.scrollTo({top: y, behavior: 'smooth'});
-                }
-            }, 200); 
-        }
-
-        // Modal de Detalles del Producto
-        function openModalById(id) {
-            const p = inventario.find(x => x.id === id); if(!p) return;
-            window.lastViewedProduct = p; window.history.pushState({ productId: id }, '', `?producto=${id}`);
-            productQuantity = 1; document.getElementById('modal-quantity').innerText = productQuantity;
-            
-            const isPh = p.imagen && p.imagen.includes('via.placeholder.com');
-            currentModalImages = p.imagenes && p.imagenes.length > 0 && !isPh ? p.imagenes : (p.imagen && !isPh ? [p.imagen] : ['https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Sin+Imagen']);
-            currentImageIndex = 0; updateCarouselView();
-            
-            document.getElementById('modal-title').innerText = p.titulo; 
-            document.getElementById('modal-sku-display').innerText = p.sku ? `SKU: ${p.sku}` : '';
-            document.getElementById('modal-desc').innerText = p.descripcion; 
-            document.getElementById('modal-cat').innerText = p.categoria || 'General';
-
-            const pData = PricingEngine.calcular(p, 1);
-            const priceContainer = document.getElementById('modal-price-container');
-            const badgesContainer = document.getElementById('modal-badges-container');
-            
-            badgesContainer.innerHTML = '';
-            if (pData.isActive) {
-                badgesContainer.innerHTML = `<div class="bg-promo text-white px-3 py-1.5 text-xs font-bold uppercase rounded-lg shadow-sm flex items-center gap-1"><i class="fas fa-tag"></i> ${pData.badgeText}</div>`;
-                priceContainer.innerHTML = `
-                    <div class="flex flex-col items-start justify-center gap-1 mb-1">
-                        <span class="text-muted line-through text-base font-semibold leading-none">${PricingEngine.format(pData.baseUnitario)}</span>
-                        <span class="text-3xl font-extrabold text-dark block tracking-tight leading-none">${PricingEngine.format(pData.finalUnitario)}</span>
-                    </div>
-                    <div class="mt-2 inline-flex items-center bg-primary/10 px-2.5 py-1 rounded-lg text-primary text-xs font-bold">
-                        Ahorras ${PricingEngine.format(pData.savings)}
-                    </div>`;
-            } else {
-                priceContainer.innerHTML = `<span class="text-3xl font-extrabold text-dark tracking-tight leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`;
-            }
-
-            const ratingDisplay = document.getElementById('modal-rating-display');
-            if (p.rating) {
-                const finalRating = parseFloat(p.rating);
-                const finalReviewCount = p.reviewCount !== undefined && p.reviewCount !== null && p.reviewCount !== "" ? parseInt(p.reviewCount) : Math.floor(Math.random() * 21) + 15;
-                
-                let starsHTML = '';
-                const fullStars = Math.floor(finalRating);
-                const hasHalf = finalRating % 1 >= 0.4;
-                for(let i=1; i<=5; i++){
-                    if(i <= fullStars) starsHTML += `<i class="fas fa-star text-sm text-[#F59E0B]"></i>`;
-                    else if(i === fullStars + 1 && hasHalf) starsHTML += `<i class="fas fa-star-half-alt text-sm text-[#F59E0B]"></i>`;
-                    else starsHTML += `<i class="far fa-star text-sm text-[#E5E7EB]"></i>`;
-                }
-                ratingDisplay.innerHTML = `
-                    <div class="flex items-center gap-1">${starsHTML}</div>
-                    <span class="text-dark font-bold text-sm ml-1">${finalRating.toFixed(1)}</span>
-                    <span class="text-muted text-xs font-medium">(${finalReviewCount} valoraciones de clientes)</span>
-                `;
-                ratingDisplay.classList.remove('hidden');
-                ratingDisplay.classList.add('flex');
-            } else {
-                ratingDisplay.innerHTML = '';
-                ratingDisplay.classList.add('hidden');
-                ratingDisplay.classList.remove('flex');
-            }
-
-            const btnAddCart = document.getElementById('btn-add-cart'); const msgDisabled = document.getElementById('modal-disabled-msg'); const qtyContainer = document.getElementById('modal-quantity-container'); const badge = document.getElementById('modal-status-badge');
-            badge.className = 'px-3 py-1 text-[10px] font-bold uppercase rounded-full hidden';
-            
-            const isPrevActiva = esPreventaActiva(p);
-
-            if (isPrevActiva) { 
-                badge.classList.remove('hidden'); badge.classList.add('bg-accent/10', 'text-accent'); 
-                badge.innerHTML = p.fechaLanzamiento ? `Próximamente: ${p.fechaLanzamiento}` : `Próximamente`; 
-                btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "No disponible aún"; 
-            } 
-            else if (p.stock !== undefined && p.stock <= 0) { 
-                badge.classList.remove('hidden'); badge.classList.add('bg-promo', 'text-white'); badge.innerText = "Agotado"; 
-                btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "Fuera de Stock"; 
-            } 
-            else { 
-                btnAddCart.classList.remove('hidden'); msgDisabled.classList.add('hidden'); qtyContainer.classList.remove('hidden'); qtyContainer.classList.add('flex'); 
-            }
-            
-            const measuresC = document.getElementById('modal-measures-container'); const tallaC = document.getElementById('modal-talla-select-container');
-            if(p.hasMeasures && p.tallas && p.tallas.length > 0) {
-                measuresC.classList.remove('hidden'); const cols = p.columnas && p.columnas.length > 0 ? p.columnas : ['Medida'];
-                document.getElementById('modal-measures-head').innerHTML = `<th class="py-3 px-2 w-16">Tipo</th>` + cols.map(c => `<th class="py-3 px-2 text-center whitespace-nowrap">${c}</th>`).join('');
-                document.getElementById('modal-measures-body').innerHTML = p.tallas.map(t => { const m = p.medidas && p.medidas[t] ? p.medidas[t] : {}; const tds = cols.map(c => { const val = m[c] !== undefined && m[c] !== "" ? m[c] : (m[c.toLowerCase()] !== undefined && m[c.toLowerCase()] !== "" ? m[c.toLowerCase()] : '-'); return `<td class="py-3 px-2 text-center text-muted font-semibold whitespace-nowrap">${val}</td>`; }).join(''); return `<tr class="hover:bg-light transition-colors"><td class="py-3 px-2 text-dark font-bold whitespace-nowrap">${t}</td>${tds}</tr>`; }).join('');
-                tallaC.classList.remove('hidden'); document.getElementById('modal-talla').innerHTML = '<option value="" disabled selected>Elige un tamaño/tipo...</option>' + p.tallas.map(t => `<option value="${t}">${t}</option>`).join(''); document.getElementById('modal-talla').classList.remove('ring-promo');
-            } else { measuresC.classList.add('hidden'); tallaC.classList.add('hidden'); }
-            document.getElementById('product-modal').classList.add('active');
-            document.body.classList.add('overflow-hidden');
-        }
-
-        function updateQuantity(c) { productQuantity += c; if(productQuantity < 1) productQuantity = 1; if(productQuantity > 20) productQuantity = 20; document.getElementById('modal-quantity').innerText = productQuantity; }
-        function handleTouchStart(e) { touchStartX = e.changedTouches[0].screenX; } function handleTouchEnd(e) { touchEndX = e.changedTouches[0].screenX; if(currentModalImages.length>1) { if(touchEndX < touchStartX - 50) changeImage(1); if(touchEndX > touchStartX + 50) changeImage(-1); } }
-        function shareProduct() { const url = window.location.href; const sText = config.shareText || '¡Mira esto en Pinkitos Shop!'; if (navigator.share) navigator.share({ title: `Pinkitos Shop: ${window.lastViewedProduct.titulo}`, text: sText, url: url }).catch(e=>console.log(e)); else { navigator.clipboard.writeText(`${url}`).then(() => Toast.fire({ icon: 'success', title: 'Enlace copiado' })); } }
-        function closeModal(e) { window.history.pushState({}, '', window.location.pathname); document.getElementById('product-modal').classList.remove('active'); document.body.classList.remove('overflow-hidden'); }
-        window.addEventListener('popstate', () => { const p = new URLSearchParams(window.location.search); const id = p.get('producto'); if(id) openModalById(id); else { document.getElementById('product-modal').classList.remove('active'); document.body.classList.remove('overflow-hidden'); } });
-
-        function changeImage(d) { currentImageIndex += d; if (currentImageIndex >= currentModalImages.length) currentImageIndex = 0; if (currentImageIndex < 0) currentImageIndex = currentModalImages.length - 1; updateCarouselView(); }
-        function updateCarouselView() { const img = document.getElementById('modal-img'); const l = document.getElementById('modal-img-loader'); img.style.opacity = 0; l.classList.remove('hidden'); const nImg = new Image(); nImg.src = currentModalImages[currentImageIndex]; nImg.onerror = () => { img.src = "https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Error"; l.classList.add('hidden'); img.style.opacity = 1; }; nImg.onload = () => { img.src = nImg.src; l.classList.add('hidden'); img.style.opacity = 1; }; const p = document.getElementById('btn-prev-img'), n = document.getElementById('btn-next-img'), dots = document.getElementById('carousel-dots'); if (currentModalImages.length > 1) { p.classList.remove('hidden'); n.classList.remove('hidden'); dots.innerHTML = currentModalImages.map((_, i) => `<span class="h-2 rounded-full transition-all duration-300 ${i === currentImageIndex ? 'bg-primary w-8' : 'bg-dark/20 w-2'}"></span>`).join(''); } else { p.classList.add('hidden'); n.classList.add('hidden'); dots.innerHTML = ''; } }
-        function saveCart() { localStorage.setItem('pk_carrito', JSON.stringify(carrito)); }
 
         function agregarAlPedido() {
             const p = window.lastViewedProduct; if (esPreventaActiva(p) || (p.stock !== undefined && p.stock <= 0)) return;
@@ -955,6 +729,7 @@
         }
 
         function updateCartQty(idx, d) { carrito[idx].cantidad += d; if(carrito[idx].cantidad <= 0) carrito.splice(idx, 1); saveCart(); renderCarrito(); }
+        function updateQuantity(c) { productQuantity += c; if(productQuantity < 1) productQuantity = 1; if(productQuantity > 20) productQuantity = 20; document.getElementById('modal-quantity').innerText = productQuantity; }
 
         function renderCarrito() {
             const cCount = carrito.reduce((acc, item) => acc + item.cantidad, 0);
@@ -966,10 +741,8 @@
                 container.innerHTML = `<div class="text-center py-10 mt-10"><div class="w-20 h-20 bg-white border border-border shadow-sm rounded-full mx-auto flex items-center justify-center text-border mb-4"><i class="fas fa-shopping-basket text-4xl"></i></div><p class="text-muted font-bold">Cesta vacía</p></div>`; 
                 document.getElementById('cart-drawer-total').innerText = PricingEngine.format(0); 
                 document.getElementById('cart-drawer-subtotal-orig').innerText = PricingEngine.format(0);
-                
                 document.getElementById('cart-drawer-subtotal-row').classList.add('hidden');
                 document.getElementById('cart-drawer-savings-row').classList.add('hidden');
-                
                 btnInit.disabled = true; btnInit.classList.replace('bg-primary', 'bg-border'); btnInit.classList.replace('text-white', 'text-muted'); pBanner.classList.add('hidden'); cancelarCheckout(); return; 
             }
 
@@ -1019,13 +792,9 @@
             const savingsRow = document.getElementById('cart-drawer-savings-row');
             
             if (granAhorro > 0.01) { 
-                subtotalRow.classList.remove('hidden');
-                savingsRow.classList.remove('hidden'); 
+                subtotalRow.classList.remove('hidden'); savingsRow.classList.remove('hidden'); 
                 document.getElementById('cart-drawer-savings').innerText = `- ${PricingEngine.format(granAhorro)}`; 
-            } else { 
-                subtotalRow.classList.add('hidden');
-                savingsRow.classList.add('hidden'); 
-            }
+            } else { subtotalRow.classList.add('hidden'); savingsRow.classList.add('hidden'); }
             
             window._tempCartTotals = { base: granTotalBase, final: granTotalFinal, savings: granAhorro };
         }
@@ -1034,27 +803,13 @@
         function cancelarCheckout() { document.getElementById('btn-checkout-init').classList.remove('hidden'); document.getElementById('checkout-form').classList.add('hidden'); document.getElementById('btn-checkout-confirm').classList.add('hidden'); document.getElementById('btn-checkout-cancel').classList.add('hidden'); }
 
         function updateCheckoutButton() {
-            const btn = document.getElementById('btn-checkout-confirm');
-            const txt = document.getElementById('btn-wa-text');
-            const icon = document.getElementById('btn-wa-icon');
-            const method = document.querySelector('input[name="checkout-method"]:checked').value;
-            
-            if (method === 'whatsapp') {
-                btn.className = "w-full py-4 bg-[#25D366] text-white font-bold text-lg hover:bg-[#20b858] transition-all shadow-md flex items-center justify-center gap-2 rounded-2xl";
-                icon.className = "fab fa-whatsapp text-2xl";
-                txt.innerText = "Enviar por WhatsApp";
-            } else {
-                btn.className = "w-full py-4 bg-[#E1306C] text-white font-bold text-lg hover:bg-[#C13584] transition-all shadow-md flex items-center justify-center gap-2 rounded-2xl";
-                icon.className = "fab fa-instagram text-2xl";
-                txt.innerText = "Enviar por Instagram";
-            }
+            const btn = document.getElementById('btn-checkout-confirm'); const txt = document.getElementById('btn-wa-text'); const icon = document.getElementById('btn-wa-icon'); const method = document.querySelector('input[name="checkout-method"]:checked').value;
+            if (method === 'whatsapp') { btn.className = "w-full py-4 bg-[#25D366] text-white font-bold text-lg hover:bg-[#20b858] transition-all shadow-md flex items-center justify-center gap-2 rounded-2xl"; icon.className = "fab fa-whatsapp text-2xl"; txt.innerText = "Enviar por WhatsApp"; } 
+            else { btn.className = "w-full py-4 bg-[#E1306C] text-white font-bold text-lg hover:bg-[#C13584] transition-all shadow-md flex items-center justify-center gap-2 rounded-2xl"; icon.className = "fab fa-instagram text-2xl"; txt.innerText = "Enviar por Instagram"; }
         }
 
         function procesarEnvioPedido() {
-            const n = document.getElementById('cliente-nombre').value.trim(); 
-            const tel = document.getElementById('cliente-telefono').value.trim();
-            const m = document.getElementById('mensaje').value.trim();
-            
+            const n = document.getElementById('cliente-nombre').value.trim(); const tel = document.getElementById('cliente-telefono').value.trim(); const m = document.getElementById('mensaje').value.trim();
             if(!n) { Toast.fire({ icon: 'warning', title: 'Necesitamos tu nombre' }); return document.getElementById('cliente-nombre').focus(); }
             if(!tel) { Toast.fire({ icon: 'warning', title: 'Necesitamos tu número de contacto' }); return document.getElementById('cliente-telefono').focus(); }
             if(carrito.length === 0) return Toast.fire({ icon: 'error', title: 'Cesta vacía' });
@@ -1086,64 +841,107 @@
             carrito = []; saveCart(); renderCarrito(); document.getElementById('mensaje').value = ''; document.getElementById('cliente-telefono').value = ''; document.getElementById('cliente-nombre').value = ''; btnTxt.innerText = ogTxt; toggleCartDrawer();
             
             const method = document.querySelector('input[name="checkout-method"]:checked').value;
-            
-            if (method === 'whatsapp') {
-                window.open(`https://wa.me/${config.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
-            } else {
+            if (method === 'whatsapp') { window.open(`https://wa.me/${config.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank'); } 
+            else {
                 navigator.clipboard.writeText(msg).then(() => {
-                    Swal.fire({
-                        title: '¡Pedido copiado!',
-                        text: 'Hemos copiado los detalles. Te abriremos el chat de Instagram de la tienda. Simplemente presiona "Pegar" en el mensaje.',
-                        icon: 'success',
-                        confirmButtonText: 'Ir a Instagram',
-                        confirmButtonColor: '#E1306C',
-                        background: '#FFFFFF', color: '#2C2421'
-                    }).then(() => {
+                    Swal.fire({ title: '¡Pedido copiado!', text: 'Hemos copiado los detalles. Te abriremos el chat de Instagram de la tienda. Simplemente presiona "Pegar" en el mensaje.', icon: 'success', confirmButtonText: 'Ir a Instagram', confirmButtonColor: '#E1306C', background: '#FFFFFF', color: '#2C2421' }).then(() => {
                         let igUrl = config.instagram || "https://instagram.com";
-                        if(igUrl.includes('instagram.com/')) {
-                            let igUser = igUrl.split('instagram.com/')[1].replace('/', '');
-                            window.open(`https://ig.me/m/${igUser}`, '_blank');
-                        } else {
-                            window.open(igUrl, '_blank');
-                        }
+                        if(igUrl.includes('instagram.com/')) { let igUser = igUrl.split('instagram.com/')[1].replace('/', ''); window.open(`https://ig.me/m/${igUser}`, '_blank'); } else { window.open(igUrl, '_blank'); }
                     });
                 });
             }
         }
 
-        function applyConfig() { 
-            document.getElementById('display-hero-title').innerText = config.heroTitle || ""; 
-            document.getElementById('display-hero-subtitle').innerText = config.heroSubtitle || ""; 
-            document.getElementById('hero-display').style.backgroundImage = `url('${config.heroImage || ""}')`; 
-            
-            const heroSection = document.getElementById('hero-display');
-            if(config.heroActive === false) {
-                heroSection.style.display = 'none';
-            } else {
-                heroSection.style.display = 'flex';
-            }
+        // =====================================================================
+        // 🚪 6. MODALES Y NAVEGACIÓN
+        // =====================================================================
+        function toggleMobileSearch() { const c = document.getElementById('mobile-search-container'); if (c.classList.contains('scale-y-0')) { c.classList.remove('hidden'); setTimeout(() => { c.classList.remove('scale-y-0'); c.classList.add('scale-y-100'); document.getElementById('mobile-live-search').focus(); }, 10); } else { c.classList.remove('scale-y-100'); c.classList.add('scale-y-0'); setTimeout(() => c.add('hidden'), 300); } }
+        function toggleMobileCategories() { const d = document.getElementById('mobile-cat-drawer'); d.classList.toggle('-translate-x-full'); }
+        
+        function toggleCartDrawer() { 
+            const d = document.getElementById('cart-drawer'); const o = document.getElementById('cart-drawer-overlay'); 
+            if(d.classList.contains('translate-x-full')) { document.body.classList.add('overflow-hidden'); o.classList.remove('hidden'); setTimeout(() => o.classList.remove('opacity-0'), 10); d.classList.remove('translate-x-full'); cancelarCheckout(); renderCarrito(); } 
+            else { document.body.classList.remove('overflow-hidden'); o.classList.add('opacity-0'); d.classList.add('translate-x-full'); setTimeout(() => o.classList.add('hidden'), 300); } 
+        }
+        
+        function abrirMisPedidos() { renderMisPedidos(); document.getElementById('mis-pedidos-modal').classList.add('active'); }
+        function cerrarMisPedidos(e) { if(e) e.stopPropagation(); document.getElementById('mis-pedidos-modal').classList.remove('active'); }
+        function renderMisPedidos() { const lista = document.getElementById('lista-mis-pedidos'); const h = JSON.parse(localStorage.getItem('pk_pedidos') || '[]'); if(h.length===0) return lista.innerHTML = `<div class="text-center py-8"><div class="w-16 h-16 bg-white border border-border rounded-full mx-auto flex items-center justify-center text-muted mb-3 shadow-sm"><i class="fas fa-box-open text-2xl"></i></div><p class="text-muted text-sm font-semibold">No tienes compras recientes</p></div>`; lista.innerHTML = h.reverse().map(pedido => `<div class="bg-white border border-border p-5 rounded-2xl mb-4 shadow-sm"><div class="flex justify-between items-center mb-4 border-b border-border pb-3"><span class="text-dark font-bold text-sm">Pedido: ${pedido.idPedido}</span><span class="text-muted text-xs font-medium">${new Date(pedido.fecha).toLocaleDateString()}</span></div><div class="space-y-3 mb-4">${pedido.items.map(item => `<div class="flex items-center gap-3 bg-white border border-border shadow-sm p-2.5 rounded-xl"><div class="w-12 h-12 bg-white rounded-lg border border-border overflow-hidden shrink-0"><img src="${item.img}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><p class="text-dark text-xs font-bold truncate">${item.titulo}</p><p class="text-muted text-[10px] mt-0.5">Tipo: <span class="text-dark font-semibold">${item.talla}</span> | Cant: <span class="text-primary font-bold">x${item.cantidad}</span></p></div><div class="text-right shrink-0"><button onclick="cerrarMisPedidos(); openModalById('${item.id}')" class="bg-white hover:bg-light border border-border text-dark p-2 rounded-lg transition-colors text-xs shadow-sm"><i class="fas fa-redo"></i></button></div></div>`).join('')}</div><div class="text-right border-t border-border pt-3"><span class="text-dark font-bold">Total: ${config.currency||'$'}${(pedido.total||0).toFixed(2)}</span></div></div>`).join(''); }
+        function limpiarMisPedidos() { localStorage.removeItem('pk_pedidos'); renderMisPedidos(); Toast.fire({icon: 'info', title: 'Historial borrado'}); }
 
-            document.getElementById('display-shop-slogan').innerText = config.slogan || ""; 
-            document.getElementById('display-about-title').innerText = config.aboutTitle || ""; 
-            document.getElementById('display-about-desc').innerText = config.aboutDesc || ""; 
+        function updateWishlistNav() { const iconD = document.getElementById('nav-wishlist-icon'); const iconM = document.getElementById('nav-wishlist-icon-mobile'); if(wishlist.length > 0) { if(iconD) iconD.className = 'fas fa-heart text-promo text-xl transition-all'; if(iconM) iconM.className = 'fas fa-heart text-promo text-lg mb-1 transition-all'; } else { if(iconD) iconD.className = 'far fa-heart text-dark text-xl transition-all'; if(iconM) iconM.className = 'far fa-heart text-dark text-lg mb-1 transition-all'; } }
+        function abrirWishlist() { renderWishlist(); document.getElementById('wishlist-modal').classList.add('active'); }
+        function cerrarWishlist(e) { if(e) e.stopPropagation(); document.getElementById('wishlist-modal').classList.remove('active'); }
+        function toggleWishlist(id, event) { event.stopPropagation(); const idx = wishlist.indexOf(id); let incVal = 0; if(idx > -1) { wishlist.splice(idx, 1); Toast.fire({icon: 'info', title: 'Removido de favoritos'}); incVal = -1; } else { wishlist.push(id); Toast.fire({icon: 'success', title: 'Añadido a favoritos'}); incVal = 1; } localStorage.setItem('pk_wishlist', JSON.stringify(wishlist)); renderGallery(); updateWishlistNav(); if(document.getElementById('wishlist-modal').classList.contains('active')) renderWishlist(); const docRef = db.collection("productos").doc(id); db.runTransaction((transaction) => { return transaction.get(docRef).then((sfDoc) => { if (!sfDoc.exists) return; let currentCount = sfDoc.data().favCount || 0; let newCount = currentCount + incVal; if (newCount < 0) newCount = 0; transaction.update(docRef, { favCount: newCount }); }); }).catch((error) => console.log("Error en favoritos: ", error)); }
+        function renderWishlist() { const lista = document.getElementById('lista-wishlist'); const items = inventario.filter(p => wishlist.includes(p.id)); if(items.length===0) return lista.innerHTML = `<div class="text-center py-8"><div class="w-16 h-16 bg-white border border-border rounded-full mx-auto flex items-center justify-center text-promo mb-3 shadow-sm"><i class="fas fa-heart text-2xl"></i></div><p class="text-muted text-sm font-semibold">Tu lista está vacía</p></div>`; lista.innerHTML = items.map(p => { const pData = PricingEngine.calcular(p); const img = p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen||'https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Sin+Imagen'); return `<div class="flex items-center gap-4 bg-white border border-border p-3 rounded-2xl cursor-pointer hover:shadow-md transition-shadow mb-3 shadow-sm" onclick="cerrarWishlist(); openModalById('${p.id}')"><div class="w-16 h-16 bg-white border border-border rounded-xl overflow-hidden shrink-0"><img src="${img}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><p class="text-dark text-sm font-bold truncate">${p.titulo}</p><p class="text-primary font-bold text-sm mt-1">${PricingEngine.format(pData.finalUnitario)}</p></div><button onclick="toggleWishlist('${p.id}', event)" class="w-10 h-10 text-promo hover:bg-light rounded-full flex items-center justify-center transition-colors border border-border"><i class="fas fa-heart"></i></button></div>` }).join(''); }
+
+        function goLobby() { showSection('inicio'); }
+        function goToCatalogTop() { showSection('catalogo', true); const s = document.getElementById('productos'); if (s) { const yOffset = -80; const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset; window.scrollTo({top: y, behavior: 'smooth'}); } else { window.scrollTo({top: 0, behavior: 'smooth'}); } }
+        function showSection(id, noScroll = false) { document.querySelectorAll('.section-fade').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; }); const target = document.getElementById(id); if(target) { target.style.display = 'block'; setTimeout(() => target.classList.add('active'), 50); } if (id === 'inicio') { document.body.classList.add('lobby-mode'); } else { document.body.classList.remove('lobby-mode'); } if (!noScroll) window.scrollTo({top: 0, behavior: 'smooth'}); }
+        function handleSearch(val) { showSection('catalogo', true); if(val!==undefined){ document.getElementById('live-search').value=val; const m=document.getElementById('mobile-live-search'); if(m)m.value=val; } renderGallery(); const t=(document.getElementById('live-search').value||"").toLowerCase(); if(t.length>0&&window.innerWidth>=768){ const s=document.getElementById('productos'); if(s) { const yOffset = -80; const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset; window.scrollTo({top: y, behavior: 'smooth'}); } } }
+        function filterGallery(c) { showSection('catalogo', true); currentCategory = c; renderFilters(); const g = document.getElementById('gallery-grid'); if(g) g.style.opacity = '0'; setTimeout(() => { renderGallery(); if(g) g.style.opacity = '1'; const s = document.getElementById('productos'); if (s) { const yOffset = -80; const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset; window.scrollTo({top: y, behavior: 'smooth'}); } }, 200); }
+
+        function openModalById(id) {
+            const p = inventario.find(x => x.id === id); if(!p) return;
+            window.lastViewedProduct = p; window.history.pushState({ productId: id }, '', `?producto=${id}`);
+            productQuantity = 1; document.getElementById('modal-quantity').innerText = productQuantity;
             
-            const w=document.getElementById('link-whatsapp'); if(w) w.href=`https://wa.me/${config.whatsapp}`; 
+            const isPh = p.imagen && p.imagen.includes('via.placeholder.com');
+            currentModalImages = p.imagenes && p.imagenes.length > 0 && !isPh ? p.imagenes : (p.imagen && !isPh ? [p.imagen] : ['https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Sin+Imagen']);
+            currentImageIndex = 0; updateCarouselView();
             
-            const ig=document.getElementById('link-instagram'); 
-            if(ig) { ig.href = config.instagram && config.instagram !== "#" ? config.instagram : "#"; ig.style.display = (!config.instagram || config.instagram==="#") ? "none" : "flex"; } 
+            document.getElementById('modal-title').innerText = p.titulo; document.getElementById('modal-sku-display').innerText = p.sku ? `SKU: ${p.sku}` : ''; document.getElementById('modal-desc').innerText = p.descripcion; document.getElementById('modal-cat').innerText = p.categoria || 'General';
+
+            const pData = PricingEngine.calcular(p, 1);
+            const priceContainer = document.getElementById('modal-price-container'); const badgesContainer = document.getElementById('modal-badges-container');
+            badgesContainer.innerHTML = '';
+            if (pData.isActive) { badgesContainer.innerHTML = `<div class="bg-promo text-white px-3 py-1.5 text-xs font-bold uppercase rounded-lg shadow-sm flex items-center gap-1"><i class="fas fa-tag"></i> ${pData.badgeText}</div>`; priceContainer.innerHTML = `<div class="flex flex-col items-start justify-center gap-1 mb-1"><span class="text-muted line-through text-base font-semibold leading-none">${PricingEngine.format(pData.baseUnitario)}</span><span class="text-3xl font-extrabold text-dark block tracking-tight leading-none">${PricingEngine.format(pData.finalUnitario)}</span></div><div class="mt-2 inline-flex items-center bg-primary/10 px-2.5 py-1 rounded-lg text-primary text-xs font-bold">Ahorras ${PricingEngine.format(pData.savings)}</div>`; } 
+            else { priceContainer.innerHTML = `<span class="text-3xl font-extrabold text-dark tracking-tight leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`; }
+
+            const ratingDisplay = document.getElementById('modal-rating-display');
+            if (p.rating) { const finalRating = parseFloat(p.rating); const finalReviewCount = p.reviewCount !== undefined && p.reviewCount !== null && p.reviewCount !== "" ? parseInt(p.reviewCount) : Math.floor(Math.random() * 21) + 15; let starsHTML = ''; const fullStars = Math.floor(finalRating); const hasHalf = finalRating % 1 >= 0.4; for(let i=1; i<=5; i++){ if(i <= fullStars) starsHTML += `<i class="fas fa-star text-sm text-[#F59E0B]"></i>`; else if(i === fullStars + 1 && hasHalf) starsHTML += `<i class="fas fa-star-half-alt text-sm text-[#F59E0B]"></i>`; else starsHTML += `<i class="far fa-star text-sm text-[#E5E7EB]"></i>`; } ratingDisplay.innerHTML = `<div class="flex items-center gap-1">${starsHTML}</div><span class="text-dark font-bold text-sm ml-1">${finalRating.toFixed(1)}</span><span class="text-muted text-xs font-medium">(${finalReviewCount} valoraciones de clientes)</span>`; ratingDisplay.classList.remove('hidden'); ratingDisplay.classList.add('flex'); } 
+            else { ratingDisplay.innerHTML = ''; ratingDisplay.classList.add('hidden'); ratingDisplay.classList.remove('flex'); }
+
+            const btnAddCart = document.getElementById('btn-add-cart'); const msgDisabled = document.getElementById('modal-disabled-msg'); const qtyContainer = document.getElementById('modal-quantity-container'); const badge = document.getElementById('modal-status-badge');
+            badge.className = 'px-3 py-1 text-[10px] font-bold uppercase rounded-full hidden';
             
-            const fb=document.getElementById('link-facebook'); 
-            if(fb) { fb.href = config.facebook && config.facebook !== "#" ? config.facebook : "#"; fb.style.display = (!config.facebook || config.facebook==="#") ? "none" : "flex"; } 
+            if (esPreventaActiva(p)) { badge.classList.remove('hidden'); badge.classList.add('bg-accent/10', 'text-accent'); badge.innerHTML = p.fechaLanzamiento ? `Próximamente: ${p.fechaLanzamiento}` : `Próximamente`; btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "No disponible aún"; } 
+            else if (p.stock !== undefined && p.stock <= 0) { badge.classList.remove('hidden'); badge.classList.add('bg-promo', 'text-white'); badge.innerText = "Agotado"; btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "Fuera de Stock"; } 
+            else { btnAddCart.classList.remove('hidden'); msgDisabled.classList.add('hidden'); qtyContainer.classList.remove('hidden'); qtyContainer.classList.add('flex'); }
             
-            const tk=document.getElementById('link-tiktok'); 
-            if(tk) { tk.href = config.tiktok && config.tiktok !== "#" ? config.tiktok : "#"; tk.style.display = (!config.tiktok || config.tiktok==="#") ? "none" : "flex"; } 
+            const measuresC = document.getElementById('modal-measures-container'); const tallaC = document.getElementById('modal-talla-select-container');
+            if(p.hasMeasures && p.tallas && p.tallas.length > 0) { measuresC.classList.remove('hidden'); const cols = p.columnas && p.columnas.length > 0 ? p.columnas : ['Medida']; document.getElementById('modal-measures-head').innerHTML = `<th class="py-3 px-2 w-16">Tipo</th>` + cols.map(c => `<th class="py-3 px-2 text-center whitespace-nowrap">${c}</th>`).join(''); document.getElementById('modal-measures-body').innerHTML = p.tallas.map(t => { const m = p.medidas && p.medidas[t] ? p.medidas[t] : {}; const tds = cols.map(c => { const val = m[c] !== undefined && m[c] !== "" ? m[c] : (m[c.toLowerCase()] !== undefined && m[c.toLowerCase()] !== "" ? m[c.toLowerCase()] : '-'); return `<td class="py-3 px-2 text-center text-muted font-semibold whitespace-nowrap">${val}</td>`; }).join(''); return `<tr class="hover:bg-light transition-colors"><td class="py-3 px-2 text-dark font-bold whitespace-nowrap">${t}</td>${tds}</tr>`; }).join(''); tallaC.classList.remove('hidden'); document.getElementById('modal-talla').innerHTML = '<option value="" disabled selected>Elige un tamaño/tipo...</option>' + p.tallas.map(t => `<option value="${t}">${t}</option>`).join(''); document.getElementById('modal-talla').classList.remove('ring-promo'); } 
+            else { measuresC.classList.add('hidden'); tallaC.classList.add('hidden'); }
+            document.getElementById('product-modal').classList.add('active'); document.body.classList.add('overflow-hidden');
+        }
+
+        function closeModal(e) { window.history.pushState({}, '', window.location.pathname); document.getElementById('product-modal').classList.remove('active'); document.body.classList.remove('overflow-hidden'); }
+        window.addEventListener('popstate', () => { const p = new URLSearchParams(window.location.search); const id = p.get('producto'); if(id) openModalById(id); else { document.getElementById('product-modal').classList.remove('active'); document.body.classList.remove('overflow-hidden'); } });
+
+        function changeImage(d) { currentImageIndex += d; if (currentImageIndex >= currentModalImages.length) currentImageIndex = 0; if (currentImageIndex < 0) currentImageIndex = currentModalImages.length - 1; updateCarouselView(); }
+        function updateCarouselView() { const img = document.getElementById('modal-img'); const l = document.getElementById('modal-img-loader'); img.style.opacity = 0; l.classList.remove('hidden'); const nImg = new Image(); nImg.src = currentModalImages[currentImageIndex]; nImg.onerror = () => { img.src = "https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Error"; l.classList.add('hidden'); img.style.opacity = 1; }; nImg.onload = () => { img.src = nImg.src; l.classList.add('hidden'); img.style.opacity = 1; }; const p = document.getElementById('btn-prev-img'), n = document.getElementById('btn-next-img'), dots = document.getElementById('carousel-dots'); if (currentModalImages.length > 1) { p.classList.remove('hidden'); n.classList.remove('hidden'); dots.innerHTML = currentModalImages.map((_, i) => `<span class="h-2 rounded-full transition-all duration-300 ${i === currentImageIndex ? 'bg-primary w-8' : 'bg-dark/20 w-2'}"></span>`).join(''); } else { p.classList.add('hidden'); n.classList.add('hidden'); dots.innerHTML = ''; } }
+
+        // =====================================================================
+        // 🚀 7. INICIALIZACIÓN
+        // =====================================================================
+        function cargarDatosLocales() { 
+            try { 
+                const sc = localStorage.getItem('pk_carrito'); if(sc) carrito = JSON.parse(sc); 
+                const sw = localStorage.getItem('pk_wishlist'); if(sw) wishlist = JSON.parse(sw); 
+            } catch (e) {} 
+        }
+
+        function init() { 
+            cargarDatosLocales(); 
+            applyConfig(); 
+            escucharFirebase(); 
+            escucharHero(); 
+            escucharConfigGlobal(); 
+            renderCarrito(); 
+            updateWishlistNav(); 
         }
 
         window.onload = init;
     </script>
-     <!-- Pinkitos Shop Core Modules -->
-     <script src="./js/store/cart.js"></script>
-     <script src="./js/store/wishlist.js"></script>
-     <script src="./js/ui/navigation.js"></script>
 </body>
 </html>
