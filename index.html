@@ -92,7 +92,8 @@
         /* Ocultar elementos de navegación en el Lobby */
         .lobby-mode #desktop-search-bar,
         .lobby-mode #desktop-nav-links,
-        .lobby-mode #mobile-search-btn { display: none !important; }
+        .lobby-mode #mobile-search-btn,
+        .lobby-mode #mobile-bottom-nav { display: none !important; }
     </style>
 </head>
 <body class="bg-light text-dark font-sans antialiased selection:bg-primary selection:text-white lobby-mode">
@@ -157,7 +158,7 @@
     </header>
 
     <!-- MOBILE BOTTOM NAV REDISEÑADA -->
-    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-border z-[150] flex justify-around items-center pt-2 pb-safe h-16 shadow-[0_-5px_20px_rgba(44,36,33,0.05)] rounded-t-3xl">
+    <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-border z-[150] flex justify-around items-center pt-2 pb-safe h-16 shadow-[0_-5px_20px_rgba(44,36,33,0.05)] rounded-t-3xl">
         <button onclick="goToCatalogTop()" class="flex flex-col items-center text-muted hover:text-primary transition-colors w-14"><i class="fas fa-home text-lg mb-1"></i><span class="text-[10px] font-semibold">Inicio</span></button>
         <button onclick="toggleMobileCategories()" class="flex flex-col items-center text-muted hover:text-primary transition-colors w-14"><i class="fas fa-shapes text-lg mb-1"></i><span class="text-[10px] font-semibold">Catálogo</span></button>
         <button onclick="showSection('nosotros')" class="flex flex-col items-center text-muted hover:text-primary transition-colors w-14"><i class="fas fa-users text-lg mb-1"></i><span class="text-[10px] font-semibold">Nosotros</span></button>
