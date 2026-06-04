@@ -88,15 +88,20 @@
         
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
+        
+        /* Ocultar elementos de navegación en el Lobby */
+        .lobby-mode #desktop-search-bar,
+        .lobby-mode #desktop-nav-links,
+        .lobby-mode #mobile-search-btn { display: none !important; }
     </style>
 </head>
-<body class="bg-light text-dark font-sans antialiased selection:bg-primary selection:text-white">
+<body class="bg-light text-dark font-sans antialiased selection:bg-primary selection:text-white lobby-mode">
 
     <!-- HEADER REDISEÑADO -->
     <header class="fixed w-full z-[100] top-0 bg-white/90 backdrop-blur-md border-b border-border shadow-sm transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex justify-between items-center gap-4 relative">
             
-            <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity shrink-0" onclick="showSection('inicio')">
+            <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity shrink-0" onclick="goLobby()">
                 <div class="header-logo-container w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-accent text-xl transition-all">
                     <i class="fas fa-cat"></i>
                 </div>
@@ -105,17 +110,25 @@
                 </div>
             </div>
             
-            <div class="flex-1 max-w-md relative group hidden md:block ml-auto mr-8">
+            <div class="flex-1 max-w-md relative group hidden md:block ml-auto mr-8" id="desktop-search-bar">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-muted group-hover:text-primary transition-colors text-sm"></i>
                 <input type="text" id="live-search" oninput="handleSearch(this.value)" placeholder="Buscar juguetes o coleccionables..." class="w-full bg-white border border-border pl-10 pr-4 py-2.5 rounded-2xl text-dark outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium shadow-sm">
             </div>
 
-            <nav class="hidden md:flex space-x-6 items-center shrink-0">
-                <span onclick="showSection('inicio')" class="cursor-pointer text-sm font-semibold text-dark hover:text-primary transition-colors">Inicio</span>
+            <nav class="hidden md:flex space-x-6 items-center shrink-0" id="desktop-nav-links">
+                <span onclick="goToCatalogTop()" class="cursor-pointer text-sm font-semibold text-dark hover:text-primary transition-colors">Inicio</span>
+                
+                <!-- [MODIFICACIÓN QUIRÚRGICA UX/UI]: Se retiró el onclick para evitar el ruteo forzado, 
+                     actuando solo como hover para desplegar filtros. Se mejoró la flecha indicadora -->
                 <div class="relative dropdown group">
-                    <button class="cursor-pointer text-sm font-semibold text-dark hover:text-primary transition-colors py-4">Catálogo <i class="fas fa-chevron-down ml-1 text-xs opacity-50"></i></button>
-                    <div class="dropdown-menu hidden absolute top-full left-0 w-56 bg-white border border-border rounded-2xl shadow-soft pt-2 pb-2"><div id="desktop-nav-categories"></div></div>
+                    <button class="cursor-default text-sm font-semibold text-dark group-hover:text-primary transition-colors py-4 flex items-center gap-1">
+                        Catálogo <i class="fas fa-chevron-down text-[10px] opacity-50 transition-transform duration-300 group-hover:-rotate-180"></i>
+                    </button>
+                    <div class="dropdown-menu hidden absolute top-full left-0 w-56 bg-white border border-border rounded-2xl shadow-soft pt-2 pb-2">
+                        <div id="desktop-nav-categories"></div>
+                    </div>
                 </div>
+
                 <span onclick="showSection('nosotros')" class="cursor-pointer text-sm font-semibold text-dark hover:text-primary transition-colors">Nosotros</span>
                 
                 <div class="flex items-center gap-4 border-l border-border pl-6 ml-2">
@@ -131,7 +144,7 @@
             </nav>
             
             <div class="md:hidden flex items-center gap-5 text-xl">
-                <button onclick="toggleMobileSearch()" class="text-dark hover:text-primary transition-colors"><i class="fas fa-search"></i></button>
+                <button onclick="toggleMobileSearch()" class="text-dark hover:text-primary transition-colors" id="mobile-search-btn"><i class="fas fa-search"></i></button>
                 <button onclick="toggleCartDrawer()" class="text-dark hover:text-primary transition-colors relative">
                     <i class="fas fa-shopping-bag"></i>
                     <span id="cart-count-mobile" class="absolute -top-1.5 -right-2 bg-primary text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">0</span>
@@ -145,7 +158,7 @@
 
     <!-- MOBILE BOTTOM NAV REDISEÑADA -->
     <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-border z-[150] flex justify-around items-center pt-2 pb-safe h-16 shadow-[0_-5px_20px_rgba(44,36,33,0.05)] rounded-t-3xl">
-        <button onclick="showSection('inicio')" class="flex flex-col items-center text-muted hover:text-primary transition-colors w-14"><i class="fas fa-home text-lg mb-1"></i><span class="text-[10px] font-semibold">Inicio</span></button>
+        <button onclick="goToCatalogTop()" class="flex flex-col items-center text-muted hover:text-primary transition-colors w-14"><i class="fas fa-home text-lg mb-1"></i><span class="text-[10px] font-semibold">Inicio</span></button>
         <button onclick="toggleMobileCategories()" class="flex flex-col items-center text-muted hover:text-primary transition-colors w-14"><i class="fas fa-shapes text-lg mb-1"></i><span class="text-[10px] font-semibold">Catálogo</span></button>
         <button onclick="showSection('nosotros')" class="flex flex-col items-center text-muted hover:text-primary transition-colors w-14"><i class="fas fa-users text-lg mb-1"></i><span class="text-[10px] font-semibold">Nosotros</span></button>
         <button onclick="abrirWishlist()" class="flex flex-col items-center text-muted hover:text-promo transition-colors w-14"><i id="nav-wishlist-icon-mobile" class="far fa-heart text-lg mb-1"></i><span class="text-[10px] font-semibold">Favoritos</span></button>
@@ -323,8 +336,8 @@
         </div>
     </div>
 
-    <!-- SECCIONES PRINCIPALES REDISEÑADAS -->
-    <div id="inicio" class="section-fade active pt-20">
+    <!-- VISTA 1: INICIO (SOLO LOBBY) -->
+    <div id="inicio" class="section-fade active pt-20 pb-16">
         
         <section id="hero-display" class="h-[50vh] md:h-[65vh] flex items-center justify-center text-center relative overflow-hidden hero-bg mx-2 md:mx-6 mt-4">
             <div class="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
@@ -337,10 +350,25 @@
             </div>
         </section>
 
-        <section id="productos" class="py-16 md:py-24 max-w-7xl mx-auto px-4 md:px-6">
+        <!-- LOBI DE BIENVENIDA / CATEGORÍAS -->
+        <section id="lobby-categorias" class="max-w-7xl mx-auto px-4 md:px-6 pt-16 pb-8 relative z-20">
+            <div class="text-center mb-10">
+                <h2 class="font-extrabold text-3xl md:text-4xl text-dark tracking-tight drop-shadow-sm">¿Qué estás buscando hoy?</h2>
+                <p class="text-muted text-sm font-medium mt-3">Descubre la magia en nuestras categorías principales</p>
+            </div>
+            <div id="lobby-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <!-- Se inyectan dinámicamente mediante JS -->
+            </div>
+        </section>
+    </div>
+
+    <!-- VISTA 2: CATÁLOGO INDEPENDIENTE (NUEVO) -->
+    <div id="catalogo" class="section-fade pt-28 pb-16 min-h-screen">
+        <section id="productos" class="max-w-7xl mx-auto px-4 md:px-6">
             <div class="mb-12 text-center md:text-left flex flex-col md:flex-row justify-between items-end gap-4 border-b border-border pb-6">
                 <div>
-                    <h2 class="font-bold text-3xl md:text-4xl text-dark tracking-tight">Catálogo</h2>
+                    <button onclick="goLobby()" class="text-muted hover:text-primary transition-colors text-sm font-bold mb-3 flex items-center gap-2"><i class="fas fa-arrow-left"></i> Volver al Lobby</button>
+                    <h2 id="catalog-section-title" class="font-bold text-3xl md:text-4xl text-dark tracking-tight capitalize">Catálogo</h2>
                     <p class="text-muted font-medium text-sm mt-2" id="display-shop-slogan"></p>
                 </div>
             </div>
@@ -357,6 +385,7 @@
         </section>
     </div>
 
+    <!-- VISTA 3: NOSOTROS -->
     <div id="nosotros" class="section-fade pt-32 min-h-screen">
         <div class="max-w-4xl mx-auto px-6 text-center">
             <div class="w-24 h-24 bg-white rounded-full mx-auto mb-8 shadow-sm flex items-center justify-center text-4xl text-accent border border-border">
@@ -539,11 +568,41 @@
         
         function escucharHero() { db.collection("config").doc("hero").onSnapshot((doc) => { if (doc.exists) { config = { ...config, ...doc.data() }; applyConfig(); } }); }
 
-        function showSection(id) { document.querySelectorAll('.section-fade').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; }); const target = document.getElementById(id); if(target) { target.style.display = 'block'; setTimeout(() => target.classList.add('active'), 50); } window.scrollTo({top: 0, behavior: 'smooth'}); }
+        function goLobby() {
+            showSection('inicio');
+        }
+
+        function goToCatalogTop() {
+            showSection('catalogo', true);
+            const s = document.getElementById('productos');
+            if (s) {
+                const yOffset = -80; 
+                const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({top: y, behavior: 'smooth'});
+            } else {
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+        }
+
+        function showSection(id, noScroll = false) { 
+            document.querySelectorAll('.section-fade').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; }); 
+            const target = document.getElementById(id); 
+            if(target) { target.style.display = 'block'; setTimeout(() => target.classList.add('active'), 50); } 
+            
+            // Administra la UI del encabezado según si estamos en Lobby o no
+            if (id === 'inicio') {
+                document.body.classList.add('lobby-mode');
+            } else {
+                document.body.classList.remove('lobby-mode');
+            }
+            
+            if (!noScroll) window.scrollTo({top: 0, behavior: 'smooth'}); 
+        }
         
         function handleSearch(val) { 
-            showSection('inicio'); 
+            showSection('catalogo', true); // <-- Dirige al usuario al catálogo al buscar sin resetear scroll forzado
             if(val!==undefined){ document.getElementById('live-search').value=val; const m=document.getElementById('mobile-live-search'); if(m)m.value=val; } 
+            renderGallery(); 
             const t=(document.getElementById('live-search').value||"").toLowerCase(); 
             if(t.length>0&&window.innerWidth>=768){ 
                 const s=document.getElementById('productos'); 
@@ -552,8 +611,7 @@
                     const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({top: y, behavior: 'smooth'});
                 }
-            } 
-            renderGallery(); 
+            }
         }
 
         function updateHeaderLogo() {
@@ -572,10 +630,74 @@
         }
 
         // ==========================================
+        // 🔥 LOBBY DE BIENVENIDA Aislado (CRO)
+        // ==========================================
+        function renderLobby() {
+            const lobbyGrid = document.getElementById('lobby-grid');
+            if(!lobbyGrid) return;
+
+            const cats = config.categories || [];
+            if(cats.length === 0) {
+                document.getElementById('lobby-categorias').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('lobby-categorias').style.display = 'block';
+
+            const getIconForCategory = (catName) => {
+                const map = {
+                    'figura': 'fas fa-user-astronaut', 'figuras': 'fas fa-user-astronaut',
+                    'peluche': 'fas fa-paw', 'peluches': 'fas fa-paw',
+                    'llavero': 'fas fa-key', 'llaveros': 'fas fa-key',
+                    'ropa': 'fas fa-tshirt', 'accesorio': 'fas fa-ring', 'accesorios': 'fas fa-ring',
+                    'juguete': 'fas fa-gamepad', 'juguetes': 'fas fa-gamepad'
+                };
+                return map[catName.toLowerCase()] || 'fas fa-box-open';
+            };
+
+            // Tarjeta estática de "Todo el catálogo" (la primera)
+            const allCatalogCard = `
+                <div onclick="filterGallery('all')" class="bg-white rounded-[2rem] p-6 md:p-8 shadow-[0_8px_30px_rgba(44,36,33,0.06)] border-b-[6px] border-border hover:border-primary transform hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(184,134,69,0.15)] active:translate-y-1 active:border-b-2 active:shadow-sm transition-all duration-300 flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="w-16 h-16 bg-light group-hover:bg-primary/10 rounded-full flex items-center justify-center text-3xl text-muted group-hover:text-primary transition-all duration-300 mb-4 relative z-10 shadow-inner group-hover:shadow-sm">
+                        <i class="fas fa-shapes group-hover:scale-110 transition-transform duration-500"></i>
+                    </div>
+                    <h3 class="text-dark font-bold text-lg md:text-xl capitalize relative z-10 group-hover:text-primary transition-colors text-center leading-tight tracking-tight">Todo el Catálogo</h3>
+                    <div class="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 relative z-10">
+                        <span class="bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full shadow-md flex items-center gap-2">Explorar <i class="fas fa-arrow-right text-[9px]"></i></span>
+                    </div>
+                </div>
+            `;
+
+            // Tarjetas dinámicas desde la DB
+            const dynamicCards = cats.map(c => `
+                <div onclick="filterGallery('${c}')" class="bg-white rounded-[2rem] p-6 md:p-8 shadow-[0_8px_30px_rgba(44,36,33,0.06)] border-b-[6px] border-border hover:border-primary transform hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(184,134,69,0.15)] active:translate-y-1 active:border-b-2 active:shadow-sm transition-all duration-300 flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="w-16 h-16 bg-light group-hover:bg-primary/10 rounded-full flex items-center justify-center text-3xl text-muted group-hover:text-primary transition-all duration-300 mb-4 relative z-10 shadow-inner group-hover:shadow-sm">
+                        <i class="${getIconForCategory(c)} group-hover:scale-110 transition-transform duration-500"></i>
+                    </div>
+                    <h3 class="text-dark font-bold text-lg md:text-xl capitalize relative z-10 group-hover:text-primary transition-colors text-center leading-tight tracking-tight">${c}</h3>
+                    <div class="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 relative z-10">
+                        <span class="bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full shadow-md flex items-center gap-2">Explorar <i class="fas fa-arrow-right text-[9px]"></i></span>
+                    </div>
+                </div>
+            `).join('');
+
+            lobbyGrid.innerHTML = allCatalogCard + dynamicCards;
+        }
+
+        // ==========================================
         // 🔥 CRO: RENDER GALLERY OPTIMIZADO
         // ==========================================
         function renderGallery() {
             const grid = document.getElementById('gallery-grid'); if(!grid) return;
+            
+            // Actualizar Título del Catálogo dinámicamente
+            const catalogTitle = document.getElementById('catalog-section-title');
+            if (catalogTitle) {
+                catalogTitle.innerText = currentCategory === 'all' ? 'Todo el Catálogo' : currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1);
+            }
+
             const term = (document.getElementById('live-search').value || "").toLowerCase();
             let filt = inventario.filter(p => (currentCategory === 'all' || p.categoria === currentCategory) && ((p.titulo || "").toLowerCase().includes(term) || (p.sku || "").toLowerCase().includes(term)));
             
@@ -588,11 +710,9 @@
                 
                 let btnQuickAddHTML = ''; let badgesHTML = '';
                 
-                // CRO: Jerarquía de precio superior
                 let priceHtml = `<span class="text-dark font-extrabold text-lg md:text-xl truncate leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`;
                 const isPrevActiva = esPreventaActiva(prod);
 
-                // CRO: Badges Inteligentes (Soporte dinámico + Urgencia de stock y popularidad)
                 if (isPrevActiva) {
                     badgesHTML += `<div class="bg-accent text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider"><i class="fas fa-clock"></i> Pronto</div>`;
                     btnQuickAddHTML = `<button disabled class="bg-light text-muted w-9 h-9 rounded-xl flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-clock"></i></button>`;
@@ -600,7 +720,6 @@
                     badgesHTML += `<div class="bg-promo text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider">Agotado</div>`;
                     btnQuickAddHTML = `<button disabled class="bg-light text-muted w-9 h-9 rounded-xl flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-ban"></i></button>`;
                 } else {
-                    // CRO: Botón CTA destacado estilo bolso premium
                     btnQuickAddHTML = `<button onclick="quickAdd('${prod.id}', event)" class="bg-primary text-white w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#A6763A] hover:scale-105 active:scale-95 shadow-md hover:shadow-lg transition-all duration-300 z-20"><i class="fas fa-shopping-bag text-sm"></i></button>`;
                     
                     if (pData.isActive) {
@@ -608,17 +727,14 @@
                         priceHtml = `<div class="flex flex-col items-start leading-none gap-0.5"><span class="text-muted line-through text-xs font-semibold">${PricingEngine.format(pData.baseUnitario)}</span><span class="text-promo font-extrabold text-lg md:text-xl leading-none mt-1">${PricingEngine.format(pData.finalUnitario)}</span></div>`;
                     }
 
-                    // Urgencia de Stock (Scarcity Psychology) toggleable
                     if (config.globalScarcityActivo && prod.stock > 0 && prod.stock <= 5) {
                         badgesHTML += `<div class="bg-promo/15 text-promo border border-promo/20 px-2 py-0.5 text-[9px] font-extrabold uppercase rounded shadow-sm w-max tracking-wider animate-pulse"><i class="fas fa-bolt"></i> ¡Solo quedan ${prod.stock}!</div>`;
                     }
-                    // Prueba Social de Popularidad
                     if (prod.favCount && prod.favCount >= 10) {
                         badgesHTML += `<div class="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-[9px] font-extrabold uppercase rounded shadow-sm w-max tracking-wider"><i class="fas fa-heart text-promo"></i> Popular</div>`;
                     }
                 }
 
-                // Generación de estrellas dinámicas en catálogo (CRO Social Proof)
                 let ratingSectionHTML = '';
                 if (prod.rating) {
                     const finalRating = parseFloat(prod.rating);
@@ -645,7 +761,6 @@
                 const isFav = wishlist.includes(prod.id);
                 const btnFavHTML = `<button onclick="toggleWishlist('${prod.id}', event)" class="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all z-20 border border-border ${isFav ? 'bg-white text-promo shadow-md opacity-100' : 'bg-white/90 text-muted hover:bg-white hover:text-promo opacity-0 group-hover:opacity-100 backdrop-blur-sm shadow-sm'}"><i class="${isFav ? 'fas' : 'far'} fa-heart"></i></button>`;
                 
-                // Microinteracciones Premium en Imagen (Zoom sutil, sin gris)
                 const imgClasses = isOut ? 'opacity-90 transition-transform duration-500 group-hover:scale-105' : 'transition-transform duration-500 group-hover:scale-105';
 
                 return `
@@ -679,14 +794,20 @@
         }
 
         function renderFilters() {
-            const cats = config.categories || []; const dT = document.getElementById('desktop-nav-categories');
+            const cats = config.categories || []; 
+            const dT = document.getElementById('desktop-nav-categories');
             if(dT) dT.innerHTML = `<button onclick="filterGallery('all')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors">Todo el catálogo</button>` + cats.map(c => `<button onclick="filterGallery('${c}')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors capitalize">${c}</button>`).join('');
+            
             const mT = document.getElementById('mobile-nav-categories');
             if(mT) mT.innerHTML = `<button onclick="filterGallery('all'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all ${currentCategory === 'all' ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">Todos los artículos</button>` + cats.map(c => `<button onclick="filterGallery('${c}'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all capitalize ${currentCategory === c ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">${c}</button>`).join('');
+            
+            renderLobby();
         }
         
         function filterGallery(c) { 
-            showSection('inicio'); 
+            // 1. Cambia de vista al catálogo y oculta el lobby de manera estática
+            showSection('catalogo', true); 
+            
             currentCategory = c; 
             renderFilters(); 
             const g = document.getElementById('gallery-grid'); 
@@ -694,6 +815,7 @@
             setTimeout(() => { 
                 renderGallery(); 
                 if(g) g.style.opacity = '1'; 
+                // Hacer auto-scroll hacia la parte superior de la página o del catalogo
                 const s = document.getElementById('productos'); 
                 if (s) {
                     const yOffset = -80;
@@ -982,12 +1104,8 @@
             const heroSection = document.getElementById('hero-display');
             if(config.heroActive === false) {
                 heroSection.style.display = 'none';
-                document.getElementById('inicio').classList.remove('pt-20');
-                document.getElementById('inicio').classList.add('pt-24'); 
             } else {
                 heroSection.style.display = 'flex';
-                document.getElementById('inicio').classList.add('pt-20');
-                document.getElementById('inicio').classList.remove('pt-24');
             }
 
             document.getElementById('display-shop-slogan').innerText = config.slogan || ""; 
@@ -1008,5 +1126,9 @@
 
         window.onload = init;
     </script>
+     <!-- Pinkitos Shop Core Modules -->
+     <script src="./js/store/cart.js"></script>
+     <script src="./js/store/wishlist.js"></script>
+     <script src="./js/ui/navigation.js"></script>
 </body>
 </html>
