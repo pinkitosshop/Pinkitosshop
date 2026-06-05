@@ -810,9 +810,9 @@
         }
 
         function procesarEnvioPedido() {
-            // Protección Anti-Spam (Rate-Limiting básico)
+            // Protección Anti-Spam (Rate-Limiting Lógico)
             if (Date.now() - lastCheckoutTime < 10000) {
-                return Toast.fire({ icon: 'warning', title: 'Por favor espera unos segundos...' });
+                return Toast.fire({ icon: 'warning', title: 'Procesando... por favor espera.' });
             }
 
             const n = document.getElementById('cliente-nombre').value.trim(); const tel = document.getElementById('cliente-telefono').value.trim(); const m = document.getElementById('mensaje').value.trim();
@@ -820,6 +820,15 @@
             if(!tel) { Toast.fire({ icon: 'warning', title: 'Necesitamos tu número de contacto' }); return document.getElementById('cliente-telefono').focus(); }
             if(carrito.length === 0) return Toast.fire({ icon: 'error', title: 'Cesta vacía' });
             
+            // 🔥 CAMBIO QUIRÚRGICO: Actualización SÍNCRONA e Inmediata del candado limitador
+            lastCheckoutTime = Date.now();
+
+            // Bloqueo de UI (Botón) para evitar clics dobles físicos
+            const btnConfirm = document.getElementById('btn-checkout-confirm');
+            btnConfirm.disabled = true;
+            btnConfirm.style.pointerEvents = 'none';
+            btnConfirm.style.opacity = '0.75';
+
             const btnTxt = document.getElementById('btn-wa-text'); const ogTxt = btnTxt.innerText; btnTxt.innerText = "Preparando magia...";
             const orderId = `PK-${Math.floor(1000 + Math.random() * 9000)}`; 
             
@@ -843,15 +852,26 @@
             
             // Creación en backend con captura de errores reforzada
             db.collection("pedidos").add(pedidoData).then(() => {
-                lastCheckoutTime = Date.now();
+                // Éxito: El candado sincrónico ya fue aplicado arriba
+                console.log("Pedido guardado en base de datos de manera exitosa.");
             }).catch(e => {
                 console.error(e);
                 Toast.fire({ icon: 'error', title: 'Error al conectar con la base de datos' });
+                // Fallback de resiliencia: Permitimos al usuario volver a intentar en caso de fallo de red
+                lastCheckoutTime = 0; 
             });
             
             const hLocal = JSON.parse(localStorage.getItem('pk_pedidos') || '[]'); hLocal.push({ idPedido: orderId, fecha: new Date().toISOString(), items: cartItemsSaved, total: t.final }); localStorage.setItem('pk_pedidos', JSON.stringify(hLocal));
 
-            carrito = []; saveCart(); renderCarrito(); document.getElementById('mensaje').value = ''; document.getElementById('cliente-telefono').value = ''; document.getElementById('cliente-nombre').value = ''; btnTxt.innerText = ogTxt; toggleCartDrawer();
+            // Reset UI
+            carrito = []; saveCart(); renderCarrito(); document.getElementById('mensaje').value = ''; document.getElementById('cliente-telefono').value = ''; document.getElementById('cliente-nombre').value = ''; btnTxt.innerText = ogTxt;
+            
+            // Restaurar botón
+            btnConfirm.disabled = false;
+            btnConfirm.style.pointerEvents = 'auto';
+            btnConfirm.style.opacity = '1';
+
+            toggleCartDrawer();
             
             const method = document.querySelector('input[name="checkout-method"]:checked').value;
             if (method === 'whatsapp') { window.open(`https://wa.me/${config.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank'); } 
