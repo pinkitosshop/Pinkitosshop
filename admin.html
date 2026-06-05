@@ -721,6 +721,10 @@
                                     <p class="text-[10px] text-muted mt-1 font-medium">RECOMENDADO: 1920x1080px, MÁX 500KB</p>
                                 </div>
                                 <img id="hero-preview" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl opacity-80" src="">
+                                
+                                <!-- BOTÓN ELIMINAR BANNER AÑADIDO QUIRÚRGICAMENTE -->
+                                <button id="btn-delete-hero" onclick="removeHeroImage(event)" class="hidden absolute top-3 right-3 z-30 text-white bg-promo/90 hover:bg-promo w-9 h-9 rounded-full flex items-center justify-center shadow-md backdrop-blur-sm transition-all" title="Eliminar banner"><i class="fas fa-trash text-sm"></i></button>
+
                                 <div id="hero-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20"><div class="loader !block"></div></div>
                             </div>
                         </div>
@@ -1703,17 +1707,44 @@
             if (!input.files || !input.files[0]) return; const reader = new FileReader(); reader.readAsDataURL(input.files[0]); reader.onload = function(e) { const img = new Image(); img.src = e.target.result; img.onload = function() { const canvas = document.createElement('canvas'); let w = img.width > 500 ? 500 : img.width; canvas.width = w; canvas.height = img.height * (w / img.width); canvas.getContext('2d').drawImage(img, 0, 0, w, canvas.height); selectedLogoImg = canvas.toDataURL('image/png', 0.9); document.getElementById('logo-preview').src = selectedLogoImg; document.getElementById('logo-preview').classList.remove('hidden'); document.getElementById('logo-preview-container').classList.add('opacity-0', 'group-hover:opacity-100', 'transition-opacity', 'bg-white/90', 'p-4', 'rounded-2xl', 'backdrop-blur-sm'); } }
         }
 
-        function compressHeroImage(input) { if (!input.files || !input.files[0]) return; const reader = new FileReader(); reader.readAsDataURL(input.files[0]); reader.onload = function(e) { const img = new Image(); img.src = e.target.result; img.onload = function() { const canvas = document.createElement('canvas'); let w = img.width > 1200 ? 1200 : img.width; canvas.width = w; canvas.height = img.height * (w / img.width); canvas.getContext('2d').drawImage(img, 0, 0, w, canvas.height); selectedHeroImg = canvas.toDataURL('image/jpeg', 0.8); document.getElementById('hero-preview').src = selectedHeroImg; document.getElementById('hero-preview').classList.remove('hidden'); document.getElementById('hero-preview-container').classList.add('bg-white/90'); } } }
+        function compressHeroImage(input) { 
+            if (!input.files || !input.files[0]) return; 
+            const reader = new FileReader(); 
+            reader.readAsDataURL(input.files[0]); 
+            reader.onload = function(e) { 
+                const img = new Image(); img.src = e.target.result; 
+                img.onload = function() { 
+                    const canvas = document.createElement('canvas'); let w = img.width > 1200 ? 1200 : img.width; canvas.width = w; canvas.height = img.height * (w / img.width); canvas.getContext('2d').drawImage(img, 0, 0, w, canvas.height); 
+                    selectedHeroImg = canvas.toDataURL('image/jpeg', 0.8); 
+                    document.getElementById('hero-preview').src = selectedHeroImg; 
+                    document.getElementById('hero-preview').classList.remove('hidden'); 
+                    document.getElementById('hero-preview-container').classList.add('bg-white/90'); 
+                    document.getElementById('btn-delete-hero').classList.remove('hidden'); 
+                } 
+            } 
+        }
+
+        function removeHeroImage(event) {
+            event.stopPropagation();
+            selectedHeroImg = "";
+            config.heroImage = "";
+            document.getElementById('hero-preview').src = "";
+            document.getElementById('hero-preview').classList.add('hidden');
+            document.getElementById('hero-preview-container').classList.remove('bg-white/90');
+            document.getElementById('btn-delete-hero').classList.add('hidden');
+            document.getElementById('new-hero-img').value = "";
+            Toast.fire({ icon: 'info', title: 'Banner removido. Guarda los cambios para aplicar.' });
+        }
         
         async function saveAppearanceConfig() { 
             const btn = document.getElementById('btn-save-appearance'); 
             btn.innerHTML = "<div class='loader !border-t-white !border-white/30 !block w-4 h-4 mx-auto'></div>"; 
             btn.disabled = true; 
             try { 
-                let imgBanner = config.heroImage || ""; 
+                let imgBanner = config.heroImage !== undefined ? config.heroImage : ""; 
                 if (selectedHeroImg) imgBanner = await uploadImageToStorage(selectedHeroImg, `config/hero_bg_${Date.now()}.jpg`); 
                 
-                let imgLogo = config.logoUrl || "";
+                let imgLogo = config.logoUrl !== undefined ? config.logoUrl : "";
                 if (selectedLogoImg) imgLogo = await uploadImageToStorage(selectedLogoImg, `config/logo_${Date.now()}.png`);
                 
                 await db.collection("config").doc("hero").set({ 
@@ -1774,7 +1805,12 @@
                 document.getElementById('hero-preview').src = config.heroImage; 
                 document.getElementById('hero-preview').classList.remove('hidden'); 
                 document.getElementById('hero-preview-container').classList.add('bg-white/90'); 
-            } 
+                document.getElementById('btn-delete-hero').classList.remove('hidden');
+            } else {
+                document.getElementById('hero-preview').classList.add('hidden'); 
+                document.getElementById('hero-preview-container').classList.remove('bg-white/90'); 
+                document.getElementById('btn-delete-hero').classList.add('hidden');
+            }
         }
 
         function updateAdminHeaderLogo() {
