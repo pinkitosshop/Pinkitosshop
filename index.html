@@ -206,9 +206,9 @@
             
             <div id="checkout-form" class="space-y-4 mb-4 hidden bg-light p-4 rounded-2xl border border-border">
                 <label class="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Datos de Envío</label>
-                <input type="text" id="cliente-nombre" placeholder="Tu Nombre Completo" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl shadow-sm mb-3">
-                <input type="tel" id="cliente-telefono" placeholder="Número de Contacto" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl shadow-sm mb-3">
-                <textarea id="mensaje" rows="2" maxlength="150" placeholder="Nota adicional" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all resize-none rounded-xl shadow-sm"></textarea>
+                <input type="text" id="cliente-nombre" placeholder="Tu Nombre Completo" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl shadow-sm mb-3" maxlength="100">
+                <input type="tel" id="cliente-telefono" placeholder="Número de Contacto" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl shadow-sm mb-3" maxlength="20">
+                <textarea id="mensaje" rows="2" maxlength="500" placeholder="Nota adicional" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all resize-none rounded-xl shadow-sm"></textarea>
                 
                 <div class="mt-3">
                     <label class="block text-xs font-bold text-muted uppercase tracking-wider mb-2">Método de Envío</label>
@@ -431,6 +431,7 @@
         let touchStartX = 0; 
         let touchEndX = 0;
         let currentCategory = 'all';
+        let lastCheckoutTime = 0; // Anti-spam protection
 
         // =====================================================================
         // ⚙️ 2. MOTOR DE PRECIOS Y UTILIDADES
@@ -809,6 +810,11 @@
         }
 
         function procesarEnvioPedido() {
+            // Protección Anti-Spam (Rate-Limiting básico)
+            if (Date.now() - lastCheckoutTime < 10000) {
+                return Toast.fire({ icon: 'warning', title: 'Por favor espera unos segundos...' });
+            }
+
             const n = document.getElementById('cliente-nombre').value.trim(); const tel = document.getElementById('cliente-telefono').value.trim(); const m = document.getElementById('mensaje').value.trim();
             if(!n) { Toast.fire({ icon: 'warning', title: 'Necesitamos tu nombre' }); return document.getElementById('cliente-nombre').focus(); }
             if(!tel) { Toast.fire({ icon: 'warning', title: 'Necesitamos tu número de contacto' }); return document.getElementById('cliente-telefono').focus(); }
@@ -834,7 +840,14 @@
             if(m) msg += `\n💌 *Nota:*\n_${m}_\n`;
 
             const pedidoData = { idPedido: orderId, cliente: n, telefono: tel, mensaje: m, items: cartItemsSaved, total: t.final, ahorro: t.savings, estado: 'pendiente', createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-            db.collection("pedidos").add(pedidoData).catch(e => console.error(e));
+            
+            // Creación en backend con captura de errores reforzada
+            db.collection("pedidos").add(pedidoData).then(() => {
+                lastCheckoutTime = Date.now();
+            }).catch(e => {
+                console.error(e);
+                Toast.fire({ icon: 'error', title: 'Error al conectar con la base de datos' });
+            });
             
             const hLocal = JSON.parse(localStorage.getItem('pk_pedidos') || '[]'); hLocal.push({ idPedido: orderId, fecha: new Date().toISOString(), items: cartItemsSaved, total: t.final }); localStorage.setItem('pk_pedidos', JSON.stringify(hLocal));
 
@@ -872,7 +885,26 @@
         function updateWishlistNav() { const iconD = document.getElementById('nav-wishlist-icon'); const iconM = document.getElementById('nav-wishlist-icon-mobile'); if(wishlist.length > 0) { if(iconD) iconD.className = 'fas fa-heart text-promo text-xl transition-all'; if(iconM) iconM.className = 'fas fa-heart text-promo text-lg mb-1 transition-all'; } else { if(iconD) iconD.className = 'far fa-heart text-dark text-xl transition-all'; if(iconM) iconM.className = 'far fa-heart text-dark text-lg mb-1 transition-all'; } }
         function abrirWishlist() { renderWishlist(); document.getElementById('wishlist-modal').classList.add('active'); }
         function cerrarWishlist(e) { if(e) e.stopPropagation(); document.getElementById('wishlist-modal').classList.remove('active'); }
-        function toggleWishlist(id, event) { event.stopPropagation(); const idx = wishlist.indexOf(id); let incVal = 0; if(idx > -1) { wishlist.splice(idx, 1); Toast.fire({icon: 'info', title: 'Removido de favoritos'}); incVal = -1; } else { wishlist.push(id); Toast.fire({icon: 'success', title: 'Añadido a favoritos'}); incVal = 1; } localStorage.setItem('pk_wishlist', JSON.stringify(wishlist)); renderGallery(); updateWishlistNav(); if(document.getElementById('wishlist-modal').classList.contains('active')) renderWishlist(); const docRef = db.collection("productos").doc(id); db.runTransaction((transaction) => { return transaction.get(docRef).then((sfDoc) => { if (!sfDoc.exists) return; let currentCount = sfDoc.data().favCount || 0; let newCount = currentCount + incVal; if (newCount < 0) newCount = 0; transaction.update(docRef, { favCount: newCount }); }); }).catch((error) => console.log("Error en favoritos: ", error)); }
+        
+        // Transacción Firestore segura mejorada para favCount
+        function toggleWishlist(id, event) { 
+            event.stopPropagation(); const idx = wishlist.indexOf(id); let incVal = 0; 
+            if(idx > -1) { wishlist.splice(idx, 1); Toast.fire({icon: 'info', title: 'Removido de favoritos'}); incVal = -1; } 
+            else { wishlist.push(id); Toast.fire({icon: 'success', title: 'Añadido a favoritos'}); incVal = 1; } 
+            localStorage.setItem('pk_wishlist', JSON.stringify(wishlist)); renderGallery(); updateWishlistNav(); 
+            if(document.getElementById('wishlist-modal').classList.contains('active')) renderWishlist(); 
+            const docRef = db.collection("productos").doc(id); 
+            db.runTransaction((transaction) => { 
+                return transaction.get(docRef).then((sfDoc) => { 
+                    if (!sfDoc.exists) return; 
+                    let currentCount = sfDoc.data().favCount || 0; 
+                    let newCount = currentCount + incVal; 
+                    if (newCount < 0) newCount = 0; 
+                    transaction.update(docRef, { favCount: newCount }); 
+                }); 
+            }).catch((error) => console.log("Error en favoritos: ", error)); 
+        }
+        
         function renderWishlist() { const lista = document.getElementById('lista-wishlist'); const items = inventario.filter(p => wishlist.includes(p.id)); if(items.length===0) return lista.innerHTML = `<div class="text-center py-8"><div class="w-16 h-16 bg-white border border-border rounded-full mx-auto flex items-center justify-center text-promo mb-3 shadow-sm"><i class="fas fa-heart text-2xl"></i></div><p class="text-muted text-sm font-semibold">Tu lista está vacía</p></div>`; lista.innerHTML = items.map(p => { const pData = PricingEngine.calcular(p); const img = p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen||'https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Sin+Imagen'); return `<div class="flex items-center gap-4 bg-white border border-border p-3 rounded-2xl cursor-pointer hover:shadow-md transition-shadow mb-3 shadow-sm" onclick="cerrarWishlist(); openModalById('${p.id}')"><div class="w-16 h-16 bg-white border border-border rounded-xl overflow-hidden shrink-0"><img src="${img}" class="w-full h-full object-cover"></div><div class="flex-1 min-w-0"><p class="text-dark text-sm font-bold truncate">${p.titulo}</p><p class="text-primary font-bold text-sm mt-1">${PricingEngine.format(pData.finalUnitario)}</p></div><button onclick="toggleWishlist('${p.id}', event)" class="w-10 h-10 text-promo hover:bg-light rounded-full flex items-center justify-center transition-colors border border-border"><i class="fas fa-heart"></i></button></div>` }).join(''); }
 
         function goLobby() { showSection('inicio'); }

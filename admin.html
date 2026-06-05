@@ -30,6 +30,14 @@
     const storage = firebase.storage();
     
     console.log("🌸 Pinkitos Shop: Panel Administrador Cargado");
+
+    // Función global contra Cross-Site Scripting (XSS)
+    function escapeHTML(str) {
+        if(typeof str !== 'string') return str;
+        return str.replace(/[&<>'"]/g, tag => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+        }[tag]));
+    }
     </script>
     
     <meta charset="UTF-8">
@@ -1013,8 +1021,8 @@
                     </div>
                     <div class="p-3 border-t border-border flex flex-col justify-between flex-1 min-w-0 bg-white">
                         <div class="flex items-center gap-1.5 mb-1.5 truncate">
-                            <span class="bg-light text-muted px-1.5 py-0.5 rounded text-[9px] font-bold uppercase shrink-0">${p.categoria || 'Gen'}</span>
-                            <p class="text-[11px] font-bold text-dark truncate">${p.titulo}</p>
+                            <span class="bg-light text-muted px-1.5 py-0.5 rounded text-[9px] font-bold uppercase shrink-0">${escapeHTML(p.categoria) || 'Gen'}</span>
+                            <p class="text-[11px] font-bold text-dark truncate">${escapeHTML(p.titulo)}</p>
                         </div>
                         ${priceHtml}
                     </div>
@@ -1030,8 +1038,8 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-start mb-1">
                             <div class="flex items-center gap-2 truncate mr-2">
-                                <span class="bg-light text-muted px-1.5 py-0.5 rounded text-[10px] font-bold uppercase shrink-0">${p.categoria || 'Gen'}</span>
-                                <p class="text-xs font-bold text-dark truncate">${p.titulo} <span class="text-muted font-normal text-[10px]">#${p.sku||''}</span></p>
+                                <span class="bg-light text-muted px-1.5 py-0.5 rounded text-[10px] font-bold uppercase shrink-0">${escapeHTML(p.categoria) || 'Gen'}</span>
+                                <p class="text-xs font-bold text-dark truncate">${escapeHTML(p.titulo)} <span class="text-muted font-normal text-[10px]">#${escapeHTML(p.sku)||''}</span></p>
                             </div>
                             ${isPrevActiva ? `<span class="bg-accent text-white text-[9px] px-2 py-1 rounded-lg font-bold uppercase shrink-0">Pronto</span>` : ''}
                         </div>
@@ -1046,7 +1054,7 @@
             const p = inventario.find(x => x.id === id); if(!p) return;
             if(!p.hasMeasures || !p.tallas || p.tallas.length === 0) return addToPosCart(p, "Única");
             
-            let htmlOptions = p.tallas.map(t => `<button class="swal-size-btn bg-white border border-border text-dark w-full py-3 mb-2 rounded-xl hover:bg-light hover:border-primary transition-colors text-sm font-bold shadow-sm" onclick="Swal.clickConfirm(); window.tempSelectedSize='${t}'">${t}</button>`).join('');
+            let htmlOptions = p.tallas.map(t => `<button class="swal-size-btn bg-white border border-border text-dark w-full py-3 mb-2 rounded-xl hover:bg-light hover:border-primary transition-colors text-sm font-bold shadow-sm" onclick="Swal.clickConfirm(); window.tempSelectedSize='${escapeHTML(t)}'">${escapeHTML(t)}</button>`).join('');
             window.tempSelectedSize = null;
             
             Swal.fire({ title: 'Seleccionar Variante', html: htmlOptions, background: '#FFFFFF', color: '#2C2421', showConfirmButton: false, showCloseButton: true, customClass: { popup: 'rounded-3xl border border-border shadow-float bg-white', title: 'font-bold text-lg' }, preConfirm: () => { if(window.tempSelectedSize) addToPosCart(p, window.tempSelectedSize); } });
@@ -1081,8 +1089,8 @@
                     ${discount > 0 ? `<span class="absolute -top-2 -left-2 bg-promo text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg shadow-sm z-10">-${discount}%</span>` : ''}
                     <div class="w-14 h-14 bg-white rounded-xl overflow-hidden shrink-0 border border-border"><img src="${item.img}" class="w-full h-full object-contain"></div>
                     <div class="flex-1 min-w-0 flex flex-col justify-center">
-                        <p class="text-dark text-xs font-bold line-clamp-1 leading-tight mb-1">${item.titulo}</p>
-                        <p class="text-muted text-[10px] font-semibold mb-2">Var: <span class="text-dark">${item.talla}</span></p>
+                        <p class="text-dark text-xs font-bold line-clamp-1 leading-tight mb-1">${escapeHTML(item.titulo)}</p>
+                        <p class="text-muted text-[10px] font-semibold mb-2">Var: <span class="text-dark">${escapeHTML(item.talla)}</span></p>
                         <div class="flex items-end justify-between mt-auto">
                             ${priceDisplayHtml}
                             <div class="flex items-center gap-1 bg-white border border-border rounded-lg p-0.5 shrink-0 h-7">
@@ -1186,8 +1194,8 @@
                         </div>
                         <div class="truncate min-w-0 flex-1">
                             <div class="flex items-center gap-2 mb-1.5 truncate">
-                                <span class="bg-white border border-border text-muted text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase shrink-0">${prod.categoria || 'Gen'}</span>
-                                <p class="text-dark text-sm font-bold truncate">${prod.titulo} <span class="text-muted font-normal text-[10px]">#${prod.sku||''}</span></p>
+                                <span class="bg-white border border-border text-muted text-[9px] px-2 py-0.5 rounded-lg font-bold uppercase shrink-0">${escapeHTML(prod.categoria) || 'Gen'}</span>
+                                <p class="text-dark text-sm font-bold truncate">${escapeHTML(prod.titulo)} <span class="text-muted font-normal text-[10px]">#${escapeHTML(prod.sku)||''}</span></p>
                             </div>
                             <div class="flex flex-wrap items-center mt-1">${statusInfo}${ratingInfo}${favCountInfo}</div>
                         </div>
@@ -1336,7 +1344,7 @@
             const sel = document.getElementById('new-cat'); 
             const filterSel = document.getElementById('inv-filter-cat');
             if(config.categories) {
-                const options = config.categories.map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join('');
+                const options = config.categories.map(c => `<option value="${c}">${escapeHTML(c).toUpperCase()}</option>`).join('');
                 if(sel) sel.innerHTML = '<option value="" disabled selected>Seleccione...</option>' + options;
                 if(filterSel) filterSel.innerHTML = '<option value="all">Todas las Categorías</option>' + options;
             }
@@ -1354,7 +1362,7 @@
                                 <div class="w-8 h-8 rounded-lg bg-light flex items-center justify-center overflow-hidden border border-border shrink-0">
                                     ${catImg ? `<img src="${catImg}" class="w-full h-full object-contain p-1">` : `<i class="fas fa-image text-muted text-xs"></i>`}
                                 </div>
-                                <span class="text-xs uppercase font-bold text-dark">${c}</span>
+                                <span class="text-xs uppercase font-bold text-dark">${escapeHTML(c)}</span>
                             </div>
                             <div class="flex items-center gap-1 border-l border-border pl-2 ml-1 shrink-0">
                                 <button onclick="editCategory('${c}')" class="text-muted hover:text-primary transition-colors px-1" title="Editar"><i class="fas fa-pencil-alt text-xs"></i></button>
@@ -1462,6 +1470,10 @@
 
             list.innerHTML = slice.map(pedido => {
                 const dateStr = (pedido.createdAt && typeof pedido.createdAt.toDate === 'function') ? new Date(pedido.createdAt.toDate()).toLocaleString() : 'Nuevo / Pendiente';
+                // XSS Protection Implementada
+                const safeCliente = escapeHTML(pedido.cliente);
+                const safeMensaje = escapeHTML(pedido.mensaje);
+
                 return `
                 <div class="bg-white border border-border rounded-3xl shadow-soft relative p-6">
                     <div class="absolute left-0 top-6 bottom-6 w-1.5 bg-primary/80 rounded-r-full"></div>
@@ -1469,7 +1481,7 @@
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5 ml-4">
                         <div>
                             <h4 class="text-dark text-lg font-bold">PEDIDO: ${pedido.idPedido || 'S/N'}</h4>
-                            <p class="text-muted text-sm font-semibold mt-1"><i class="fas fa-user text-primary mr-2"></i>${pedido.cliente}</p>
+                            <p class="text-muted text-sm font-semibold mt-1"><i class="fas fa-user text-primary mr-2"></i>${safeCliente}</p>
                         </div>
                         <div class="text-left sm:text-right w-full sm:w-auto">
                             <span class="text-xs text-muted font-bold block"><i class="fas fa-clock text-promo mr-1"></i> ${dateStr}</span>
@@ -1480,7 +1492,7 @@
                         </div>
                     </div>
 
-                    ${pedido.mensaje ? `<p class="text-dark text-sm font-medium italic mt-2 bg-light p-4 rounded-2xl border border-border">" ${pedido.mensaje} "</p>` : ''}
+                    ${safeMensaje ? `<p class="text-dark text-sm font-medium italic mt-2 bg-light p-4 rounded-2xl border border-border">" ${safeMensaje} "</p>` : ''}
                     
                     <div class="mt-5 border-t border-border pt-5 ml-4">
                         <button onclick="toggleAccordion('acc-${pedido.id}')" class="w-full flex justify-between items-center text-sm font-bold text-dark hover:text-primary transition-colors bg-white border border-border px-4 py-3 rounded-xl shadow-sm">
@@ -1492,8 +1504,8 @@
                                 <div class="flex items-center gap-4 bg-white border border-border p-3 rounded-xl shadow-sm">
                                     <div class="w-12 h-12 bg-white rounded-lg border border-border overflow-hidden shrink-0"><img src="${i.img}" class="w-full h-full object-contain drop-shadow-sm"></div>
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-dark text-xs font-bold truncate">${i.titulo}</p>
-                                        <p class="text-muted text-[10px] font-semibold mt-0.5">Var: <span class="text-dark">${i.talla}</span> | SKU: <span class="text-dark">${i.sku || 'N/A'}</span></p>
+                                        <p class="text-dark text-xs font-bold truncate">${escapeHTML(i.titulo)}</p>
+                                        <p class="text-muted text-[10px] font-semibold mt-0.5">Var: <span class="text-dark">${escapeHTML(i.talla)}</span> | SKU: <span class="text-dark">${escapeHTML(i.sku) || 'N/A'}</span></p>
                                     </div>
                                     <div class="text-right">
                                         <span class="text-primary text-xs font-bold bg-white px-2 py-1 rounded-md border border-border">x${i.cantidad}</span>
@@ -1541,7 +1553,7 @@
                 const itemsHtml = (pedido.items || []).map(i => {
                     const finalP = parseFloat(String(i.precio||i.precioFinalAplicado||"0").replace(/[^0-9.-]+/g,"")) || 0; const discount = getDiscountPercent(i.precio, i.precioOriginal);
                     let discountHtml = ''; if (discount > 0) { const origBase = parseFloat(String(i.precioOriginal||"0").replace(/[^0-9.-]+/g,"")) || 0; discountHtml = `<br><span style="color:#999; text-decoration: line-through;">${config.currency||'$'}${origBase.toFixed(2)} c/u</span>`; }
-                    return `<tr style="border-bottom: 1px solid #E5E7EB;"><td style="padding: 8px 0; font-size: 12px; color: #2C2421;">${i.titulo} <br><small style="color:#9CA3AF;" class="notranslate" translate="no">Var: ${i.talla}</small>${discountHtml}</td><td style="text-align: center; font-size: 12px; color: #2C2421; font-weight: bold;">${i.cantidad}</td><td style="text-align: right; font-size: 12px; color: #2C2421; font-weight: bold;">${config.currency||'$'}${(finalP * i.cantidad).toFixed(2)}</td></tr>`;
+                    return `<tr style="border-bottom: 1px solid #E5E7EB;"><td style="padding: 8px 0; font-size: 12px; color: #2C2421;">${escapeHTML(i.titulo)} <br><small style="color:#9CA3AF;" class="notranslate" translate="no">Var: ${escapeHTML(i.talla)}</small>${discountHtml}</td><td style="text-align: center; font-size: 12px; color: #2C2421; font-weight: bold;">${i.cantidad}</td><td style="text-align: right; font-size: 12px; color: #2C2421; font-weight: bold;">${config.currency||'$'}${(finalP * i.cantidad).toFixed(2)}</td></tr>`;
                 }).join('');
                 
                 let totalAhorro = pedido.ahorro || 0; if (!pedido.ahorro) { (pedido.items || []).forEach(i => { const finalP = parseFloat(String(i.precio||i.precioFinalAplicado||"0").replace(/[^0-9.-]+/g,"")) || 0; const origP = parseFloat(String(i.precioOriginal||i.precio||"0").replace(/[^0-9.-]+/g,"")) || finalP; if (origP > finalP) totalAhorro += (origP - finalP) * i.cantidad; }); }
@@ -1551,7 +1563,7 @@
                 if (totalAhorro > 0) extraTotals += `<h3 style="text-align: right; font-size: 14px; margin: 0 0 5px 0; color: #B88645; font-weight: bold;">Ahorro: -${config.currency||'$'}${totalAhorro.toFixed(2)}</h3>`;
                 if(pedido.impuesto > 0) extraTotals += `<h3 style="text-align: right; font-size: 14px; margin: 0 0 10px 0; color: #2C2421; font-weight: normal;">ISV: ${config.currency||'$'}${(pedido.impuesto).toFixed(2)}</h3>`;
 
-                const ticketHtml = `<div id="temp-invoice-capture" style="background: #FFFFFF; color: #2C2421; font-family: 'Courier New', Courier, monospace; width: 350px; padding: 25px; box-sizing: border-box; position: absolute; left: -9999px; top: -9999px; z-index: -1; border-radius: 16px; border: 1px solid #E5E7EB;"><h2 style="text-align: center; margin-bottom: 5px; font-size: 26px; color: #2C2421; font-family: sans-serif; font-weight: 800;">PINKITOS SHOP</h2><p style="text-align: center; margin-top: 0; font-size: 11px; color: #9CA3AF; font-family: sans-serif; font-weight: bold;">${invHeader}</p><hr style="border: 1px dashed #E5E7EB; margin: 15px 0;"><p style="font-size: 12px; margin: 5px 0;"><strong>FACTURA:</strong> ${pedido.idPedido || 'S/N'}</p><p style="font-size: 12px; margin: 5px 0;"><strong>CLIENTE:</strong> ${pedido.cliente}</p><p style="font-size: 12px; margin: 5px 0;"><strong>FECHA:</strong> ${dateStr}</p><hr style="border: 1px dashed #E5E7EB; margin: 15px 0;"><table style="width: 100%; border-collapse: collapse;"><thead><tr style="border-bottom: 2px solid #2C2421;"><th style="text-align: left; padding-bottom: 5px; font-size: 12px;">DESC.</th><th style="text-align: center; padding-bottom: 5px; font-size: 12px;">CANT</th><th style="text-align: right; padding-bottom: 5px; font-size: 12px;">SUB</th></tr></thead><tbody>${itemsHtml}</tbody></table><hr style="border: 1px dashed #E5E7EB; margin: 15px 0;">${extraTotals}<h3 style="text-align: right; font-size: 20px; margin: 0; color: #2C2421; font-weight: 800;">TOTAL: ${config.currency||'$'}${(pedido.total || 0).toFixed(2)}</h3><p style="text-align: center; margin-top: 30px; font-size: 11px; color: #9CA3AF; font-family: sans-serif; font-weight: 600;">${invFooter}</p></div>`;
+                const ticketHtml = `<div id="temp-invoice-capture" style="background: #FFFFFF; color: #2C2421; font-family: 'Courier New', Courier, monospace; width: 350px; padding: 25px; box-sizing: border-box; position: absolute; left: -9999px; top: -9999px; z-index: -1; border-radius: 16px; border: 1px solid #E5E7EB;"><h2 style="text-align: center; margin-bottom: 5px; font-size: 26px; color: #2C2421; font-family: sans-serif; font-weight: 800;">PINKITOS SHOP</h2><p style="text-align: center; margin-top: 0; font-size: 11px; color: #9CA3AF; font-family: sans-serif; font-weight: bold;">${invHeader}</p><hr style="border: 1px dashed #E5E7EB; margin: 15px 0;"><p style="font-size: 12px; margin: 5px 0;"><strong>FACTURA:</strong> ${pedido.idPedido || 'S/N'}</p><p style="font-size: 12px; margin: 5px 0;"><strong>CLIENTE:</strong> ${escapeHTML(pedido.cliente)}</p><p style="font-size: 12px; margin: 5px 0;"><strong>FECHA:</strong> ${dateStr}</p><hr style="border: 1px dashed #E5E7EB; margin: 15px 0;"><table style="width: 100%; border-collapse: collapse;"><thead><tr style="border-bottom: 2px solid #2C2421;"><th style="text-align: left; padding-bottom: 5px; font-size: 12px;">DESC.</th><th style="text-align: center; padding-bottom: 5px; font-size: 12px;">CANT</th><th style="text-align: right; padding-bottom: 5px; font-size: 12px;">SUB</th></tr></thead><tbody>${itemsHtml}</tbody></table><hr style="border: 1px dashed #E5E7EB; margin: 15px 0;">${extraTotals}<h3 style="text-align: right; font-size: 20px; margin: 0; color: #2C2421; font-weight: 800;">TOTAL: ${config.currency||'$'}${(pedido.total || 0).toFixed(2)}</h3><p style="text-align: center; margin-top: 30px; font-size: 11px; color: #9CA3AF; font-family: sans-serif; font-weight: 600;">${invFooter}</p></div>`;
                 document.body.insertAdjacentHTML('beforeend', ticketHtml); const captureDiv = document.getElementById('temp-invoice-capture');
                 try {
                     const canvas = await html2canvas(captureDiv, { backgroundColor: '#ffffff', scale: 2 }); const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png')); const file = new File([blob], `Factura_${pedido.idPedido}.png`, { type: 'image/png' });
@@ -1587,7 +1599,7 @@
                 <div class="bg-white border border-border p-5 rounded-3xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm hover:shadow-soft transition-all">
                     <div class="flex-1 w-full">
                         <div class="flex justify-between items-center mb-2"><h4 class="text-dark text-sm font-bold"><i class="fas fa-file-alt text-primary mr-2"></i>FACTURA: ${pedido.idPedido || 'S/N'}</h4><p class="text-dark text-lg font-bold">${config.currency||'$'}${(pedido.total || 0).toFixed(2)}</p></div>
-                        <p class="text-muted text-xs font-bold"><i class="fas fa-user text-primary w-4"></i> ${pedido.cliente}</p>
+                        <p class="text-muted text-xs font-bold"><i class="fas fa-user text-primary w-4"></i> ${escapeHTML(pedido.cliente)}</p>
                         <p class="text-muted text-[10px] mt-1.5 font-semibold"><i class="fas fa-calendar-check text-[#20b858] w-4"></i> Despachado: ${dateStr}</p>
                     </div>
                     <div class="flex flex-wrap gap-2 w-full md:w-auto mt-2 md:mt-0">
@@ -1654,11 +1666,11 @@
         function eliminarFactura(docId) { DarkAlert.fire({ title: '¿Borrar Factura?', text: "Acción irreversible.", icon: 'warning', showCancelButton: true, confirmButtonText: 'Eliminar', cancelButtonText: 'Atrás' }).then((result) => { if (result.isConfirmed) db.collection("pedidos").doc(docId).delete().then(() => Toast.fire({ icon: 'info', title: 'Factura eliminada' })); }); }
         function imprimirFactura(docId) {
             const f = pedidosList.find(p => p.id === docId); if(!f) return; const dateStr = (f.despachadoAt && f.despachadoAt.toDate) ? new Date(f.despachadoAt.toDate()).toLocaleString() : new Date().toLocaleString(); const invHeader = config.invoiceHeader || 'JUGUETES Y COLECCIONABLES'; const invFooter = config.invoiceFooter || '¡Gracias por comprar!<br>IG: @pinkitos_shop';
-            const itemsHtml = (f.items || []).map(i => { const finalP = parseFloat(String(i.precio||i.precioFinalAplicado||"0").replace(/[^0-9.-]+/g,"")) || 0; const discount = getDiscountPercent(i.precio, i.precioOriginal); let discountHtml = ''; if (discount > 0) { const origBase = parseFloat(String(i.precioOriginal||"0").replace(/[^0-9.-]+/g,"")) || 0; discountHtml = `<br><span style="color:#999; text-decoration: line-through;">${config.currency||'$'}${origBase.toFixed(2)} c/u</span>`; } return `<tr style="border-bottom: 1px solid #ddd;"><td style="padding: 8px 0; font-size: 12px;">${i.titulo} <br><small style="color:#555;" class="notranslate" translate="no">Var: ${i.talla}</small>${discountHtml}</td><td style="text-align: center; font-size: 12px;">${i.cantidad}</td><td style="text-align: right; font-size: 12px;">${config.currency||'$'}${(finalP * i.cantidad).toFixed(2)}</td></tr>`; }).join('');
+            const itemsHtml = (f.items || []).map(i => { const finalP = parseFloat(String(i.precio||i.precioFinalAplicado||"0").replace(/[^0-9.-]+/g,"")) || 0; const discount = getDiscountPercent(i.precio, i.precioOriginal); let discountHtml = ''; if (discount > 0) { const origBase = parseFloat(String(i.precioOriginal||"0").replace(/[^0-9.-]+/g,"")) || 0; discountHtml = `<br><span style="color:#999; text-decoration: line-through;">${config.currency||'$'}${origBase.toFixed(2)} c/u</span>`; } return `<tr style="border-bottom: 1px solid #ddd;"><td style="padding: 8px 0; font-size: 12px;">${escapeHTML(i.titulo)} <br><small style="color:#555;" class="notranslate" translate="no">Var: ${escapeHTML(i.talla)}</small>${discountHtml}</td><td style="text-align: center; font-size: 12px;">${i.cantidad}</td><td style="text-align: right; font-size: 12px;">${config.currency||'$'}${(finalP * i.cantidad).toFixed(2)}</td></tr>`; }).join('');
             let totalAhorro = f.ahorro || 0; if (!f.ahorro) { (f.items || []).forEach(i => { const finalP = parseFloat(String(i.precio||i.precioFinalAplicado||"0").replace(/[^0-9.-]+/g,"")) || 0; const origP = parseFloat(String(i.precioOriginal||i.precio||"0").replace(/[^0-9.-]+/g,"")) || finalP; if (origP > finalP) totalAhorro += (origP - finalP) * i.cantidad; }); }
             let subtotalF = f.subtotal || f.total; let extraTotals = `<h3 style="text-align: right; font-size: 14px; margin: 0 0 5px 0; font-weight: normal;">Subtotal: ${config.currency||'$'}${(subtotalF).toFixed(2)}</h3>`; if (totalAhorro > 0) extraTotals += `<h3 style="text-align: right; font-size: 14px; margin: 0 0 5px 0; font-weight: normal;">Ahorro: -${config.currency||'$'}${totalAhorro.toFixed(2)}</h3>`; if(f.impuesto > 0) extraTotals += `<h3 style="text-align: right; font-size: 14px; margin: 0 0 10px 0; font-weight: normal;">ISV: ${config.currency||'$'}${(f.impuesto).toFixed(2)}</h3>`;
             const printDiv = document.getElementById('printable-invoice');
-            printDiv.innerHTML = `<div style="font-family: 'Courier New', Courier, monospace; max-width: 350px; margin: 0 auto; padding: 20px;"><h2 style="text-align: center; margin-bottom: 5px; font-size: 24px;">PINKITOS SHOP</h2><p style="text-align: center; margin-top: 0; font-size: 12px; color: #333;">${invHeader}</p><hr style="border: 1px dashed #000; margin: 15px 0;"><p style="font-size: 13px; margin: 5px 0;"><strong>FACTURA:</strong> ${f.idPedido}</p><p style="font-size: 13px; margin: 5px 0;"><strong>CLIENTE:</strong> ${f.cliente}</p><p style="font-size: 13px; margin: 5px 0;"><strong>FECHA:</strong> ${dateStr}</p><hr style="border: 1px dashed #000; margin: 15px 0;"><table style="width: 100%; border-collapse: collapse;"><thead><tr style="border-bottom: 2px solid #000;"><th style="text-align: left; padding-bottom: 5px; font-size: 12px;">DESC.</th><th style="text-align: center; padding-bottom: 5px; font-size: 12px;">CANT</th><th style="text-align: right; padding-bottom: 5px; font-size: 12px;">SUB</th></tr></thead><tbody>${itemsHtml}</tbody></table><hr style="border: 1px dashed #000; margin: 15px 0;">${extraTotals}<h3 style="text-align: right; font-size: 18px; margin: 0;">TOTAL: ${config.currency||'$'}${(f.total || 0).toFixed(2)}</h3><p style="text-align: center; margin-top: 30px; font-size: 11px;">${invFooter}</p></div>`; window.print();
+            printDiv.innerHTML = `<div style="font-family: 'Courier New', Courier, monospace; max-width: 350px; margin: 0 auto; padding: 20px;"><h2 style="text-align: center; margin-bottom: 5px; font-size: 24px;">PINKITOS SHOP</h2><p style="text-align: center; margin-top: 0; font-size: 12px; color: #333;">${invHeader}</p><hr style="border: 1px dashed #000; margin: 15px 0;"><p style="font-size: 13px; margin: 5px 0;"><strong>FACTURA:</strong> ${f.idPedido}</p><p style="font-size: 13px; margin: 5px 0;"><strong>CLIENTE:</strong> ${escapeHTML(f.cliente)}</p><p style="font-size: 13px; margin: 5px 0;"><strong>FECHA:</strong> ${dateStr}</p><hr style="border: 1px dashed #000; margin: 15px 0;"><table style="width: 100%; border-collapse: collapse;"><thead><tr style="border-bottom: 2px solid #000;"><th style="text-align: left; padding-bottom: 5px; font-size: 12px;">DESC.</th><th style="text-align: center; padding-bottom: 5px; font-size: 12px;">CANT</th><th style="text-align: right; padding-bottom: 5px; font-size: 12px;">SUB</th></tr></thead><tbody>${itemsHtml}</tbody></table><hr style="border: 1px dashed #000; margin: 15px 0;">${extraTotals}<h3 style="text-align: right; font-size: 18px; margin: 0;">TOTAL: ${config.currency||'$'}${(f.total || 0).toFixed(2)}</h3><p style="text-align: center; margin-top: 30px; font-size: 11px;">${invFooter}</p></div>`; window.print();
         }
 
         // =====================================================================
