@@ -84,8 +84,6 @@
         .modal-overlay.active { display: flex; }
         .modal-content { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(44, 36, 33, 0.25); max-width: 1200px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
         
-        .hero-bg { background-color: #E5E7EB; background-size: cover; background-position: center; background-repeat: no-repeat; border-radius: 0 0 40px 40px; }
-        
         .loader { border: 3px solid rgba(110, 193, 228, 0.3); border-radius: 50%; border-top: 3px solid #6EC1E4; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
@@ -217,7 +215,6 @@
             <div id="checkout-form" class="space-y-4 mb-4 hidden bg-light p-4 rounded-2xl border border-border">
                 <label class="block text-xs font-bold text-muted uppercase tracking-wider mb-1">¡Estás a un paso de completar tu pedido! Llena tus datos e ingresa al chat para recibir asesoría personalizada. Te ayudaremos a finalizar tu compra de forma rápida y segura.</label>
                 <input type="text" id="cliente-nombre" placeholder="Tu Nombre Completo" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl shadow-sm mb-3" maxlength="100">
-                <!-- SEGURIDAD Y UX: Conversión a tipo numérico con Regex para evitar inyecciones -->
                 <input type="tel" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" id="cliente-telefono" placeholder="Número de Contacto" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all rounded-xl shadow-sm mb-3" maxlength="20">
                 <textarea id="mensaje" rows="2" maxlength="500" placeholder="Nota adicional" class="w-full bg-white border border-border px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-dark text-sm transition-all resize-none rounded-xl shadow-sm"></textarea>
                 
@@ -291,7 +288,6 @@
                         <button onclick="shareProduct()" class="text-muted hover:text-dark transition-colors bg-light rounded-full w-10 h-10 flex items-center justify-center shrink-0 border border-border"><i class="fas fa-share-alt"></i></button>
                     </div>
 
-                    <!-- CRO: Social Proof Stars Display in Modal -->
                     <div id="modal-rating-display" class="hidden items-center gap-1.5 mb-4 w-max"></div>
                     
                     <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-border">
@@ -302,7 +298,6 @@
                     
                     <p id="modal-desc" class="text-muted text-sm leading-relaxed mb-8"></p>
                     
-                    <!-- ACORDEÓN DE MEDIDAS -->
                     <div id="modal-measures-container" class="mb-6 hidden">
                         <details class="group bg-white border border-border rounded-2xl shadow-sm">
                             <summary class="flex justify-between items-center font-bold cursor-pointer p-5 text-dark text-sm select-none hover:bg-light transition-colors rounded-2xl">
@@ -328,7 +323,6 @@
                         <div id="modal-price-container" class="w-full lg:w-auto shrink-0 mb-4 lg:mb-0"></div>
                         
                         <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
-                            <!-- SELECTOR DE CANTIDAD -->
                             <div id="modal-quantity-container" class="flex items-center gap-3 bg-white border border-border rounded-xl p-1.5 w-full sm:w-auto shrink-0 justify-between sm:justify-start shadow-sm">
                                 <button onclick="updateQuantity(-1)" class="w-10 h-10 text-dark hover:bg-light hover:text-primary rounded-lg transition-colors"><i class="fas fa-minus text-xs"></i></button>
                                 <span id="modal-quantity" class="text-dark text-lg font-bold w-8 text-center select-none">1</span>
@@ -349,14 +343,42 @@
     <!-- VISTA 1: INICIO (SOLO LOBBY) -->
     <div id="inicio" class="section-fade active pt-20 pb-16">
         
-        <section id="hero-display" class="h-[50vh] md:h-[65vh] flex items-center justify-center text-center relative overflow-hidden hero-bg mx-2 md:mx-6 mt-4">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        <!-- ===================================================================== -->
+        <!-- 🌟 HERO / CARRUSEL REDISEÑADO -->
+        <!-- ===================================================================== -->
+        <section id="hero-display" class="h-[40vh] md:h-[50vh] relative overflow-hidden mx-4 md:mx-6 mt-4 rounded-3xl shadow-soft group block">
             
-            <div class="relative z-10 px-6 max-w-3xl">
-                <div class="bg-white/80 backdrop-blur-md p-6 md:p-8 rounded-[2rem] shadow-float inline-block border border-white/50">
-                    <h1 id="display-hero-title" class="font-extrabold text-4xl md:text-6xl text-dark mb-3 leading-tight drop-shadow-sm"></h1>
-                    <p id="display-hero-subtitle" class="text-secondary text-sm md:text-base font-bold tracking-wide"></p>
+            <!-- Pista del Carrusel -->
+            <div id="hero-track" class="flex w-full h-full transition-transform duration-700 ease-in-out" style="transform: translateX(0%);">
+                <!-- JS inyectará las imágenes dinámicamente aquí -->
+            </div>
+
+            <!-- Capa superpuesta de texto (Mantiene compatibilidad con el título actual) -->
+            <div id="hero-text-overlay" class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none transition-opacity duration-300">
+                <div class="bg-white/80 backdrop-blur-md p-6 md:p-8 rounded-[2rem] shadow-float inline-block border border-white/50 text-center pointer-events-auto transition-all">
+                    <h1 id="display-hero-title" class="font-extrabold text-3xl md:text-5xl text-dark mb-2 leading-tight drop-shadow-sm"></h1>
+                    <p id="display-hero-subtitle" class="text-secondary text-xs md:text-sm font-bold tracking-wide"></p>
                 </div>
+            </div>
+
+            <!-- Controles Laterales (Flechas) -->
+            <button onclick="prevHero()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-md border border-border text-dark rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 shadow-md z-20">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button onclick="nextHero()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-md border border-border text-dark rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 shadow-md z-20">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- Indicadores (Puntos Inferiores) -->
+            <div id="hero-indicators" class="absolute bottom-16 md:bottom-12 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+                <!-- JS inyectará los puntos -->
+            </div>
+
+            <!-- Botón de anclaje hacia el Lobby -->
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 cursor-pointer">
+                <button onclick="scrollToLobby()" class="w-8 h-8 md:w-10 md:h-10 bg-white/90 backdrop-blur-md text-primary rounded-full shadow-md flex items-center justify-center hover:bg-primary hover:text-white transition-all animate-bounce border border-border" title="Ir al Catálogo">
+                    <i class="fas fa-arrow-down text-sm"></i>
+                </button>
             </div>
         </section>
 
@@ -384,7 +406,6 @@
             </div>
             
             <div class="w-full">
-                <!-- CRO: Grid spacing optimizado responsivo -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 transition-opacity duration-300 min-h-[400px]" id="gallery-grid">
                     <div class="col-span-full text-center py-20 flex flex-col items-center justify-center">
                             <div class="loader !border-t-accent !border-border !w-10 !h-10 mb-4 !block"></div>
@@ -428,7 +449,7 @@
         const DEFAULT_CONFIG = { 
             slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", 
             categories: ["figuras", "peluches"], lobbyCategoryLimit: 4, categoryImages: {},
-            heroTitle: "Bienvenido a Pinkitos", heroSubtitle: "Coleccionables y Juguetes", heroImage: "", logoUrl: "", heroActive: true, shareText: "¡Mira este juguete!", currency: "$", taxEnabled: false, taxRate: 15, globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false 
+            heroTitle: "Bienvenido a Pinkitos", heroSubtitle: "Coleccionables y Juguetes", heroImage: "", heroImages: [], logoUrl: "", heroActive: true, shareText: "¡Mira este juguete!", currency: "$", taxEnabled: false, taxRate: 15, globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false 
         };
 
         let inventario = []; 
@@ -442,7 +463,12 @@
         let touchStartX = 0; 
         let touchEndX = 0;
         let currentCategory = 'all';
-        let lastCheckoutTime = 0; // Anti-spam protection
+        let lastCheckoutTime = 0;
+
+        // Variables Globales Carrusel Hero
+        let heroImagesArray = [];
+        let currentHeroIndex = 0;
+        let heroAutoPlayInterval = null;
 
         // =====================================================================
         // ⚙️ 2. MOTOR DE PRECIOS Y UTILIDADES
@@ -686,14 +712,120 @@
             renderLobby();
         }
 
-        function applyConfig() { 
-            document.getElementById('display-hero-title').innerText = config.heroTitle || ""; 
-            document.getElementById('display-hero-subtitle').innerText = config.heroSubtitle || ""; 
-            document.getElementById('hero-display').style.backgroundImage = `url('${config.heroImage || ""}')`; 
-            
-            const heroSection = document.getElementById('hero-display');
-            if(config.heroActive === false) { heroSection.style.display = 'none'; } else { heroSection.style.display = 'flex'; }
+        // =====================================================================
+        // 🔄 FUNCIONES DEL CARRUSEL (NUEVO)
+        // =====================================================================
+        function renderHeroCarousel() {
+            const track = document.getElementById('hero-track');
+            const indicators = document.getElementById('hero-indicators');
 
+            if (heroImagesArray.length === 0) {
+                // Estado por defecto (sin imágenes)
+                track.innerHTML = `<div class="w-full h-full shrink-0 bg-gray-200 flex items-center justify-center"><i class="fas fa-image text-muted text-5xl"></i></div>`;
+                indicators.innerHTML = '';
+                stopHeroAutoplay();
+                return;
+            }
+
+            track.innerHTML = heroImagesArray.map(img => `
+                <div class="w-full h-full shrink-0 relative">
+                    <img src="${img}" class="w-full h-full object-cover">
+                    <!-- Overlay sutil para oscurecer imagen y leer mejor el texto (si hubiera) -->
+                    <div class="absolute inset-0 bg-black/10"></div>
+                </div>
+            `).join('');
+
+            if (heroImagesArray.length > 1) {
+                indicators.innerHTML = heroImagesArray.map((_, i) => `<button onclick="goToHero(${i})" id="hero-dot-${i}" class="h-2 rounded-full transition-all duration-300 shadow-sm ${i === 0 ? 'bg-primary w-8' : 'bg-white/60 w-2'}"></button>`).join('');
+                startHeroAutoplay();
+            } else {
+                indicators.innerHTML = '';
+                stopHeroAutoplay();
+            }
+            goToHero(0);
+        }
+
+        function updateHeroIndicators() {
+            if (heroImagesArray.length <= 1) return;
+            for (let i = 0; i < heroImagesArray.length; i++) {
+                const dot = document.getElementById(`hero-dot-${i}`);
+                if (dot) dot.className = `h-2 rounded-full transition-all duration-300 shadow-sm ${i === currentHeroIndex ? 'bg-primary w-8' : 'bg-white/60 w-2'}`;
+            }
+        }
+
+        function goToHero(index) {
+            if (heroImagesArray.length === 0) return;
+            currentHeroIndex = index;
+            if (currentHeroIndex < 0) currentHeroIndex = heroImagesArray.length - 1;
+            if (currentHeroIndex >= heroImagesArray.length) currentHeroIndex = 0;
+
+            const track = document.getElementById('hero-track');
+            track.style.transform = `translateX(-${currentHeroIndex * 100}%)`;
+            updateHeroIndicators();
+            resetHeroAutoplay();
+        }
+
+        function nextHero() { goToHero(currentHeroIndex + 1); }
+        function prevHero() { goToHero(currentHeroIndex - 1); }
+
+        function startHeroAutoplay() {
+            stopHeroAutoplay();
+            heroAutoPlayInterval = setInterval(nextHero, 6000); // 6 segundos de transición automática
+        }
+        function stopHeroAutoplay() {
+            if (heroAutoPlayInterval) clearInterval(heroAutoPlayInterval);
+        }
+        function resetHeroAutoplay() {
+            if (heroImagesArray.length > 1) startHeroAutoplay();
+        }
+
+        function scrollToLobby() {
+            const lobby = document.getElementById('lobby-categorias');
+            if (lobby) {
+                const yOffset = -80;
+                const y = lobby.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({top: y, behavior: 'smooth'});
+            }
+        }
+
+        // =====================================================================
+        // 🔄 APPLY CONFIG (MODIFICADO)
+        // =====================================================================
+        function applyConfig() { 
+            // 1. Manejo del Título y Textos del Hero
+            const titleEl = document.getElementById('display-hero-title');
+            const subEl = document.getElementById('display-hero-subtitle');
+            const overlayText = document.getElementById('hero-text-overlay');
+
+            titleEl.innerText = config.heroTitle || ""; 
+            subEl.innerText = config.heroSubtitle || ""; 
+            
+            // Lógica Quirúrgica: Si no hay título ni subtítulo, ocultamos la caja 
+            // Esto permite subir Banners limpios completos (que ya tengan texto en la imagen).
+            if (!config.heroTitle && !config.heroSubtitle) {
+                overlayText.style.display = 'none';
+            } else {
+                overlayText.style.display = 'flex';
+            }
+
+            // 2. Gestión de Imágenes (Carrusel Inteligente)
+            heroImagesArray = config.heroImages || [];
+            
+            // Compatibilidad hacia atrás: Si no hay array 'heroImages' aún, usamos la imagen vieja 'heroImage' si existe
+            if (heroImagesArray.length === 0 && config.heroImage) {
+                heroImagesArray = [config.heroImage];
+            }
+            renderHeroCarousel();
+
+            // 3. Manejo de visibilidad del Carrusel completo
+            const heroSection = document.getElementById('hero-display');
+            if(config.heroActive === false) { 
+                heroSection.style.display = 'none'; 
+            } else { 
+                heroSection.style.display = 'block'; 
+            }
+
+            // Textos Globales de Tienda
             document.getElementById('display-shop-slogan').innerText = config.slogan || ""; 
             document.getElementById('display-about-title').innerText = config.aboutTitle || ""; 
             document.getElementById('display-about-desc').innerText = config.aboutDesc || ""; 
@@ -831,10 +963,9 @@
             if(!tel) { Toast.fire({ icon: 'warning', title: 'Necesitamos tu número de contacto' }); return document.getElementById('cliente-telefono').focus(); }
             if(carrito.length === 0) return Toast.fire({ icon: 'error', title: 'Cesta vacía' });
             
-            // 🔥 CAMBIO QUIRÚRGICO: Actualización SÍNCRONA e Inmediata del candado limitador
             lastCheckoutTime = Date.now();
 
-            // Bloqueo de UI (Botón) para evitar clics dobles físicos
+            // Bloqueo de UI
             const btnConfirm = document.getElementById('btn-checkout-confirm');
             btnConfirm.disabled = true;
             btnConfirm.style.pointerEvents = 'none';
@@ -861,14 +992,11 @@
 
             const pedidoData = { idPedido: orderId, cliente: n, telefono: tel, mensaje: m, items: cartItemsSaved, total: t.final, ahorro: t.savings, estado: 'pendiente', createdAt: firebase.firestore.FieldValue.serverTimestamp() };
             
-            // Creación en backend con captura de errores reforzada
             db.collection("pedidos").add(pedidoData).then(() => {
-                // Éxito: El candado sincrónico ya fue aplicado arriba
-                console.log("Pedido guardado en base de datos de manera exitosa.");
+                console.log("Pedido guardado exitosamente.");
             }).catch(e => {
                 console.error(e);
-                Toast.fire({ icon: 'error', title: 'Error al conectar con la base de datos' });
-                // Fallback de resiliencia: Permitimos al usuario volver a intentar en caso de fallo de red
+                Toast.fire({ icon: 'error', title: 'Error de red' });
                 lastCheckoutTime = 0; 
             });
             
@@ -877,7 +1005,6 @@
             // Reset UI
             carrito = []; saveCart(); renderCarrito(); document.getElementById('mensaje').value = ''; document.getElementById('cliente-telefono').value = ''; document.getElementById('cliente-nombre').value = ''; btnTxt.innerText = ogTxt;
             
-            // Restaurar botón
             btnConfirm.disabled = false;
             btnConfirm.style.pointerEvents = 'auto';
             btnConfirm.style.opacity = '1';
@@ -917,7 +1044,6 @@
         function abrirWishlist() { renderWishlist(); document.getElementById('wishlist-modal').classList.add('active'); }
         function cerrarWishlist(e) { if(e) e.stopPropagation(); document.getElementById('wishlist-modal').classList.remove('active'); }
         
-        // Transacción Firestore segura mejorada para favCount
         function toggleWishlist(id, event) { 
             event.stopPropagation(); const idx = wishlist.indexOf(id); let incVal = 0; 
             if(idx > -1) { wishlist.splice(idx, 1); Toast.fire({icon: 'info', title: 'Removido de favoritos'}); incVal = -1; } 
