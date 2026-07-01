@@ -709,7 +709,7 @@
         }
 
         // =====================================================================
-        // 🔄 FUNCIONES DEL CARRUSEL (NUEVO)
+        // 🔄 FUNCIONES DEL CARRUSEL MEJORADAS (BLURRED BACKDROP)
         // =====================================================================
         function renderHeroCarousel() {
             const track = document.getElementById('hero-track');
@@ -723,11 +723,18 @@
                 return;
             }
 
+            // MEJORA UX/UI: Implementación de Blurred Backdrop Pattern
+            // Garantiza que la imagen nunca se recorte en pantallas horizontales.
             track.innerHTML = heroImagesArray.map(img => `
-                <div class="w-full h-full shrink-0 relative">
-                    <img src="${img}" class="w-full h-full object-cover">
+                <div class="w-full h-full shrink-0 relative flex items-center justify-center bg-[#1A1514] overflow-hidden">
+                    <!-- Fondo difuminado dinámico para cubrir espacios vacíos -->
+                    <img src="${img}" class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-125 select-none pointer-events-none" alt="Fondo borroso">
+                    
+                    <!-- Imagen principal contenida (asegura que se vea 100% sin cortes) -->
+                    <img src="${img}" class="relative w-full h-full object-contain z-10 drop-shadow-2xl select-none" alt="Banner Tienda">
+                    
                     <!-- Overlay sutil para oscurecer imagen y leer mejor el texto (si hubiera) -->
-                    <div class="absolute inset-0 bg-black/10"></div>
+                    <div class="absolute inset-0 bg-black/10 z-20 pointer-events-none"></div>
                 </div>
             `).join('');
 
