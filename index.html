@@ -344,17 +344,17 @@
     <div id="inicio" class="section-fade active pt-20 pb-16">
         
         <!-- ===================================================================== -->
-        <!-- 🌟 HERO / CARRUSEL REDISEÑADO -->
+        <!-- 🌟 HERO / CARRUSEL REDISEÑADO TIPO E-COMMERCE ALTA GAMA -->
         <!-- ===================================================================== -->
-        <section id="hero-display" class="h-[40vh] md:h-[50vh] relative overflow-hidden mx-4 md:mx-6 mt-4 rounded-3xl shadow-soft group block">
+        <section id="hero-display" class="h-[40vh] md:h-[50vh] relative mx-4 md:mx-6 mt-4 block">
             
-            <!-- Pista del Carrusel -->
-            <div id="hero-track" class="flex w-full h-full transition-transform duration-700 ease-in-out" style="transform: translateX(0%);">
+            <!-- Pista del Carrusel: Snap continuo -->
+            <div id="hero-track" class="flex w-full h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth gap-4">
                 <!-- JS inyectará las imágenes dinámicamente aquí -->
             </div>
 
             <!-- Capa superpuesta de texto (Mantiene compatibilidad con el título actual) -->
-            <div id="hero-text-overlay" class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none transition-opacity duration-300">
+            <div id="hero-text-overlay" class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none transition-opacity duration-300">
                 <div class="bg-white/80 backdrop-blur-md p-6 md:p-8 rounded-[2rem] shadow-float inline-block border border-white/50 text-center pointer-events-auto transition-all">
                     <h1 id="display-hero-title" class="font-extrabold text-3xl md:text-5xl text-dark mb-2 leading-tight drop-shadow-sm"></h1>
                     <p id="display-hero-subtitle" class="text-secondary text-xs md:text-sm font-bold tracking-wide"></p>
@@ -362,19 +362,17 @@
             </div>
 
             <!-- Controles Laterales (Flechas) -->
-            <button onclick="prevHero()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-md border border-border text-dark rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 shadow-md z-20">
+            <button onclick="prevHero()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-md border border-border text-dark rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 shadow-md z-30">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <button onclick="nextHero()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-md border border-border text-dark rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 shadow-md z-20">
+            <button onclick="nextHero()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-md border border-border text-dark rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 shadow-md z-30">
                 <i class="fas fa-chevron-right"></i>
             </button>
 
             <!-- Indicadores (Puntos Inferiores) -->
-            <div id="hero-indicators" class="absolute bottom-16 md:bottom-12 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+            <div id="hero-indicators" class="absolute bottom-[-1.5rem] left-1/2 -translate-x-1/2 flex space-x-2 z-30">
                 <!-- JS inyectará los puntos -->
             </div>
-            
-            <!-- NOTA: El botón "scrollToLobby()" animado fue eliminado por razones de UX/UI -->
             
         </section>
 
@@ -445,7 +443,7 @@
         const DEFAULT_CONFIG = { 
             slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", 
             categories: ["figuras", "peluches"], lobbyCategoryLimit: 4, categoryImages: {},
-            heroTitle: "Bienvenido a Pinkitos", heroSubtitle: "Coleccionables y Juguetes", heroImage: "", heroImages: [], logoUrl: "", heroActive: true, shareText: "¡Mira este juguete!", currency: "$", taxEnabled: false, taxRate: 15, globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false 
+            heroTitle: "Bienvenido a Pinkitos", heroSubtitle: "Coleccionables y Juguetes", heroImage: "", heroImages: [], heroLinks: [], logoUrl: "", heroActive: true, shareText: "¡Mira este juguete!", currency: "$", taxEnabled: false, taxRate: 15, globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false 
         };
 
         let inventario = []; 
@@ -709,34 +707,45 @@
         }
 
         // =====================================================================
-        // 🔄 FUNCIONES DEL CARRUSEL MEJORADAS (BLURRED BACKDROP)
+        // 🔄 FUNCIONES DEL CARRUSEL E-COMMERCE CONTINUO
         // =====================================================================
         function renderHeroCarousel() {
             const track = document.getElementById('hero-track');
             const indicators = document.getElementById('hero-indicators');
 
             if (heroImagesArray.length === 0) {
-                // Estado por defecto (sin imágenes)
-                track.innerHTML = `<div class="w-full h-full shrink-0 bg-gray-200 flex items-center justify-center"><i class="fas fa-image text-muted text-5xl"></i></div>`;
+                track.innerHTML = `<div class="w-full h-full shrink-0 bg-gray-200 flex items-center justify-center rounded-3xl"><i class="fas fa-image text-muted text-5xl"></i></div>`;
                 indicators.innerHTML = '';
                 stopHeroAutoplay();
                 return;
             }
 
-            // MEJORA UX/UI: Implementación de Blurred Backdrop Pattern
-            // Garantiza que la imagen nunca se recorte en pantallas horizontales.
-            track.innerHTML = heroImagesArray.map(img => `
-                <div class="w-full h-full shrink-0 relative flex items-center justify-center bg-[#1A1514] overflow-hidden">
-                    <!-- Fondo difuminado dinámico para cubrir espacios vacíos -->
-                    <img src="${img}" class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-125 select-none pointer-events-none" alt="Fondo borroso">
-                    
-                    <!-- Imagen principal contenida (asegura que se vea 100% sin cortes) -->
-                    <img src="${img}" class="relative w-full h-full object-contain z-10 drop-shadow-2xl select-none" alt="Banner Tienda">
-                    
-                    <!-- Overlay sutil para oscurecer imagen y leer mejor el texto (si hubiera) -->
-                    <div class="absolute inset-0 bg-black/10 z-20 pointer-events-none"></div>
-                </div>
-            `).join('');
+            // Implementación Carrusel Continuo Flexible (Soporta Cuadrados y Horizontales a la perfección)
+            track.innerHTML = heroImagesArray.map((img, i) => {
+                const link = (config.heroLinks && config.heroLinks[i]) ? config.heroLinks[i] : '';
+                const isClickable = link.trim().length > 0;
+                
+                // Contenido interno de la diapositiva
+                const innerContent = `
+                    <img src="${img}" class="h-full w-full md:w-auto md:h-full object-cover md:object-contain mx-auto transition-transform duration-700 group-hover:scale-105 select-none" alt="Banner Tienda">
+                    ${isClickable ? `
+                    <div class="absolute inset-x-0 bottom-6 md:bottom-8 z-10 flex justify-center pointer-events-none">
+                        <span class="bg-white/95 backdrop-blur-sm text-dark px-6 py-2.5 rounded-full font-bold text-sm shadow-float pointer-events-auto hover:bg-primary hover:text-white transition-colors border border-white/50 flex items-center gap-2">
+                            Comprar Ahora <i class="fas fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </div>
+                    ` : ''}
+                    <div class="absolute inset-0 bg-black/5 z-0 pointer-events-none rounded-3xl"></div>
+                `;
+
+                // Construcción de envoltura adaptable. 
+                // "w-full md:w-auto" permite que las horizontales se expandan, y las cuadradas queden lado a lado sin deformarse.
+                if (isClickable) {
+                    return `<a href="${link}" target="_blank" class="hero-slide flex-shrink-0 relative h-full w-full md:w-auto max-w-full snap-center overflow-hidden group block rounded-3xl bg-white shadow-soft">${innerContent}</a>`;
+                } else {
+                    return `<div class="hero-slide flex-shrink-0 relative h-full w-full md:w-auto max-w-full snap-center overflow-hidden group rounded-3xl bg-white shadow-soft">${innerContent}</div>`;
+                }
+            }).join('');
 
             if (heroImagesArray.length > 1) {
                 indicators.innerHTML = heroImagesArray.map((_, i) => `<button onclick="goToHero(${i})" id="hero-dot-${i}" class="h-2 rounded-full transition-all duration-300 shadow-sm ${i === 0 ? 'bg-primary w-8' : 'bg-white/60 w-2'}"></button>`).join('');
@@ -745,14 +754,16 @@
                 indicators.innerHTML = '';
                 stopHeroAutoplay();
             }
-            goToHero(0);
+            
+            currentHeroIndex = 0;
+            updateHeroIndicators();
         }
 
         function updateHeroIndicators() {
             if (heroImagesArray.length <= 1) return;
             for (let i = 0; i < heroImagesArray.length; i++) {
                 const dot = document.getElementById(`hero-dot-${i}`);
-                if (dot) dot.className = `h-2 rounded-full transition-all duration-300 shadow-sm ${i === currentHeroIndex ? 'bg-primary w-8' : 'bg-white/60 w-2'}`;
+                if (dot) dot.className = `h-2 rounded-full transition-all duration-300 shadow-sm ${i === currentHeroIndex ? 'bg-primary w-8' : 'bg-white/80 w-2'}`;
             }
         }
 
@@ -763,7 +774,13 @@
             if (currentHeroIndex >= heroImagesArray.length) currentHeroIndex = 0;
 
             const track = document.getElementById('hero-track');
-            track.style.transform = `translateX(-${currentHeroIndex * 100}%)`;
+            const slides = track.querySelectorAll('.hero-slide');
+            
+            if (slides[currentHeroIndex]) {
+                // Desplazamiento nativo limpio relativo al padre (Soporta múltiples anchos a la perfección)
+                const scrollPos = slides[currentHeroIndex].offsetLeft - track.offsetLeft;
+                track.scrollTo({ left: scrollPos, behavior: 'smooth' });
+            }
             updateHeroIndicators();
             resetHeroAutoplay();
         }
@@ -782,15 +799,6 @@
             if (heroImagesArray.length > 1) startHeroAutoplay();
         }
 
-        function scrollToLobby() {
-            const lobby = document.getElementById('lobby-categorias');
-            if (lobby) {
-                const yOffset = -80;
-                const y = lobby.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                window.scrollTo({top: y, behavior: 'smooth'});
-            }
-        }
-
         // =====================================================================
         // 🔄 APPLY CONFIG (MODIFICADO)
         // =====================================================================
@@ -804,20 +812,20 @@
             subEl.innerText = config.heroSubtitle || ""; 
             
             // Lógica Quirúrgica: Si no hay título ni subtítulo, ocultamos la caja 
-            // Esto permite subir Banners limpios completos (que ya tengan texto en la imagen).
             if (!config.heroTitle && !config.heroSubtitle) {
                 overlayText.style.display = 'none';
             } else {
                 overlayText.style.display = 'flex';
             }
 
-            // 2. Gestión de Imágenes (Carrusel Inteligente)
+            // 2. Gestión de Imágenes y Enlaces (Carrusel Inteligente)
             heroImagesArray = config.heroImages || [];
             
-            // Compatibilidad hacia atrás: Si no hay array 'heroImages' aún, usamos la imagen vieja 'heroImage' si existe
+            // Compatibilidad hacia atrás: Si no hay array 'heroImages' aún, usamos la imagen vieja
             if (heroImagesArray.length === 0 && config.heroImage) {
                 heroImagesArray = [config.heroImage];
             }
+            
             renderHeroCarousel();
 
             // 3. Manejo de visibilidad del Carrusel completo
@@ -956,7 +964,6 @@
         }
 
         function procesarEnvioPedido() {
-            // Protección Anti-Spam (Rate-Limiting Lógico)
             if (Date.now() - lastCheckoutTime < 10000) {
                 return Toast.fire({ icon: 'warning', title: 'Procesando... por favor espera.' });
             }
@@ -968,7 +975,6 @@
             
             lastCheckoutTime = Date.now();
 
-            // Bloqueo de UI
             const btnConfirm = document.getElementById('btn-checkout-confirm');
             btnConfirm.disabled = true;
             btnConfirm.style.pointerEvents = 'none';
