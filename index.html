@@ -363,13 +363,13 @@
 
             <!-- Controles Inferiores (Flechas y Puntos centralizados) -->
             <div id="hero-controls" class="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-center justify-center gap-4 z-30 hidden w-full">
-                <button onclick="prevHero()" class="w-8 h-8 bg-white border border-border text-dark rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-sm">
+                <button onclick="prevHeroGroup()" class="w-8 h-8 bg-white border border-border text-dark rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-sm">
                     <i class="fas fa-chevron-left text-[10px]"></i>
                 </button>
                 <div id="hero-indicators" class="flex space-x-2">
                     <!-- JS inyectará los puntos -->
                 </div>
-                <button onclick="nextHero()" class="w-8 h-8 bg-white border border-border text-dark rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-sm">
+                <button onclick="nextHeroGroup()" class="w-8 h-8 bg-white border border-border text-dark rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-sm">
                     <i class="fas fa-chevron-right text-[10px]"></i>
                 </button>
             </div>
@@ -633,7 +633,13 @@
                 const isOut = prod.stock !== undefined && prod.stock <= 0;
                 
                 let btnQuickAddHTML = ''; let badgesHTML = '';
-                let priceHtml = `<span class="text-dark font-extrabold text-lg md:text-xl truncate leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`;
+                
+                // CONDICION: Si el precio es cero o vacío no renderizar contenido
+                let priceHtml = '';
+                if (pData.finalUnitario > 0) {
+                    priceHtml = `<span class="text-dark font-extrabold text-lg md:text-xl truncate leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`;
+                }
+
                 const isPrevActiva = esPreventaActiva(prod);
 
                 if (isPrevActiva) {
@@ -647,7 +653,9 @@
                     
                     if (pData.isActive) {
                         badgesHTML += `<div class="promo-badge bg-promo text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider">${pData.badgeText}</div>`;
-                        priceHtml = `<div class="flex flex-col items-start leading-none gap-0.5"><span class="text-muted line-through text-xs font-semibold">${PricingEngine.format(pData.baseUnitario)}</span><span class="text-promo font-extrabold text-lg md:text-xl leading-none mt-1">${PricingEngine.format(pData.finalUnitario)}</span></div>`;
+                        if (pData.finalUnitario > 0) {
+                            priceHtml = `<div class="flex flex-col items-start leading-none gap-0.5"><span class="text-muted line-through text-xs font-semibold">${PricingEngine.format(pData.baseUnitario)}</span><span class="text-promo font-extrabold text-lg md:text-xl leading-none mt-1">${PricingEngine.format(pData.finalUnitario)}</span></div>`;
+                        }
                     }
                     if (config.globalScarcityActivo && prod.stock > 0 && prod.stock <= 5) {
                         badgesHTML += `<div class="bg-promo/15 text-promo border border-promo/20 px-2 py-0.5 text-[9px] font-extrabold uppercase rounded shadow-sm w-max tracking-wider animate-pulse"><i class="fas fa-bolt"></i> ¡Solo quedan ${prod.stock}!</div>`;
@@ -789,12 +797,25 @@
             resetHeroAutoplay();
         }
 
+        // Obtiene la cantidad de diapositivas que caben actualmente en el track visible
+        function getVisibleSlidesCount() {
+            const track = document.getElementById('hero-track');
+            const slides = track.querySelectorAll('.hero-slide');
+            if (!slides || slides.length === 0) return 1;
+            const trackWidth = track.clientWidth;
+            const slideWidth = slides[0].clientWidth;
+            return Math.max(1, Math.floor(trackWidth / slideWidth));
+        }
+
+        // Navegación automática (1 por 1)
         function nextHero() { goToHero(currentHeroIndex + 1); }
-        function prevHero() { goToHero(currentHeroIndex - 1); }
+        // Navegación manual por grupos
+        function nextHeroGroup() { goToHero(currentHeroIndex + getVisibleSlidesCount()); }
+        function prevHeroGroup() { goToHero(currentHeroIndex - getVisibleSlidesCount()); }
 
         function startHeroAutoplay() {
             stopHeroAutoplay();
-            heroAutoPlayInterval = setInterval(nextHero, 6000); 
+            heroAutoPlayInterval = setInterval(nextHero, 2500); // Modificado a 2.5s (2500ms)
         }
         function stopHeroAutoplay() {
             if (heroAutoPlayInterval) clearInterval(heroAutoPlayInterval);
@@ -1090,8 +1111,18 @@
             const pData = PricingEngine.calcular(p, 1);
             const priceContainer = document.getElementById('modal-price-container'); const badgesContainer = document.getElementById('modal-badges-container');
             badgesContainer.innerHTML = '';
-            if (pData.isActive) { badgesContainer.innerHTML = `<div class="bg-promo text-white px-3 py-1.5 text-xs font-bold uppercase rounded-lg shadow-sm flex items-center gap-1"><i class="fas fa-tag"></i> ${pData.badgeText}</div>`; priceContainer.innerHTML = `<div class="flex flex-col items-start justify-center gap-1 mb-1"><span class="text-muted line-through text-base font-semibold leading-none">${PricingEngine.format(pData.baseUnitario)}</span><span class="text-3xl font-extrabold text-dark block tracking-tight leading-none">${PricingEngine.format(pData.finalUnitario)}</span></div><div class="mt-2 inline-flex items-center bg-primary/10 px-2.5 py-1 rounded-lg text-primary text-xs font-bold">Ahorras ${PricingEngine.format(pData.savings)}</div>`; } 
-            else { priceContainer.innerHTML = `<span class="text-3xl font-extrabold text-dark tracking-tight leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`; }
+            
+            // CONDICION: Si el precio es cero o vacío no renderizar contenido
+            if (pData.finalUnitario > 0) {
+                if (pData.isActive) { 
+                    badgesContainer.innerHTML = `<div class="bg-promo text-white px-3 py-1.5 text-xs font-bold uppercase rounded-lg shadow-sm flex items-center gap-1"><i class="fas fa-tag"></i> ${pData.badgeText}</div>`; 
+                    priceContainer.innerHTML = `<div class="flex flex-col items-start justify-center gap-1 mb-1"><span class="text-muted line-through text-base font-semibold leading-none">${PricingEngine.format(pData.baseUnitario)}</span><span class="text-3xl font-extrabold text-dark block tracking-tight leading-none">${PricingEngine.format(pData.finalUnitario)}</span></div><div class="mt-2 inline-flex items-center bg-primary/10 px-2.5 py-1 rounded-lg text-primary text-xs font-bold">Ahorras ${PricingEngine.format(pData.savings)}</div>`; 
+                } else { 
+                    priceContainer.innerHTML = `<span class="text-3xl font-extrabold text-dark tracking-tight leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`; 
+                }
+            } else {
+                priceContainer.innerHTML = ''; // Ocultar bloque de precio completamente
+            }
 
             const ratingDisplay = document.getElementById('modal-rating-display');
             if (p.rating) { const finalRating = parseFloat(p.rating); const finalReviewCount = p.reviewCount !== undefined && p.reviewCount !== null && p.reviewCount !== "" ? parseInt(p.reviewCount) : Math.floor(Math.random() * 21) + 15; let starsHTML = ''; const fullStars = Math.floor(finalRating); const hasHalf = finalRating % 1 >= 0.4; for(let i=1; i<=5; i++){ if(i <= fullStars) starsHTML += `<i class="fas fa-star text-sm text-[#F59E0B]"></i>`; else if(i === fullStars + 1 && hasHalf) starsHTML += `<i class="fas fa-star-half-alt text-sm text-[#F59E0B]"></i>`; else starsHTML += `<i class="far fa-star text-sm text-[#E5E7EB]"></i>`; } ratingDisplay.innerHTML = `<div class="flex items-center gap-1">${starsHTML}</div><span class="text-dark font-bold text-sm ml-1">${finalRating.toFixed(1)}</span><span class="text-muted text-xs font-medium">(${finalReviewCount} valoraciones de clientes)</span>`; ratingDisplay.classList.remove('hidden'); ratingDisplay.classList.add('flex'); } 
