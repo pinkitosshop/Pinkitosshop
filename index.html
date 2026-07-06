@@ -8,6 +8,8 @@
     <script>
     // =====================================================================
     // 🔥 CONEXIÓN A FIREBASE (PRODUCCIÓN)
+    // NOTA DE SEGURIDAD: En aplicaciones cliente de Firebase, es seguro que esta configuración 
+    // sea pública. La seguridad real se maneja en las Reglas de Firestore en la consola de Firebase.
     // =====================================================================
     const firebaseConfig = {
       apiKey: "AIzaSyCDsFpMnAq6s8uiuXway3gpLUHjf1P0JtU",
@@ -392,10 +394,12 @@
     <div id="catalogo" class="section-fade pt-28 pb-16 min-h-screen">
         <section id="productos" class="max-w-7xl mx-auto px-4 md:px-6">
             <div class="mb-12 text-center md:text-left flex flex-col md:flex-row justify-between items-end gap-4 border-b border-border pb-6">
-                <div>
-                    <button onclick="goLobby()" class="text-muted hover:text-primary transition-colors text-sm font-bold mb-3 flex items-center gap-2"><i class="fas fa-arrow-left"></i> Volver al Lobby</button>
-                    <h2 id="catalog-section-title" class="font-bold text-3xl md:text-4xl text-dark tracking-tight capitalize">Catálogo</h2>
-                    <p class="text-muted font-medium text-sm mt-2" id="display-shop-slogan"></p>
+                <div class="w-full flex justify-between items-end">
+                    <div>
+                        <button onclick="goLobby()" class="text-muted hover:text-primary transition-colors text-sm font-bold mb-3 flex items-center gap-2"><i class="fas fa-arrow-left"></i> Volver al Lobby</button>
+                        <h2 id="catalog-section-title" class="font-bold text-3xl md:text-4xl text-dark tracking-tight capitalize">Catálogo</h2>
+                        <p class="text-muted font-medium text-sm mt-2" id="display-shop-slogan"></p>
+                    </div>
                 </div>
             </div>
             
@@ -549,11 +553,22 @@
                 }); 
                 renderGallery(); 
                 
+                // Lógica robusta de Deep Linking (Productos y Categorías)
                 if (!hasCheckedUrlParams && inventario.length > 0) { 
                     const p = new URLSearchParams(window.location.search); 
                     const pId = p.get('producto'); 
-                    if (pId && inventario.find(x => x.id === pId)) setTimeout(() => openModalById(pId), 400); 
-                    else window.history.pushState({}, '', window.location.pathname); 
+                    const pCat = p.get('categoria');
+
+                    if (pCat && (config.categories || []).includes(pCat)) {
+                        currentCategory = pCat;
+                        setTimeout(() => filterGallery(pCat), 100);
+                    }
+
+                    if (pId && inventario.find(x => x.id === pId)) {
+                        setTimeout(() => openModalById(pId), 400); 
+                    } else if (!pCat) {
+                        window.history.replaceState({}, '', window.location.pathname); 
+                    }
                     hasCheckedUrlParams = true; 
                 } 
             }, (e) => console.error(e)); 
@@ -1095,7 +1110,30 @@
         function goToCatalogTop() { showSection('catalogo', true); const s = document.getElementById('productos'); if (s) { const yOffset = -80; const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset; window.scrollTo({top: y, behavior: 'smooth'}); } else { window.scrollTo({top: 0, behavior: 'smooth'}); } }
         function showSection(id, noScroll = false) { document.querySelectorAll('.section-fade').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; }); const target = document.getElementById(id); if(target) { target.style.display = 'block'; setTimeout(() => target.classList.add('active'), 50); } if (id === 'inicio') { document.body.classList.add('lobby-mode'); } else { document.body.classList.remove('lobby-mode'); } if (!noScroll) window.scrollTo({top: 0, behavior: 'smooth'}); }
         function handleSearch(val) { showSection('catalogo', true); if(val!==undefined){ document.getElementById('live-search').value=val; const m=document.getElementById('mobile-live-search'); if(m)m.value=val; } renderGallery(); const t=(document.getElementById('live-search').value||"").toLowerCase(); if(t.length>0&&window.innerWidth>=768){ const s=document.getElementById('productos'); if(s) { const yOffset = -80; const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset; window.scrollTo({top: y, behavior: 'smooth'}); } } }
-        function filterGallery(c) { showSection('catalogo', true); currentCategory = c; renderFilters(); const g = document.getElementById('gallery-grid'); if(g) g.style.opacity = '0'; setTimeout(() => { renderGallery(); if(g) g.style.opacity = '1'; const s = document.getElementById('productos'); if (s) { const yOffset = -80; const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset; window.scrollTo({top: y, behavior: 'smooth'}); } }, 200); }
+        
+        // MODIFICADO: Sistema de filtro dinámico e historial
+        function filterGallery(c) { 
+            showSection('catalogo', true); 
+            currentCategory = c; 
+            renderFilters(); 
+            
+            // Actualizar la URL de forma limpia
+            const newUrl = c === 'all' ? window.location.pathname : `?categoria=${encodeURIComponent(c)}`;
+            window.history.pushState({ categoria: c }, '', newUrl);
+
+            const g = document.getElementById('gallery-grid'); 
+            if(g) g.style.opacity = '0'; 
+            setTimeout(() => { 
+                renderGallery(); 
+                if(g) g.style.opacity = '1'; 
+                const s = document.getElementById('productos'); 
+                if (s) { 
+                    const yOffset = -80; 
+                    const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset; 
+                    window.scrollTo({top: y, behavior: 'smooth'}); 
+                } 
+            }, 200); 
+        }
 
         function openModalById(id) {
             const p = inventario.find(x => x.id === id); if(!p) return;
@@ -1141,8 +1179,35 @@
             document.getElementById('product-modal').classList.add('active'); document.body.classList.add('overflow-hidden');
         }
 
-        function closeModal(e) { window.history.pushState({}, '', window.location.pathname); document.getElementById('product-modal').classList.remove('active'); document.body.classList.remove('overflow-hidden'); }
-        window.addEventListener('popstate', () => { const p = new URLSearchParams(window.location.search); const id = p.get('producto'); if(id) openModalById(id); else { document.getElementById('product-modal').classList.remove('active'); document.body.classList.remove('overflow-hidden'); } });
+        // MODIFICADO: Event listener de retroceso para las categorías en la URL
+        function closeModal(e) { 
+            const newUrl = currentCategory === 'all' ? window.location.pathname : `?categoria=${encodeURIComponent(currentCategory)}`;
+            window.history.pushState({ categoria: currentCategory }, '', newUrl);
+            document.getElementById('product-modal').classList.remove('active'); 
+            document.body.classList.remove('overflow-hidden'); 
+        }
+
+        window.addEventListener('popstate', () => { 
+            const p = new URLSearchParams(window.location.search); 
+            const id = p.get('producto'); 
+            const cat = p.get('categoria');
+
+            if(id) openModalById(id); 
+            else { 
+                document.getElementById('product-modal').classList.remove('active'); 
+                document.body.classList.remove('overflow-hidden'); 
+            }
+
+            if(cat && currentCategory !== cat) {
+                currentCategory = cat;
+                renderFilters();
+                renderGallery();
+            } else if (!cat && currentCategory !== 'all' && !id) {
+                currentCategory = 'all';
+                renderFilters();
+                renderGallery();
+            }
+        });
 
         function changeImage(d) { currentImageIndex += d; if (currentImageIndex >= currentModalImages.length) currentImageIndex = 0; if (currentImageIndex < 0) currentImageIndex = currentModalImages.length - 1; updateCarouselView(); }
         function updateCarouselView() { const img = document.getElementById('modal-img'); const l = document.getElementById('modal-img-loader'); img.style.opacity = 0; l.classList.remove('hidden'); const nImg = new Image(); nImg.src = currentModalImages[currentImageIndex]; nImg.onerror = () => { img.src = "https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Error"; l.classList.add('hidden'); img.style.opacity = 1; }; nImg.onload = () => { img.src = nImg.src; l.classList.add('hidden'); img.style.opacity = 1; }; const p = document.getElementById('btn-prev-img'), n = document.getElementById('btn-next-img'), dots = document.getElementById('carousel-dots'); if (currentModalImages.length > 1) { p.classList.remove('hidden'); n.classList.remove('hidden'); dots.innerHTML = currentModalImages.map((_, i) => `<span class="h-2 rounded-full transition-all duration-300 ${i === currentImageIndex ? 'bg-primary w-8' : 'bg-dark/20 w-2'}"></span>`).join(''); } else { p.classList.add('hidden'); n.classList.add('hidden'); dots.innerHTML = ''; } }
