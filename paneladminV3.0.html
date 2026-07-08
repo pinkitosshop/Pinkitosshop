@@ -268,8 +268,9 @@
                             <button onclick="clearPosCart()" class="text-promo text-xs font-bold hover:bg-promo hover:text-white bg-promo/10 px-3 py-1.5 rounded-lg transition-colors"><i class="fas fa-trash"></i> Limpiar</button>
                         </div>
                         
-                        <div class="mb-4">
+                        <div class="mb-4 flex flex-col gap-2">
                             <input type="text" id="pos-client-name" placeholder="Nombre del Cliente (Opcional)" class="admin-input rounded-xl bg-white">
+                            <input type="tel" id="pos-client-phone" placeholder="Número de Contacto (Opcional)" class="admin-input rounded-xl bg-white">
                         </div>
 
                         <div id="pos-cart-list" class="space-y-3 border-b border-border mb-4 pb-4 max-h-[300px] overflow-y-auto pr-2">
@@ -444,12 +445,21 @@
                                     <label class="text-xs font-bold text-dark mb-2 block" title="Stock por defecto es 0">Stock / Cantidad</label>
                                     <input type="number" id="new-stock" min="0" value="0" class="admin-input w-full bg-white">
                                 </div>
-                                <div class="flex items-center justify-between sm:justify-start gap-4 border-t sm:border-t-0 sm:border-l border-border pt-4 sm:pt-0 sm:pl-5 mt-2 sm:mt-0">
-                                    <span class="text-xs font-bold text-dark">Modo Preventa</span>
-                                    <label class="switch">
-                                        <input type="checkbox" id="toggle-presale">
-                                        <span class="slider"></span>
-                                    </label>
+                                <div class="flex flex-col gap-3 border-t sm:border-t-0 sm:border-l border-border pt-4 sm:pt-0 sm:pl-5 mt-2 sm:mt-0">
+                                    <div class="flex items-center justify-between sm:justify-start gap-4">
+                                        <span class="text-xs font-bold text-dark">Modo Preventa</span>
+                                        <label class="switch">
+                                            <input type="checkbox" id="toggle-presale">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center justify-between sm:justify-start gap-4" title="Mostrar alerta 'Poco Stock' (1-5 uds) en este producto">
+                                        <span class="text-xs font-bold text-accent">Alerta "Poco Stock"</span>
+                                        <label class="switch switch-accent">
+                                            <input type="checkbox" id="toggle-scarcity">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div id="release-date-container" class="border-t sm:border-t-0 sm:border-l border-border pt-4 sm:pt-0 sm:pl-5 mt-2 sm:mt-0 w-full sm:w-auto">
                                     <label class="text-xs font-bold text-dark block mb-2">Fecha Lanzamiento</label>
@@ -1104,6 +1114,7 @@
                     posCart = []; 
                     posEditingOrderId = null; 
                     document.getElementById('pos-client-name').value = ''; 
+                    document.getElementById('pos-client-phone').value = '';
                     document.getElementById('pos-ticket-title').innerText = 'Venta Nueva'; 
                     document.getElementById('pos-discount-type').value = 'none';
                     document.getElementById('pos-discount-input').value = '';
@@ -1222,6 +1233,7 @@
             for(let item of posCart) { const p = inventario.find(x => x.id === item.id); if(p && p.stock !== undefined && item.cantidad > p.stock) return DarkAlert.fire({icon: 'error', title: 'Stock Insuficiente', text: `Solo quedan ${p.stock} uds. de ${item.titulo}`}); }
 
             let client = document.getElementById('pos-client-name').value.trim() || 'Venta Mostrador';
+            let phone = document.getElementById('pos-client-phone').value.trim();
             
             // Obtenemos los cálculos actualizados del motor POS (con descuento manual)
             let totals = window._currentPosTotals || { subtotal: 0, impuesto: 0, descuentoManual: 0, total: 0 };
@@ -1230,6 +1242,7 @@
             const orderData = { 
                 idPedido: isEditing ? posCart._origIdPedido || docId : docId, 
                 cliente: client, 
+                telefono: phone,
                 items: posCart, 
                 subtotal: totals.subtotal, 
                 descuentoManual: totals.descuentoManual, 
@@ -1251,6 +1264,7 @@
                 posCart = []; 
                 posEditingOrderId = null; 
                 document.getElementById('pos-client-name').value = ''; 
+                document.getElementById('pos-client-phone').value = '';
                 document.getElementById('pos-ticket-title').innerText = 'Venta Nueva'; 
                 document.getElementById('pos-discount-type').value = 'none';
                 document.getElementById('pos-discount-input').value = '';
@@ -1272,6 +1286,7 @@
             posCart = pedido.items.map(item => { const prod = inventario.find(x => x.id === item.id); return { ...item, precio: item.precio || (prod ? prod.precio : (item.precioFinalAplicado ? String(item.precioFinalAplicado) : "0")), precioOriginal: item.precioOriginal || (prod ? prod.precioOriginal : null), taxable: item.taxable !== undefined ? item.taxable : (prod ? prod.taxable : !!config.taxEnabled), img: item.img || (prod && prod.imagenes && prod.imagenes.length > 0 ? prod.imagenes[0] : (prod ? prod.imagen : 'https://via.placeholder.com/100/FFFFFF/2C2421?text=Sin+Imagen')), sku: item.sku || (prod ? prod.sku : '') }; });
             posCart._origIdPedido = pedido.idPedido; 
             document.getElementById('pos-client-name').value = pedido.cliente || ''; 
+            document.getElementById('pos-client-phone').value = pedido.telefono || ''; 
             document.getElementById('pos-ticket-title').innerText = `Editando: ${pedido.idPedido || 'S/N'}`; 
             // Reiniciamos los inputs de descuento manual visuales
             document.getElementById('pos-discount-type').value = 'none';
@@ -1377,6 +1392,7 @@
             calcDiscount('compare');
             
             document.getElementById('new-release-date').value = p.fechaLanzamiento || ""; document.getElementById('toggle-presale').checked = !!p.isPresale;
+            document.getElementById('toggle-scarcity').checked = !!p.individualScarcity;
             document.getElementById('new-promo-type').value = p.promoType || 'normal'; document.getElementById('new-offer-start').value = p.ofertaInicio || ''; document.getElementById('new-offer-end').value = p.ofertaFin || '';
             document.getElementById('new-stock').value = p.stock !== undefined ? p.stock : 0; document.getElementById('toggle-taxable').checked = p.taxable !== undefined ? p.taxable : !!config.taxEnabled; document.getElementById('toggle-pinned').checked = !!p.isPinned; document.getElementById('toggle-measures').checked = !!p.hasMeasures; toggleMeasuresVisibility();
             
@@ -1393,7 +1409,7 @@
         function cancelEdit() {
             const wasEditing = !!editId; editId = null; document.getElementById('admin-form-container').classList.remove('editing-mode'); document.getElementById('btn-cancel-edit').classList.add('hidden');
             document.getElementById('admin-form-title').innerHTML = '<i class="fas fa-box-open text-primary"></i> Crear / Editar Producto';
-            document.getElementById('new-title').value = ""; document.getElementById('new-sku').value = ""; document.getElementById('new-price').value = ""; document.getElementById('new-desc').value = ""; document.getElementById('new-stock').value = "0"; document.getElementById('toggle-presale').checked = false; document.getElementById('new-price-compare').value = ""; document.getElementById('new-discount-percent').value = ""; document.getElementById('new-release-date').value = ""; document.getElementById('new-promo-type').value = 'normal'; document.getElementById('new-offer-start').value = ''; document.getElementById('new-offer-end').value = ''; document.getElementById('toggle-taxable').checked = !!config.taxEnabled; document.getElementById('toggle-pinned').checked = false; document.getElementById('toggle-measures').checked = true; toggleMeasuresVisibility();
+            document.getElementById('new-title').value = ""; document.getElementById('new-sku').value = ""; document.getElementById('new-price').value = ""; document.getElementById('new-desc').value = ""; document.getElementById('new-stock').value = "0"; document.getElementById('toggle-presale').checked = false; document.getElementById('toggle-scarcity').checked = false; document.getElementById('new-price-compare').value = ""; document.getElementById('new-discount-percent').value = ""; document.getElementById('new-release-date').value = ""; document.getElementById('new-promo-type').value = 'normal'; document.getElementById('new-offer-start').value = ''; document.getElementById('new-offer-end').value = ''; document.getElementById('toggle-taxable').checked = !!config.taxEnabled; document.getElementById('toggle-pinned').checked = false; document.getElementById('toggle-measures').checked = true; toggleMeasuresVisibility();
             document.getElementById('new-rating').value = ""; document.getElementById('new-review-count').value = "";
             selectedBase64Imgs = []; renderThumbnails(); currentFormSizes = ["Pequeño", "Mediano", "Grande"]; currentFormColumns = ["Medida"]; renderMedidasForm();
             if (wasEditing) showAdminTab('inventario');
@@ -1433,7 +1449,7 @@
                     precio: finalPrice, precioOriginal: finalComparePrice, fechaLanzamiento: document.getElementById('new-release-date').value || null, 
                     promoType: document.getElementById('new-promo-type').value, ofertaInicio: document.getElementById('new-offer-start').value || null, 
                     ofertaFin: document.getElementById('new-offer-end').value || null, stock: parseInt(document.getElementById('new-stock').value) || 0, 
-                    isPresale: document.getElementById('toggle-presale').checked, taxable: document.getElementById('toggle-taxable').checked, 
+                    isPresale: document.getElementById('toggle-presale').checked, individualScarcity: document.getElementById('toggle-scarcity').checked, taxable: document.getElementById('toggle-taxable').checked, 
                     isPinned: document.getElementById('toggle-pinned').checked, hasMeasures, tallas, medidas, columnas: currentFormColumns, 
                     imagen: imageUrls[0] || "", imagenes: imageUrls || [],
                     rating: parseFloat(document.getElementById('new-rating').value) || null,
