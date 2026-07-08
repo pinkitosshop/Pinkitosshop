@@ -557,7 +557,9 @@
                     if (pId && inventario.find(x => x.id === pId)) {
                         setTimeout(() => openModalById(pId), 400); 
                     } else if (pCat) { 
-                        const catSafe = (pCat === 'all' || (config.categories && config.categories.includes(pCat))) ? pCat : 'all';
+                        // MODIFICACIÓN QUIRÚRGICA: Evitamos depender del asincronismo de config.categories.
+                        // Ahora aceptamos la categoría directamente de la URL evitando el fallo de enrutamiento a "all".
+                        const catSafe = pCat; 
                         setTimeout(() => filterGallery(catSafe), 400);
                     } else { 
                         window.history.pushState({}, '', window.location.pathname); 
@@ -665,9 +667,13 @@
                             priceHtml = `<div class="flex flex-col items-start leading-none gap-0.5"><span class="text-muted line-through text-xs font-semibold">${PricingEngine.format(pData.baseUnitario)}</span><span class="text-promo font-extrabold text-lg md:text-xl leading-none mt-1">${PricingEngine.format(pData.finalUnitario)}</span></div>`;
                         }
                     }
-                    if (config.globalScarcityActivo && prod.stock > 0 && prod.stock <= 5) {
+                    
+                    // MODIFICACIÓN QUIRÚRGICA: Lógica combinada para Alerta "Poco Stock" evaluando individualScarcity 
+                    const showScarcityAlert = (config.globalScarcityActivo || prod.individualScarcity) && prod.stock > 0 && prod.stock <= 5;
+                    if (showScarcityAlert) {
                         badgesHTML += `<div class="bg-promo/15 text-promo border border-promo/20 px-2 py-0.5 text-[9px] font-extrabold uppercase rounded shadow-sm w-max tracking-wider animate-pulse"><i class="fas fa-bolt"></i> ¡Solo quedan ${prod.stock}!</div>`;
                     }
+
                     if (prod.favCount && prod.favCount >= 10) {
                         badgesHTML += `<div class="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-[9px] font-extrabold uppercase rounded shadow-sm w-max tracking-wider"><i class="fas fa-heart text-promo"></i> Popular</div>`;
                     }
@@ -1185,12 +1191,12 @@
                 document.getElementById('product-modal').classList.remove('active'); 
                 document.body.classList.remove('overflow-hidden'); 
                 
-                if(cat && (cat === 'all' || (config.categories && config.categories.includes(cat)))) { 
-                    currentCategory = cat; 
-                    renderFilters(); 
-                    renderGallery(); 
-                    showSection('catalogo', true); 
-                } 
+                // MODIFICACIÓN QUIRÚRGICA: Lógica simple e inteligente para restaurar el filtro al volver atrás
+                const targetCat = cat || 'all';
+                currentCategory = targetCat; 
+                renderFilters(); 
+                renderGallery(); 
+                showSection('catalogo', true); 
             } 
         });
 
