@@ -281,8 +281,26 @@
                                 <span>Subtotal</span>
                                 <span id="pos-subtotal-display">0.00</span>
                             </div>
+                            <!-- INICIO MEJORA: UI Descuento Manual POS -->
+                            <div class="flex justify-between items-center mb-2 text-sm text-muted font-semibold">
+                                <span>Desc. Manual</span>
+                                <div class="flex items-center gap-1">
+                                    <select id="pos-discount-type" onchange="renderPosCart()" class="bg-light border border-border text-xs rounded px-1 py-0.5 outline-none focus:border-primary">
+                                        <option value="none">No</option>
+                                        <option value="percent">%</option>
+                                        <option value="fixed">$</option>
+                                    </select>
+                                    <input type="number" id="pos-discount-input" oninput="renderPosCart()" placeholder="0" min="0" step="0.01" class="bg-light border border-border text-xs rounded px-2 py-0.5 w-16 text-right outline-none focus:border-primary disabled:opacity-50" disabled>
+                                </div>
+                            </div>
+                            <div id="pos-manual-discount-row" class="flex justify-between items-center mb-2 text-sm text-promo font-bold hidden">
+                                <span>Descuento Aplicado</span>
+                                <span id="pos-manual-discount-display">- 0.00</span>
+                            </div>
+                            <!-- FIN MEJORA: UI Descuento Manual POS -->
+
                             <div id="pos-savings-row" class="flex justify-between items-center mb-2 text-sm text-primary font-bold hidden">
-                                <span>Ahorro</span>
+                                <span>Ahorro Ofertas</span>
                                 <span id="pos-savings-display">- 0.00</span>
                             </div>
                             <div id="pos-tax-row" class="flex justify-between items-center mb-2 text-sm text-muted font-semibold hidden">
@@ -511,7 +529,6 @@
                                 </div>
                             </div>
 
-                            <!-- MEJORA CRO: Integración de Reseñas / Calificación para Social Proof -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 bg-white p-5 border border-border rounded-2xl shadow-sm">
                                 <div>
                                     <label class="text-xs font-bold text-muted mb-2 block"><i class="fas fa-star text-[#F59E0B]"></i> Calificación Mostrada (1.0 - 5.0)</label>
@@ -582,7 +599,6 @@
                     </div>
                 </div>
                 
-                <!-- GESTIÓN DE CATEGORÍAS MODIFICADA -->
                 <div class="bg-white p-8 border border-border rounded-3xl mt-10 shadow-soft">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                         <h3 class="text-dark text-xl font-bold flex items-center gap-2"><i class="fas fa-tags text-primary"></i> Gestión de Categorías</h3>
@@ -680,7 +696,6 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN APARIENCIA MEJORADA -->
                 <div class="bg-white p-8 border border-border rounded-3xl shadow-soft">
                     <h3 class="text-dark text-xl font-bold mb-8 border-b border-border pb-4 flex items-center gap-2"><i class="fas fa-paint-brush text-primary"></i> Apariencia de la Tienda (Logo y Banners)</h3>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -716,7 +731,7 @@
                                 <div id="logo-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20"><div class="loader !block"></div></div>
                             </div>
                             
-                            <!-- Banners Upload Múltiple + Enlaces -->
+                            <!-- Banners Upload Múltiple -->
                             <div class="flex-1 flex flex-col gap-3">
                                 <div class="flex flex-col justify-center items-center border-2 border-dashed border-border rounded-2xl p-4 hover:border-primary transition-colors cursor-pointer relative bg-white" onclick="document.getElementById('new-hero-img').click()">
                                     <input type="file" id="new-hero-img" class="hidden" accept="image/png, image/jpeg, image/webp" multiple onchange="compressHeroImage(this)">
@@ -727,7 +742,6 @@
                                     </div>
                                     <div id="hero-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20"><div class="loader !block"></div></div>
                                 </div>
-                                <!-- Thumbnails Container con inputs de Enlace REFACTORIZADO A GRID -->
                                 <div id="hero-thumbnails-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 bg-light/30 p-3 rounded-xl border border-border min-h-[90px] content-start shadow-inner">
                                     <p class="text-xs col-span-full text-muted w-full text-center mt-2 font-medium">Aún no hay banners configurados</p>
                                 </div>
@@ -1007,6 +1021,7 @@
             }
         }
 
+        // INICIO MEJORA: Refactorización Tarjetas POS para solucionar bug de imágenes deformadas
         function _createPosCard(p, isGrid) {
             const img = p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen || 'https://via.placeholder.com/150/FFFFFF/2C2421?text=Sin+Imagen');
             const isOut = p.stock !== undefined && p.stock <= 0;
@@ -1027,9 +1042,9 @@
 
             if(isGrid) {
                 return `
-                <div class="bg-white border border-border rounded-2xl overflow-hidden cursor-pointer hover:shadow-soft hover:border-primary/40 transition-all flex flex-col" onclick="${clickAction}">
-                    <div class="aspect-square relative bg-white shrink-0 p-2">
-                        <img src="${img}" class="w-full h-full object-contain drop-shadow-sm">
+                <div class="bg-white border border-border rounded-2xl overflow-hidden cursor-pointer hover:shadow-soft hover:border-primary/40 transition-all flex flex-col h-full" onclick="${clickAction}">
+                    <div class="w-full aspect-square relative bg-white shrink-0 p-3 flex items-center justify-center">
+                        <img src="${img}" class="max-w-full max-h-full object-contain drop-shadow-sm">
                         ${overlayBadges}
                     </div>
                     <div class="p-3 border-t border-border flex flex-col justify-between flex-1 min-w-0 bg-white">
@@ -1044,8 +1059,8 @@
                 let listOverlayBadges = isOut ? '<div class="absolute inset-0 bg-white/20 flex items-center justify-center z-10"><span class="bg-dark/80 backdrop-blur-md text-white text-[8px] px-2 py-1 uppercase font-bold rounded shadow-md border border-white/20">Agotado</span></div>' : '';
                 return `
                 <div class="flex items-center gap-4 bg-white border border-border p-3 rounded-2xl cursor-pointer hover:shadow-soft hover:border-primary/40 transition-all" onclick="${clickAction}">
-                    <div class="w-16 h-16 bg-white rounded-xl overflow-hidden shrink-0 relative p-1 border border-border">
-                        <img src="${img}" class="w-full h-full object-contain drop-shadow-sm">
+                    <div class="w-16 h-16 min-w-[64px] min-h-[64px] bg-white rounded-xl overflow-hidden shrink-0 relative p-1 border border-border flex items-center justify-center">
+                        <img src="${img}" class="max-w-full max-h-full object-contain drop-shadow-sm">
                         ${listOverlayBadges}
                     </div>
                     <div class="flex-1 min-w-0">
@@ -1062,6 +1077,7 @@
                 </div>`;
             }
         }
+        // FIN MEJORA: Tarjetas POS
 
         function openPosSizeSelector(id) {
             const p = inventario.find(x => x.id === id); if(!p) return;
@@ -1081,11 +1097,53 @@
         }
 
         function updatePosQty(idx, delta) { posCart[idx].cantidad += delta; if(posCart[idx].cantidad <= 0) posCart.splice(idx, 1); renderPosCart(); }
-        function clearPosCart() { DarkAlert.fire({ title: '¿Limpiar ticket?', text: "Se borrarán los artículos", icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, limpiar' }).then((r) => { if (r.isConfirmed) { posCart = []; posEditingOrderId = null; document.getElementById('pos-client-name').value = ''; document.getElementById('pos-ticket-title').innerText = 'Venta Nueva'; renderPosCart(); }}); }
+        
+        function clearPosCart() { 
+            DarkAlert.fire({ title: '¿Limpiar ticket?', text: "Se borrarán los artículos", icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, limpiar' }).then((r) => { 
+                if (r.isConfirmed) { 
+                    posCart = []; 
+                    posEditingOrderId = null; 
+                    document.getElementById('pos-client-name').value = ''; 
+                    document.getElementById('pos-ticket-title').innerText = 'Venta Nueva'; 
+                    document.getElementById('pos-discount-type').value = 'none';
+                    document.getElementById('pos-discount-input').value = '';
+                    renderPosCart(); 
+                }
+            }); 
+        }
 
+        // INICIO MEJORA: Lógica de Motor de cálculo y Descuento Manual POS
         function renderPosCart() {
-            const list = document.getElementById('pos-cart-list'); const displayTotal = document.getElementById('pos-total-display'); const displaySub = document.getElementById('pos-subtotal-display'); const taxRow = document.getElementById('pos-tax-row'); const displayTax = document.getElementById('pos-tax-display'); const savingsRow = document.getElementById('pos-savings-row'); const displaySavings = document.getElementById('pos-savings-display');
-            if(posCart.length === 0) { list.innerHTML = `<div class="text-center py-10 text-muted text-sm font-semibold">Carrito vacío</div>`; displayTotal.innerText = `${config.currency||'$'}0.00`; displaySub.innerText = `0.00`; taxRow.classList.add('hidden'); savingsRow.classList.add('hidden'); return; }
+            const list = document.getElementById('pos-cart-list'); 
+            const displayTotal = document.getElementById('pos-total-display'); 
+            const displaySub = document.getElementById('pos-subtotal-display'); 
+            const taxRow = document.getElementById('pos-tax-row'); 
+            const displayTax = document.getElementById('pos-tax-display'); 
+            const savingsRow = document.getElementById('pos-savings-row'); 
+            const displaySavings = document.getElementById('pos-savings-display');
+            
+            // DOM para descuento custom
+            const discountTypeEl = document.getElementById('pos-discount-type');
+            const discountInputEl = document.getElementById('pos-discount-input');
+            const manualDiscountRow = document.getElementById('pos-manual-discount-row');
+            const displayManualDiscount = document.getElementById('pos-manual-discount-display');
+
+            // Habilitar / Deshabilitar input según tipo
+            if (discountTypeEl.value === 'none') {
+                discountInputEl.disabled = true;
+            } else {
+                discountInputEl.disabled = false;
+            }
+
+            if(posCart.length === 0) { 
+                list.innerHTML = `<div class="text-center py-10 text-muted text-sm font-semibold">Carrito vacío</div>`; 
+                displayTotal.innerText = `${config.currency||'$'}0.00`; 
+                displaySub.innerText = `0.00`; 
+                taxRow.classList.add('hidden'); 
+                savingsRow.classList.add('hidden'); 
+                manualDiscountRow.classList.add('hidden');
+                return; 
+            }
             
             let subtotal = 0; let totalImpuesto = 0; let totalAhorro = 0;
             list.innerHTML = posCart.map((item, index) => {
@@ -1117,23 +1175,69 @@
                 </div>`;
             }).join('');
 
-            const finalTotal = subtotal + totalImpuesto;
-            displaySub.innerText = `${config.currency||'$'}${subtotal.toFixed(2)}`; displayTotal.innerText = `${config.currency||'$'}${finalTotal.toFixed(2)}`;
+            // Cálculos del Descuento Manual Extra 
+            let manualDiscountAmt = 0;
+            if (discountTypeEl.value !== 'none') {
+                const val = parseFloat(discountInputEl.value) || 0;
+                if (discountTypeEl.value === 'percent') {
+                    manualDiscountAmt = subtotal * (val / 100);
+                } else if (discountTypeEl.value === 'fixed') {
+                    manualDiscountAmt = val;
+                }
+            }
+            // Proteger contra descuentos que excedan el subtotal
+            if (manualDiscountAmt > subtotal) manualDiscountAmt = subtotal;
+
+            // Ajuste proporcional del impuesto (Se asume que el descuento baja la base imponible)
+            let discountProportion = subtotal > 0 ? (manualDiscountAmt / subtotal) : 0;
+            let finalImpuesto = totalImpuesto - (totalImpuesto * discountProportion);
+            let finalTotal = (subtotal - manualDiscountAmt) + finalImpuesto;
+
+            displaySub.innerText = `${config.currency||'$'}${subtotal.toFixed(2)}`; 
+            displayTotal.innerText = `${config.currency||'$'}${finalTotal.toFixed(2)}`;
+            
+            // Actualización de la UI para el Descuento Manual
+            if (manualDiscountAmt > 0) { 
+                manualDiscountRow.classList.remove('hidden'); 
+                displayManualDiscount.innerText = `- ${config.currency||'$'}${manualDiscountAmt.toFixed(2)}`; 
+            } else { 
+                manualDiscountRow.classList.add('hidden'); 
+            }
+
             if (totalAhorro > 0) { savingsRow.classList.remove('hidden'); displaySavings.innerText = `- ${config.currency||'$'}${totalAhorro.toFixed(2)}`; } else { savingsRow.classList.add('hidden'); }
-            if (totalImpuesto > 0) { taxRow.classList.remove('hidden'); displayTax.innerText = `${config.currency||'$'}${totalImpuesto.toFixed(2)}`; } else { taxRow.classList.add('hidden'); }
+            if (finalImpuesto > 0) { taxRow.classList.remove('hidden'); displayTax.innerText = `${config.currency||'$'}${finalImpuesto.toFixed(2)}`; } else { taxRow.classList.add('hidden'); }
+
+            // Guardar totales temporales para savePosOrder
+            window._currentPosTotals = {
+                subtotal: subtotal,
+                descuentoManual: manualDiscountAmt,
+                impuesto: finalImpuesto,
+                total: finalTotal
+            };
         }
+        // FIN MEJORA: Lógica de Motor de cálculo
 
         function savePosOrder(targetStatus) {
             if(posCart.length === 0) return Toast.fire({icon:'error', title:'Carrito vacío'});
             for(let item of posCart) { const p = inventario.find(x => x.id === item.id); if(p && p.stock !== undefined && item.cantidad > p.stock) return DarkAlert.fire({icon: 'error', title: 'Stock Insuficiente', text: `Solo quedan ${p.stock} uds. de ${item.titulo}`}); }
 
             let client = document.getElementById('pos-client-name').value.trim() || 'Venta Mostrador';
-            let subtotal = 0; let impuesto = 0;
-            posCart.forEach(item => { const itemSub = (parseFloat(String(item.precio||"0").replace(/[^0-9.-]+/g,""))||0) * item.cantidad; subtotal += itemSub; if(item.taxable && config.taxEnabled) impuesto += itemSub * ((parseFloat(config.taxRate)||0) / 100); });
-            let total = subtotal + impuesto;
+            
+            // Obtenemos los cálculos actualizados del motor POS (con descuento manual)
+            let totals = window._currentPosTotals || { subtotal: 0, impuesto: 0, descuentoManual: 0, total: 0 };
             
             const isEditing = !!posEditingOrderId; const docId = isEditing ? posEditingOrderId : `PK-POS-${Math.floor(1000 + Math.random() * 9000)}`;
-            const orderData = { idPedido: isEditing ? posCart._origIdPedido || docId : docId, cliente: client, items: posCart, subtotal: subtotal, impuesto: impuesto, total: total, estado: targetStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+            const orderData = { 
+                idPedido: isEditing ? posCart._origIdPedido || docId : docId, 
+                cliente: client, 
+                items: posCart, 
+                subtotal: totals.subtotal, 
+                descuentoManual: totals.descuentoManual, 
+                impuesto: totals.impuesto, 
+                total: totals.total, 
+                estado: targetStatus, 
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
+            };
             if(!isEditing) orderData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
             if(targetStatus === 'despachado') orderData.despachadoAt = firebase.firestore.FieldValue.serverTimestamp();
 
@@ -1142,7 +1246,15 @@
             processOrder.then(async () => {
                 if(targetStatus === 'despachado') await procesarStockParaDespacho(posCart); 
                 Toast.fire({ icon: 'success', title: targetStatus === 'despachado' ? 'Venta Cobrada' : 'Pedido Guardado' });
-                posCart = []; posEditingOrderId = null; document.getElementById('pos-client-name').value = ''; document.getElementById('pos-ticket-title').innerText = 'Venta Nueva'; renderPosCart();
+                
+                // Reiniciar el POS tras compra exitosa
+                posCart = []; 
+                posEditingOrderId = null; 
+                document.getElementById('pos-client-name').value = ''; 
+                document.getElementById('pos-ticket-title').innerText = 'Venta Nueva'; 
+                document.getElementById('pos-discount-type').value = 'none';
+                document.getElementById('pos-discount-input').value = '';
+                renderPosCart();
             }).catch(e => DarkAlert.fire({ icon: 'error', title: 'Error', text: e.message }));
         }
 
@@ -1158,7 +1270,13 @@
             const pedido = pedidosList.find(p => p.id === docId); if(!pedido) return;
             posEditingOrderId = docId; 
             posCart = pedido.items.map(item => { const prod = inventario.find(x => x.id === item.id); return { ...item, precio: item.precio || (prod ? prod.precio : (item.precioFinalAplicado ? String(item.precioFinalAplicado) : "0")), precioOriginal: item.precioOriginal || (prod ? prod.precioOriginal : null), taxable: item.taxable !== undefined ? item.taxable : (prod ? prod.taxable : !!config.taxEnabled), img: item.img || (prod && prod.imagenes && prod.imagenes.length > 0 ? prod.imagenes[0] : (prod ? prod.imagen : 'https://via.placeholder.com/100/FFFFFF/2C2421?text=Sin+Imagen')), sku: item.sku || (prod ? prod.sku : '') }; });
-            posCart._origIdPedido = pedido.idPedido; document.getElementById('pos-client-name').value = pedido.cliente || ''; document.getElementById('pos-ticket-title').innerText = `Editando: ${pedido.idPedido || 'S/N'}`; showAdminTab('pos'); renderPosCart();
+            posCart._origIdPedido = pedido.idPedido; 
+            document.getElementById('pos-client-name').value = pedido.cliente || ''; 
+            document.getElementById('pos-ticket-title').innerText = `Editando: ${pedido.idPedido || 'S/N'}`; 
+            // Reiniciamos los inputs de descuento manual visuales
+            document.getElementById('pos-discount-type').value = 'none';
+            document.getElementById('pos-discount-input').value = '';
+            showAdminTab('pos'); renderPosCart();
         }
 
         // =====================================================================
@@ -1471,6 +1589,7 @@
         // =====================================================================
         function changePedPage(dir) { pedCurrentPage += dir; renderPedidosList(); }
 
+        // INICIO MEJORA: Visibilidad del número de teléfono en los Pedidos Entrantes
         function renderPedidosList() {
             const list = document.getElementById('admin-pedidos-list'); const badge = document.getElementById('badge-pedidos');
             const pedidosPendientes = pedidosList.filter(p => p.estado !== 'despachado');
@@ -1483,9 +1602,18 @@
 
             list.innerHTML = slice.map(pedido => {
                 const dateStr = (pedido.createdAt && typeof pedido.createdAt.toDate === 'function') ? new Date(pedido.createdAt.toDate()).toLocaleString() : 'Nuevo / Pendiente';
-                // XSS Protection Implementada
+                
+                // Sanitización estricta por seguridad
                 const safeCliente = escapeHTML(pedido.cliente);
                 const safeMensaje = escapeHTML(pedido.mensaje);
+                const safeTelefono = escapeHTML(pedido.telefono || '');
+                
+                // Formatear el HTML para mostrar el teléfono
+                let telefonoHtml = '';
+                if (safeTelefono) {
+                    const cleanPhone = safeTelefono.replace(/\D/g, ''); // Remueve cualquier caracter que no sea número para el link
+                    telefonoHtml = `<p class="text-muted text-sm font-semibold mt-1.5"><i class="fas fa-phone-alt text-[#25D366] w-5 text-center mr-1"></i><a href="https://wa.me/${cleanPhone}" target="_blank" class="hover:text-[#25D366] hover:underline transition-colors">${safeTelefono}</a></p>`;
+                }
 
                 return `
                 <div class="bg-white border border-border rounded-3xl shadow-soft relative p-6">
@@ -1494,7 +1622,8 @@
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5 ml-4">
                         <div>
                             <h4 class="text-dark text-lg font-bold">PEDIDO: ${pedido.idPedido || 'S/N'}</h4>
-                            <p class="text-muted text-sm font-semibold mt-1"><i class="fas fa-user text-primary mr-2"></i>${safeCliente}</p>
+                            <p class="text-muted text-sm font-semibold mt-1"><i class="fas fa-user text-primary w-5 text-center mr-1"></i>${safeCliente}</p>
+                            ${telefonoHtml}
                         </div>
                         <div class="text-left sm:text-right w-full sm:w-auto">
                             <span class="text-xs text-muted font-bold block"><i class="fas fa-clock text-promo mr-1"></i> ${dateStr}</span>
@@ -1537,6 +1666,7 @@
                 </div>`
             }).join('');
         }
+        // FIN MEJORA: Visibilidad de teléfono
 
         async function marcarPendiente(docId) {
             const pedido = pedidosList.find(p => p.id === docId); if(!pedido) return;
