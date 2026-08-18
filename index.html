@@ -557,8 +557,6 @@
                     if (pId && inventario.find(x => x.id === pId)) {
                         setTimeout(() => openModalById(pId), 400); 
                     } else if (pCat) { 
-                        // MODIFICACIÓN QUIRÚRGICA: Evitamos depender del asincronismo de config.categories.
-                        // Ahora aceptamos la categoría directamente de la URL evitando el fallo de enrutamiento a "all".
                         const catSafe = pCat; 
                         setTimeout(() => filterGallery(catSafe), 400);
                     } else { 
@@ -644,7 +642,6 @@
                 
                 let btnQuickAddHTML = ''; let badgesHTML = '';
                 
-                // CONDICION: Si el precio es cero o vacío no renderizar contenido
                 let priceHtml = '';
                 if (pData.finalUnitario > 0) {
                     priceHtml = `<span class="text-dark font-extrabold text-lg md:text-xl truncate leading-none">${PricingEngine.format(pData.finalUnitario)}</span>`;
@@ -656,7 +653,8 @@
                     badgesHTML += `<div class="bg-accent text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider"><i class="fas fa-clock"></i> Pronto</div>`;
                     btnQuickAddHTML = `<button disabled class="bg-light text-muted w-9 h-9 rounded-xl flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-clock"></i></button>`;
                 } else if (isOut) {
-                    badgesHTML += `<div class="bg-promo text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider">Agotado</div>`;
+                    // CAMBIO IMPLEMENTADO: bg-dark opacity-80 para diferenciarse de los descuentos.
+                    badgesHTML += `<div class="bg-dark opacity-80 text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider">Agotado</div>`;
                     btnQuickAddHTML = `<button disabled class="bg-light text-muted w-9 h-9 rounded-xl flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-ban"></i></button>`;
                 } else {
                     btnQuickAddHTML = `<button onclick="quickAdd('${prod.id}', event)" class="bg-primary text-white w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#A6763A] hover:scale-105 active:scale-95 shadow-md hover:shadow-lg transition-all duration-300 z-20"><i class="fas fa-shopping-bag text-sm"></i></button>`;
@@ -668,7 +666,6 @@
                         }
                     }
                     
-                    // MODIFICACIÓN QUIRÚRGICA: Lógica combinada para Alerta "Poco Stock" evaluando individualScarcity 
                     const showScarcityAlert = (config.globalScarcityActivo || prod.individualScarcity) && prod.stock > 0 && prod.stock <= 5;
                     if (showScarcityAlert) {
                         badgesHTML += `<div class="bg-promo/15 text-promo border border-promo/20 px-2 py-0.5 text-[9px] font-extrabold uppercase rounded shadow-sm w-max tracking-wider animate-pulse"><i class="fas fa-bolt"></i> ¡Solo quedan ${prod.stock}!</div>`;
@@ -744,7 +741,6 @@
                 return;
             }
 
-            // Alinear al centro automáticamente si solo hay 1 o 2 imágenes
             const alignClass = heroImagesArray.length <= 2 ? 'md:justify-center' : '';
             track.className = `flex w-full h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth gap-4 px-2 md:px-0 ${alignClass}`;
 
@@ -764,7 +760,6 @@
                     <div class="absolute inset-0 bg-black/5 z-0 pointer-events-none rounded-3xl"></div>
                 `;
 
-                // Target _self para no perder la instancia del cliente al retroceder
                 if (isClickable) {
                     return `<a href="${link}" target="_self" class="hero-slide flex-shrink-0 relative h-full w-[90%] md:w-auto max-w-full snap-center overflow-hidden group block rounded-3xl bg-white shadow-soft">${innerContent}</a>`;
                 } else {
@@ -811,7 +806,6 @@
             resetHeroAutoplay();
         }
 
-        // Obtiene la cantidad de diapositivas que caben actualmente en el track visible
         function getVisibleSlidesCount() {
             const track = document.getElementById('hero-track');
             const slides = track.querySelectorAll('.hero-slide');
@@ -821,22 +815,13 @@
             return Math.max(1, Math.floor(trackWidth / slideWidth));
         }
 
-        // Navegación automática (1 por 1)
         function nextHero() { goToHero(currentHeroIndex + 1); }
-        // Navegación manual por grupos
         function nextHeroGroup() { goToHero(currentHeroIndex + getVisibleSlidesCount()); }
         function prevHeroGroup() { goToHero(currentHeroIndex - getVisibleSlidesCount()); }
 
-        function startHeroAutoplay() {
-            stopHeroAutoplay();
-            heroAutoPlayInterval = setInterval(nextHero, 2500); // Modificado a 2.5s (2500ms)
-        }
-        function stopHeroAutoplay() {
-            if (heroAutoPlayInterval) clearInterval(heroAutoPlayInterval);
-        }
-        function resetHeroAutoplay() {
-            if (heroImagesArray.length > 1) startHeroAutoplay();
-        }
+        function startHeroAutoplay() { stopHeroAutoplay(); heroAutoPlayInterval = setInterval(nextHero, 2500); }
+        function stopHeroAutoplay() { if (heroAutoPlayInterval) clearInterval(heroAutoPlayInterval); }
+        function resetHeroAutoplay() { if (heroImagesArray.length > 1) startHeroAutoplay(); }
 
         // =====================================================================
         // 🔄 APPLY CONFIG (MODIFICADO)
@@ -1168,9 +1153,14 @@
             const btnAddCart = document.getElementById('btn-add-cart'); const msgDisabled = document.getElementById('modal-disabled-msg'); const qtyContainer = document.getElementById('modal-quantity-container'); const badge = document.getElementById('modal-status-badge');
             badge.className = 'px-3 py-1 text-[10px] font-bold uppercase rounded-full hidden';
             
-            if (esPreventaActiva(p)) { badge.classList.remove('hidden'); badge.classList.add('bg-accent/10', 'text-accent'); badge.innerHTML = p.fechaLanzamiento ? `Próximamente: ${p.fechaLanzamiento}` : `Próximamente`; btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "No disponible aún"; } 
-            else if (p.stock !== undefined && p.stock <= 0) { badge.classList.remove('hidden'); badge.classList.add('bg-promo', 'text-white'); badge.innerText = "Agotado"; btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "Fuera de Stock"; } 
-            else { btnAddCart.classList.remove('hidden'); msgDisabled.classList.add('hidden'); qtyContainer.classList.remove('hidden'); qtyContainer.classList.add('flex'); }
+            if (esPreventaActiva(p)) { 
+                badge.classList.remove('hidden'); badge.classList.add('bg-accent/10', 'text-accent'); badge.innerHTML = p.fechaLanzamiento ? `Próximamente: ${p.fechaLanzamiento}` : `Próximamente`; btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "No disponible aún"; 
+            } else if (p.stock !== undefined && p.stock <= 0) { 
+                // CAMBIO IMPLEMENTADO: bg-dark opacity-80 para diferenciarse de los descuentos en el Modal.
+                badge.classList.remove('hidden'); badge.classList.remove('bg-promo'); badge.classList.add('bg-dark', 'text-white', 'opacity-80'); badge.innerText = "Agotado"; btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "Fuera de Stock"; 
+            } else { 
+                btnAddCart.classList.remove('hidden'); msgDisabled.classList.add('hidden'); qtyContainer.classList.remove('hidden'); qtyContainer.classList.add('flex'); 
+            }
             
             const measuresC = document.getElementById('modal-measures-container'); const tallaC = document.getElementById('modal-talla-select-container');
             if(p.hasMeasures && p.tallas && p.tallas.length > 0) { measuresC.classList.remove('hidden'); const cols = p.columnas && p.columnas.length > 0 ? p.columnas : ['Medida']; document.getElementById('modal-measures-head').innerHTML = `<th class="py-3 px-2 w-16">Tipo</th>` + cols.map(c => `<th class="py-3 px-2 text-center whitespace-nowrap">${c}</th>`).join(''); document.getElementById('modal-measures-body').innerHTML = p.tallas.map(t => { const m = p.medidas && p.medidas[t] ? p.medidas[t] : {}; const tds = cols.map(c => { const val = m[c] !== undefined && m[c] !== "" ? m[c] : (m[c.toLowerCase()] !== undefined && m[c.toLowerCase()] !== "" ? m[c.toLowerCase()] : '-'); return `<td class="py-3 px-2 text-center text-muted font-semibold whitespace-nowrap">${val}</td>`; }).join(''); return `<tr class="hover:bg-light transition-colors"><td class="py-3 px-2 text-dark font-bold whitespace-nowrap">${t}</td>${tds}</tr>`; }).join(''); tallaC.classList.remove('hidden'); document.getElementById('modal-talla').innerHTML = '<option value="" disabled selected>Elige un tamaño/tipo...</option>' + p.tallas.map(t => `<option value="${t}">${t}</option>`).join(''); document.getElementById('modal-talla').classList.remove('ring-promo'); } 
@@ -1185,45 +1175,18 @@
             const id = p.get('producto'); 
             const cat = p.get('categoria'); 
             
-            if(id) {
-                openModalById(id); 
-            } else { 
-                document.getElementById('product-modal').classList.remove('active'); 
-                document.body.classList.remove('overflow-hidden'); 
-                
-                // MODIFICACIÓN QUIRÚRGICA: Lógica simple e inteligente para restaurar el filtro al volver atrás
-                const targetCat = cat || 'all';
-                currentCategory = targetCat; 
-                renderFilters(); 
-                renderGallery(); 
-                showSection('catalogo', true); 
-            } 
+            if(id) openModalById(id); 
+            else { closeModal(); if(cat) filterGallery(cat); else filterGallery('all'); } 
         });
 
-        function changeImage(d) { currentImageIndex += d; if (currentImageIndex >= currentModalImages.length) currentImageIndex = 0; if (currentImageIndex < 0) currentImageIndex = currentModalImages.length - 1; updateCarouselView(); }
-        function updateCarouselView() { const img = document.getElementById('modal-img'); const l = document.getElementById('modal-img-loader'); img.style.opacity = 0; l.classList.remove('hidden'); const nImg = new Image(); nImg.src = currentModalImages[currentImageIndex]; nImg.onerror = () => { img.src = "https://via.placeholder.com/400x400/FFFFFF/2C2421?text=Error"; l.classList.add('hidden'); img.style.opacity = 1; }; nImg.onload = () => { img.src = nImg.src; l.classList.add('hidden'); img.style.opacity = 1; }; const p = document.getElementById('btn-prev-img'), n = document.getElementById('btn-next-img'), dots = document.getElementById('carousel-dots'); if (currentModalImages.length > 1) { p.classList.remove('hidden'); n.classList.remove('hidden'); dots.innerHTML = currentModalImages.map((_, i) => `<span class="h-2 rounded-full transition-all duration-300 ${i === currentImageIndex ? 'bg-primary w-8' : 'bg-dark/20 w-2'}"></span>`).join(''); } else { p.classList.add('hidden'); n.classList.add('hidden'); dots.innerHTML = ''; } }
-
         // =====================================================================
-        // 🚀 7. INICIALIZACIÓN
+        // 🚀 INICIALIZACIÓN
         // =====================================================================
-        function cargarDatosLocales() { 
-            try { 
-                const sc = localStorage.getItem('pk_carrito'); if(sc) carrito = JSON.parse(sc); 
-                const sw = localStorage.getItem('pk_wishlist'); if(sw) wishlist = JSON.parse(sw); 
-            } catch (e) {} 
-        }
-
-        function init() { 
-            cargarDatosLocales(); 
-            applyConfig(); 
-            escucharFirebase(); 
-            escucharHero(); 
-            escucharConfigGlobal(); 
-            renderCarrito(); 
-            updateWishlistNav(); 
-        }
-
-        window.onload = init;
+        escucharConfigGlobal(); 
+        escucharFirebase(); 
+        escucharHero(); 
+        if(localStorage.getItem('pk_carrito')) { carrito = JSON.parse(localStorage.getItem('pk_carrito')); renderCarrito(); } 
+        if(localStorage.getItem('pk_wishlist')) { wishlist = JSON.parse(localStorage.getItem('pk_wishlist')); updateWishlistNav(); }
     </script>
 </body>
 </html>
