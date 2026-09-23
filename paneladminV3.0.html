@@ -128,6 +128,21 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* POS: filtros flexibles para evitar que categoría/subcategoría queden cortadas. */
+        .pos-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; width: 100%; min-width: 0; }
+        .pos-filter-search { flex: 2 1 220px; min-width: 180px; }
+        .pos-filter-select { flex: 1 1 150px; min-width: 145px; }
+        .pos-filter-view { flex: 0 0 auto; }
+        @media (max-width: 640px) {
+            .pos-filter-search, .pos-filter-select { flex: 1 1 100%; min-width: 0; }
+            .pos-filter-view { margin-left: auto; }
+        }
+
+        /* Editor de subcategorías: cada elemento tiene su propio espacio para ordenar/editar. */
+        .subcategory-editor-list { max-height: 52vh; overflow-y: auto; padding-right: 4px; }
+        .subcategory-editor-row { display: flex; align-items: center; gap: 8px; padding: 8px; background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; }
+        .subcategory-editor-row input { min-width: 0; flex: 1 1 auto; }
+
         @media (max-width: 768px) {
             html { font-size: 14px !important; }
             .admin-tab > div { padding: 1.25rem !important; margin-bottom: 1.5rem !important; }
@@ -237,15 +252,15 @@
                     <div class="lg:col-span-2 bg-white p-6 border border-border rounded-3xl shadow-soft relative overflow-hidden">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
                             <h3 class="text-dark text-lg font-bold flex items-center gap-2 shrink-0"><i class="fas fa-search text-primary"></i> Catálogo Rápido</h3>
-                            <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <input type="text" id="pos-search" oninput="posCurrentPage=1; renderPosInventory();" placeholder="Buscar producto o SKU..." class="admin-input flex-1 sm:w-64 rounded-xl bg-white">
-                                <select id="pos-filter-cat" onchange="posCurrentPage=1; renderPosSubcategoryFilter(); renderPosInventory();" class="admin-input w-auto min-w-[140px] rounded-xl bg-white text-xs">
+                            <div class="pos-filter-bar">
+                                <input type="text" id="pos-search" oninput="posCurrentPage=1; renderPosInventory();" placeholder="Buscar producto o SKU..." class="admin-input pos-filter-search rounded-xl bg-white">
+                                <select id="pos-filter-cat" onchange="posCurrentPage=1; renderPosSubcategoryFilter(); renderPosInventory();" class="admin-input pos-filter-select rounded-xl bg-white text-xs">
                                     <option value="all">Todas las Categorías</option>
                                 </select>
-                                <select id="pos-filter-subcat" onchange="posCurrentPage=1; renderPosInventory();" class="admin-input w-auto min-w-[140px] rounded-xl bg-white text-xs">
+                                <select id="pos-filter-subcat" onchange="posCurrentPage=1; renderPosInventory();" class="admin-input pos-filter-select rounded-xl bg-white text-xs">
                                     <option value="all">Todas las Subcategorías</option>
                                 </select>
-                                <div class="flex bg-light rounded-xl border border-border overflow-hidden shrink-0">
+                                <div class="flex bg-light rounded-xl border border-border overflow-hidden pos-filter-view">
                                     <button onclick="changePosView('grid')" id="pos-view-grid" class="px-4 py-2.5 text-primary bg-white transition-colors" title="Cuadrícula"><i class="fas fa-th-large"></i></button>
                                     <button onclick="changePosView('list')" id="pos-view-list" class="px-4 py-2.5 text-muted hover:text-dark transition-colors" title="Lista"><i class="fas fa-list"></i></button>
                                 </div>
@@ -1008,7 +1023,7 @@
             document.getElementById(`tab-${tab}`).classList.remove('hidden'); 
             const targetBtn = document.getElementById(`nav-${tab}`);
             if(targetBtn) targetBtn.classList.add('active'); else if(event && event.currentTarget) event.currentTarget.classList.add('active');
-            if(tab === 'pos') renderPosInventory();
+            if(tab === 'pos') { renderPosCategoryFilters(); renderPosInventory(); }
         }
 
         window.toggleAccordion = function(id) { const content = document.getElementById(id); const icon = document.getElementById('icon-' + id); if(content.classList.contains('hidden')) { content.classList.remove('hidden'); icon.style.transform = 'rotate(180deg)'; } else { content.classList.add('hidden'); icon.style.transform = 'rotate(0deg)'; } }
@@ -1108,6 +1123,7 @@
                     <div class="p-3 border-t border-border flex flex-col justify-between flex-1 min-w-0 bg-white">
                         <div class="flex items-center gap-1.5 mb-1.5 truncate">
                             <span class="bg-light text-muted px-1.5 py-0.5 rounded text-[9px] font-bold uppercase shrink-0">${escapeHTML(p.categoria) || 'Gen'}</span>
+                            ${p.subcategoria ? `<span class="bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded text-[9px] font-bold truncate max-w-[45%]">${escapeHTML(p.subcategoria)}</span>` : ''}
                             <p class="text-[11px] font-bold text-dark truncate">${escapeHTML(p.titulo)}</p>
                         </div>
                         ${priceHtml}
@@ -1125,6 +1141,7 @@
                         <div class="flex justify-between items-start mb-1">
                             <div class="flex items-center gap-2 truncate mr-2">
                                 <span class="bg-light text-muted px-1.5 py-0.5 rounded text-[10px] font-bold uppercase shrink-0">${escapeHTML(p.categoria) || 'Gen'}</span>
+                                ${p.subcategoria ? `<span class="bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded text-[9px] font-bold truncate max-w-[35%]">${escapeHTML(p.subcategoria)}</span>` : ''}
                                 <p class="text-xs font-bold text-dark truncate">${escapeHTML(p.titulo)} <span class="text-muted font-normal text-[10px]">#${escapeHTML(p.sku)||''}</span></p>
                             </div>
                             ${isPrevActiva ? `<span class="bg-accent text-white text-[9px] px-2 py-1 rounded-lg font-bold uppercase shrink-0">Pronto</span>` : ''}
@@ -1579,7 +1596,7 @@
                 list.innerHTML = config.categories.map((c, index) => { 
                     const isFirst = index === 0; const isLast = index === config.categories.length - 1; 
                     const catImg = (config.categoryImages && config.categoryImages[c]) ? config.categoryImages[c] : null;
-                    return `<div class="flex flex-col bg-white border border-border px-4 py-3 rounded-xl shadow-sm w-full sm:w-auto min-w-[200px]">
+                    return `<div class="flex flex-col bg-white border border-border px-4 py-3 rounded-xl shadow-sm w-full sm:w-[280px] min-w-0">
                         <div class="flex items-center gap-3 justify-between">
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-lg bg-light flex items-center justify-center overflow-hidden border border-border shrink-0">
@@ -1592,14 +1609,14 @@
                                 <button onclick="removeCategory('${c}')" class="text-muted hover:text-promo transition-colors px-1" title="Eliminar"><i class="fas fa-times-circle text-xs"></i></button>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between border-t border-light pt-2 mt-2">
-                            <div class="flex items-center gap-1">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-t border-light pt-2 mt-2">
+                            <div class="flex items-center gap-1 shrink-0">
                                 <button onclick="moveCategoryOrder(${index}, -1)" ${isFirst ? 'disabled class="opacity-30 cursor-not-allowed text-muted"' : 'class="text-primary hover:text-dark transition-colors"'}><i class="fas fa-chevron-left text-xs"></i></button>
                                 <button onclick="moveCategoryOrder(${index}, 1)" ${isLast ? 'disabled class="opacity-30 cursor-not-allowed text-muted"' : 'class="text-primary hover:text-dark transition-colors"'}><i class="fas fa-chevron-right text-xs"></i></button>
                             </div>
                             <input type="file" id="img-cat-${index}" class="hidden" accept="image/png, image/jpeg, image/webp" onchange="uploadCatImage('${c}', this)">
-                            <button onclick="manageSubcategories('${c}')" class="text-[9px] font-bold uppercase tracking-wider bg-light text-secondary px-2 py-1 rounded hover:bg-secondary/10 transition-colors"><i class="fas fa-sitemap mr-1"></i> Subcategorías</button>
-                            <button onclick="document.getElementById('img-cat-${index}').click()" class="text-[9px] font-bold uppercase tracking-wider bg-light text-primary px-2 py-1 rounded hover:bg-primary/10 transition-colors"><i class="fas fa-upload mr-1"></i> Logo</button>
+                            <button onclick="manageSubcategories('${c}')" class="flex-1 min-w-[120px] text-[9px] font-bold uppercase tracking-wider bg-light text-secondary px-2 py-1 rounded hover:bg-secondary/10 transition-colors whitespace-nowrap"><i class="fas fa-sitemap mr-1"></i> Subcategorías</button>
+                            <button onclick="document.getElementById('img-cat-${index}').click()" class="flex-1 min-w-[80px] text-[9px] font-bold uppercase tracking-wider bg-light text-primary px-2 py-1 rounded hover:bg-primary/10 transition-colors whitespace-nowrap"><i class="fas fa-upload mr-1"></i> Logo</button>
                         </div>
                     </div>`; 
                 }).join(''); 
@@ -1635,24 +1652,92 @@
         function moveCategoryOrder(index, direction) { if (!config.categories) return; const newIndex = index + direction; if (newIndex < 0 || newIndex >= config.categories.length) return; const cats = [...config.categories]; const temp = cats[index]; cats[index] = cats[newIndex]; cats[newIndex] = temp; db.collection("config").doc("global").set({ categories: cats }, { merge: true }).then(() => Toast.fire({ icon: 'success', title: 'Orden guardado' })); }
         function addNewCategory() { const input = document.getElementById('new-category-name'); const name = input.value.trim().toLowerCase(); if(!name || (config.categories||[]).includes(name)) return; const subcategories = { ...(config.subcategories || {}), [name]: [] }; db.collection("config").doc("global").set({ categories: [...(config.categories||[]), name], subcategories }, { merge: true }).then(() => input.value = ""); }
 
+        let activeSubcategoryEditor = [];
+
+        function syncSubcategoryEditorInputs() {
+            const inputs = document.querySelectorAll('#subcategory-editor-list .subcategory-editor-name');
+            activeSubcategoryEditor = Array.from(inputs).map(input => input.value);
+        }
+
+        function renderSubcategoryEditorRows() {
+            const list = document.getElementById('subcategory-editor-list');
+            if (!list) return;
+            list.innerHTML = activeSubcategoryEditor.length
+                ? activeSubcategoryEditor.map((name, index) => `
+                    <div class="subcategory-editor-row">
+                        <div class="w-7 h-7 rounded-lg bg-white border border-border flex items-center justify-center text-[10px] font-bold text-muted shrink-0">${index + 1}</div>
+                        <input type="text" class="admin-input subcategory-editor-name !py-2 !px-3 !text-xs" value="${escapeHTML(name)}" maxlength="60" aria-label="Subcategoría ${index + 1}" oninput="activeSubcategoryEditor[${index}] = this.value">\n                        <div class="flex items-center gap-1 shrink-0">\n                            <button type="button" onclick="moveAdminSubcategory(${index}, -1)" ${index === 0 ? 'disabled' : ''} class="w-8 h-8 rounded-lg border border-border bg-white text-dark hover:text-primary hover:border-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors" title="Subir"><i class="fas fa-chevron-up text-[10px]"></i></button>\n                            <button type="button" onclick="moveAdminSubcategory(${index}, 1)" ${index === activeSubcategoryEditor.length - 1 ? 'disabled' : ''} class="w-8 h-8 rounded-lg border border-border bg-white text-dark hover:text-primary hover:border-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors" title="Bajar"><i class="fas fa-chevron-down text-[10px]"></i></button>\n                            <button type="button" onclick="removeAdminSubcategory(${index})" class="w-8 h-8 rounded-lg border border-border bg-white text-promo hover:bg-promo/5 hover:border-promo transition-colors" title="Eliminar"><i class="fas fa-trash text-[10px]"></i></button>\n                        </div>\n                    </div>`).join('')
+                : '<div class="text-center py-6 text-xs text-muted border border-dashed border-border rounded-xl">Aún no hay subcategorías. Agrega la primera debajo.</div>';
+        }
+
+        function addAdminSubcategory() {
+            syncSubcategoryEditorInputs();
+            const input = document.getElementById('new-subcategory-editor-name');
+            if (!input) return;
+            const value = input.value.trim().toLowerCase();
+            if (!value) return;
+            if (activeSubcategoryEditor.some(item => item.trim().toLowerCase() === value)) {
+                input.focus();
+                return Toast.fire({ icon: 'warning', title: 'La subcategoría ya existe' });
+            }
+            activeSubcategoryEditor.push(value);
+            input.value = '';
+            renderSubcategoryEditorRows();
+            input.focus();
+        }
+
+        function moveAdminSubcategory(index, direction) {
+            syncSubcategoryEditorInputs();
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= activeSubcategoryEditor.length) return;
+            const temp = activeSubcategoryEditor[index];
+            activeSubcategoryEditor[index] = activeSubcategoryEditor[newIndex];
+            activeSubcategoryEditor[newIndex] = temp;
+            renderSubcategoryEditorRows();
+        }
+
+        function removeAdminSubcategory(index) {
+            syncSubcategoryEditorInputs();
+            activeSubcategoryEditor.splice(index, 1);
+            renderSubcategoryEditorRows();
+        }
+
         async function manageSubcategories(category) {
-            const current = getAdminSubcategories(category);
-            const { value: raw } = await Swal.fire({
-                title: `Subcategorías de ${category}`,
-                input: 'textarea',
-                inputValue: current.join('\n'),
-                inputPlaceholder: 'Una subcategoría por línea',
+            activeSubcategoryEditor = [...getAdminSubcategories(category)];
+            const safeCategory = escapeHTML(category);
+            const result = await Swal.fire({
+                title: `Subcategorías de ${safeCategory}`,
+                width: '720px',
+                html: `
+                    <div class="text-left">\n                        <p class="text-xs text-muted mb-3">Agrega varias subcategorías y usa las flechas para definir el orden en que aparecerán en la tienda y el POS.</p>\n                        <div id="subcategory-editor-list" class="subcategory-editor-list space-y-2 mb-4"></div>\n                        <div class="flex gap-2 items-center">\n                            <input id="new-subcategory-editor-name" type="text" maxlength="60" placeholder="Nueva subcategoría" class="admin-input flex-1" onkeydown="if(event.key === 'Enter'){event.preventDefault();addAdminSubcategory();}">\n                            <button type="button" onclick="addAdminSubcategory()" class="bg-primary text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#A6763A] transition-colors shrink-0"><i class="fas fa-plus mr-1"></i> Agregar</button>\n                        </div>\n                    </div>`,
                 showCancelButton: true,
-                confirmButtonText: 'Guardar',
+                confirmButtonText: 'Guardar orden',
                 cancelButtonText: 'Cancelar',
                 background: '#FFFFFF', color: '#2C2421', confirmButtonColor: '#B88645',
-                customClass: { popup: 'rounded-3xl border border-border shadow-float', input: 'border border-border rounded-xl text-left' }
+                customClass: { popup: 'rounded-3xl border border-border shadow-float', htmlContainer: '!m-0', confirmButton: 'font-bold text-sm px-5 py-2.5 rounded-xl', cancelButton: 'font-bold text-sm px-5 py-2.5 rounded-xl' },
+                didOpen: () => {
+                    renderSubcategoryEditorRows();
+                    const input = document.getElementById('new-subcategory-editor-name');
+                    if (input) input.focus();
+                },
+                preConfirm: () => {
+                    syncSubcategoryEditorInputs();
+                    const cleaned = [];
+                    activeSubcategoryEditor.forEach(value => {
+                        const normalized = String(value || '').trim().toLowerCase();
+                        if (normalized && !cleaned.includes(normalized)) cleaned.push(normalized);
+                    });
+                    return cleaned;
+                }
             });
-            if (raw === undefined) return;
-            const cleaned = [...new Set(String(raw).split(/\r?\n/).map(v => v.trim().toLowerCase()).filter(Boolean))];
-            const subcategories = { ...(config.subcategories || {}), [category]: cleaned };
+            if (!result.isConfirmed) return;
+            const subcategories = { ...(config.subcategories || {}), [category]: result.value || [] };
             try {
+                config.subcategories = subcategories;
                 await db.collection("config").doc("global").set({ subcategories }, { merge: true });
+                renderSubcategoryInput();
+                renderPosCategoryFilters();
+                renderCategoriesManager();
                 Toast.fire({ icon: 'success', title: 'Subcategorías actualizadas' });
             } catch (error) {
                 DarkAlert.fire({ icon: 'error', title: 'Error al guardar', text: error.message });

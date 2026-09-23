@@ -89,6 +89,10 @@
         
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Subcategorías: nunca se cortan en pantallas estrechas. */
+        #catalog-subcategory-filters { max-width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; scrollbar-width: thin; }
+        #catalog-subcategory-filters button { flex: 0 0 auto; white-space: nowrap; }
         
         .dropdown:hover .dropdown-menu { display: block; }
         .promo-badge { animation: pulse-soft 2s infinite; }
