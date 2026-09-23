@@ -788,7 +788,7 @@
         function renderFilters() {
             const cats = config.categories || []; 
             const dT = document.getElementById('desktop-nav-categories');
-            if(dT) dT.innerHTML = `<button onclick="filterGallery('all')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors">Todo el catálogo</button>` + cats.map(c => renderCategoryNavigation(c, false)).join('');
+            if(dT) dT.innerHTML = `<button onclick="filterGallery('all')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors">Todo el catálogo</button>` + cats.map(c => `<button onclick='filterGallery(${JSON.stringify(c)})' class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors capitalize">${escapeHTML(c)}</button>`).join('');
             
             const mT = document.getElementById('mobile-nav-categories');
             if(mT) mT.innerHTML = `<button onclick="filterGallery('all'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all ${currentCategory === 'all' ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">Todos los artículos</button>` + cats.map(c => renderCategoryNavigation(c, true)).join('');
