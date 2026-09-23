@@ -396,6 +396,7 @@
                     <button onclick="goLobby()" class="text-muted hover:text-primary transition-colors text-sm font-bold mb-3 flex items-center gap-2"><i class="fas fa-arrow-left"></i> Volver al Lobby</button>
                     <h2 id="catalog-section-title" class="font-bold text-3xl md:text-4xl text-dark tracking-tight capitalize">Catálogo</h2>
                     <p class="text-muted font-medium text-sm mt-2" id="display-shop-slogan"></p>
+                    <div id="catalog-subcategory-filters" class="hidden flex flex-wrap items-center gap-2 mt-4"></div>
                 </div>
             </div>
             
@@ -442,7 +443,7 @@
 
         const DEFAULT_CONFIG = { 
             slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", 
-            categories: ["figuras", "peluches"], lobbyCategoryLimit: 4, categoryImages: {},
+            categories: ["figuras", "peluches"], subcategories: {}, lobbyCategoryLimit: 4, categoryImages: {},
             heroTitle: "Bienvenido a Pinkitos", heroSubtitle: "Coleccionables y Juguetes", heroImage: "", heroImages: [], heroLinks: [], logoUrl: "", heroActive: true, shareText: "¡Mira este juguete!", currency: "$", taxEnabled: false, taxRate: 15, globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false 
         };
 
@@ -457,6 +458,8 @@
         let touchStartX = 0; 
         let touchEndX = 0;
         let currentCategory = 'all';
+        // Filtro dependiente: la subcategoría siempre vive dentro de su categoría padre.
+        let currentSubcategory = 'all';
         let lastCheckoutTime = 0;
 
         // Variables Globales Carrusel Hero
@@ -554,13 +557,15 @@
                     const pId = p.get('producto'); 
                     const pCat = p.get('categoria'); 
                     
+                    const pSub = p.get('subcategoria');
                     if (pId && inventario.find(x => x.id === pId)) {
                         setTimeout(() => openModalById(pId), 400); 
                     } else if (pCat) { 
                         // MODIFICACIÓN QUIRÚRGICA: Evitamos depender del asincronismo de config.categories.
-                        // Ahora aceptamos la categoría directamente de la URL evitando el fallo de enrutamiento a "all".
-                        const catSafe = pCat; 
-                        setTimeout(() => filterGallery(catSafe), 400);
+                        // La categoría padre y su subcategoría pueden restaurarse directamente desde la URL.
+                        const catSafe = pCat;
+                        const subSafe = pSub || 'all';
+                        setTimeout(() => filterGallery(catSafe, subSafe), 400);
                     } else { 
                         window.history.pushState({}, '', window.location.pathname); 
                     } 
@@ -632,8 +637,21 @@
             const catalogTitle = document.getElementById('catalog-section-title');
             if (catalogTitle) catalogTitle.innerText = currentCategory === 'all' ? 'Todo el Catálogo' : currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1);
 
+            renderSubcategoryFilters();
             const term = (document.getElementById('live-search').value || "").toLowerCase();
-            let filt = inventario.filter(p => (currentCategory === 'all' || p.categoria === currentCategory) && ((p.titulo || "").toLowerCase().includes(term) || (p.sku || "").toLowerCase().includes(term)));
+            let filt = inventario.filter(p => {
+                const matchCategory = currentCategory === 'all' || p.categoria === currentCategory;
+                const matchSubcategory = currentSubcategory === 'all' || p.subcategoria === currentSubcategory;
+                const matchTerm = (p.titulo || "").toLowerCase().includes(term) || (p.sku || "").toLowerCase().includes(term);
+                return matchCategory && matchSubcategory && matchTerm;
+            });
+
+            // Orden de conversión: agotados al final, preservando el orden actual del resto.
+            filt.sort((a, b) => {
+                const aOut = a.stock !== undefined && a.stock <= 0;
+                const bOut = b.stock !== undefined && b.stock <= 0;
+                return Number(aOut) - Number(bOut);
+            });
             
             if(filt.length === 0) return grid.innerHTML = `<div class="col-span-full text-center py-20"><div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center text-muted mb-4 border border-border shadow-sm"><i class="fas fa-search text-2xl"></i></div><p class="text-muted font-semibold text-sm">No encontramos artículos</p></div>`;
             
@@ -705,7 +723,10 @@
                     </div>
                     <div class="p-4 flex-1 flex flex-col justify-between border-t border-border bg-white">
                         <div class="mb-2">
-                            <p class="text-muted text-[10px] uppercase font-bold mb-1 tracking-wider">${escapeHTML(prod.categoria) || 'General'}</p>
+                            <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                                <p class="text-muted text-[10px] uppercase font-bold tracking-wider">${escapeHTML(prod.categoria) || 'General'}</p>
+                                ${prod.subcategoria ? `<span class="bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide">${escapeHTML(prod.subcategoria)}</span>` : ''}
+                            </div>
                             <h3 class="text-dark font-bold text-sm line-clamp-2 leading-tight">${escapeHTML(prod.titulo)}</h3>
                             ${ratingSectionHTML}
                         </div>
@@ -718,13 +739,56 @@
             }).join('');
         }
 
+        function getSubcategoriesForCategory(category) {
+            const map = config.subcategories || {};
+            return Array.isArray(map[category]) ? map[category] : [];
+        }
+
+        function renderSubcategoryFilters() {
+            const container = document.getElementById('catalog-subcategory-filters');
+            if (!container) return;
+            const subs = currentCategory === 'all' ? [] : getSubcategoriesForCategory(currentCategory);
+            if (subs.length === 0) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+                return;
+            }
+            container.classList.remove('hidden');
+            const allActive = currentSubcategory === 'all';
+            container.innerHTML = `<button onclick='filterSubcategory(${JSON.stringify(currentCategory)}, "all")' class="px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${allActive ? 'bg-primary text-white border-primary' : 'bg-white text-dark border-border hover:border-primary hover:text-primary'}">Todas</button>` + subs.map(sub => {
+                const active = currentSubcategory === sub;
+                return `<button onclick='filterSubcategory(${JSON.stringify(currentCategory)}, ${JSON.stringify(sub)})' class="px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${active ? 'bg-primary text-white border-primary' : 'bg-white text-dark border-border hover:border-primary hover:text-primary'}">${escapeHTML(sub)}</button>`;
+            }).join('');
+        }
+
+        function renderCategoryNavigation(category, isMobile = false) {
+            const subcats = getSubcategoriesForCategory(category);
+            const catButtonClass = isMobile
+                ? `w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all capitalize ${currentCategory === category ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}`
+                : 'w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors capitalize';
+            const catButton = isMobile
+                ? `<button onclick='filterGallery(${JSON.stringify(category)}); toggleMobileCategories();' class="${catButtonClass}">${escapeHTML(category)}</button>`
+                : `<button onclick='filterGallery(${JSON.stringify(category)})' class="${catButtonClass}">${escapeHTML(category)}</button>`;
+            const subHtml = subcats.map(sub => {
+                const subClass = isMobile
+                    ? `w-full text-left pl-9 pr-4 py-2 text-xs font-semibold rounded-xl transition-all ${currentCategory === category && currentSubcategory === sub ? 'text-primary bg-primary/5' : 'text-muted hover:text-primary hover:bg-light'}`
+                    : 'w-full text-left pl-8 pr-5 py-2 text-xs font-semibold text-muted hover:text-primary hover:bg-light transition-colors';
+                const clickAction = isMobile
+                    ? `filterSubcategory(${JSON.stringify(category)}, ${JSON.stringify(sub)}); toggleMobileCategories();`
+                    : `filterSubcategory(${JSON.stringify(category)}, ${JSON.stringify(sub)})`;
+                return `<button onclick='${clickAction}' class="${subClass}"><span class="mr-1.5">↳</span>${escapeHTML(sub)}</button>`;
+            }).join('');
+            return catButton + subHtml;
+        }
+
         function renderFilters() {
             const cats = config.categories || []; 
             const dT = document.getElementById('desktop-nav-categories');
-            if(dT) dT.innerHTML = `<button onclick="filterGallery('all')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors">Todo el catálogo</button>` + cats.map(c => `<button onclick="filterGallery('${c}')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors capitalize">${escapeHTML(c)}</button>`).join('');
+            if(dT) dT.innerHTML = `<button onclick="filterGallery('all')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors">Todo el catálogo</button>` + cats.map(c => renderCategoryNavigation(c, false)).join('');
             
             const mT = document.getElementById('mobile-nav-categories');
-            if(mT) mT.innerHTML = `<button onclick="filterGallery('all'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all ${currentCategory === 'all' ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">Todos los artículos</button>` + cats.map(c => `<button onclick="filterGallery('${c}'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all capitalize ${currentCategory === c ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">${escapeHTML(c)}</button>`).join('');
+            if(mT) mT.innerHTML = `<button onclick="filterGallery('all'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all ${currentCategory === 'all' ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">Todos los artículos</button>` + cats.map(c => renderCategoryNavigation(c, true)).join('');
+            renderSubcategoryFilters();
             renderLobby();
         }
 
@@ -1110,14 +1174,19 @@
         function showSection(id, noScroll = false) { document.querySelectorAll('.section-fade').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; }); const target = document.getElementById(id); if(target) { target.style.display = 'block'; setTimeout(() => target.classList.add('active'), 50); } if (id === 'inicio') { document.body.classList.add('lobby-mode'); } else { document.body.classList.remove('lobby-mode'); } if (!noScroll) window.scrollTo({top: 0, behavior: 'smooth'}); }
         function handleSearch(val) { showSection('catalogo', true); if(val!==undefined){ document.getElementById('live-search').value=val; const m=document.getElementById('mobile-live-search'); if(m)m.value=val; } renderGallery(); const t=(document.getElementById('live-search').value||"").toLowerCase(); if(t.length>0&&window.innerWidth>=768){ const s=document.getElementById('productos'); if(s) { const yOffset = -80; const y = s.getBoundingClientRect().top + window.pageYOffset + yOffset; window.scrollTo({top: y, behavior: 'smooth'}); } } }
         
-        function filterGallery(c) { 
+        function filterGallery(c, subcategory = 'all') { 
             showSection('catalogo', true); 
-            currentCategory = c; 
+            currentCategory = c;
+            currentSubcategory = c === 'all' ? 'all' : (subcategory || 'all');
             renderFilters(); 
             
             if (hasCheckedUrlParams) {
-                const url = c === 'all' ? window.location.pathname : window.location.pathname + '?categoria=' + encodeURIComponent(c);
-                window.history.pushState({ categoria: c }, '', url);
+                const params = new URLSearchParams();
+                if (c !== 'all') params.set('categoria', c);
+                if (c !== 'all' && currentSubcategory !== 'all') params.set('subcategoria', currentSubcategory);
+                const query = params.toString();
+                const url = window.location.pathname + (query ? `?${query}` : '');
+                window.history.pushState({ categoria: c, subcategoria: currentSubcategory }, '', url);
             }
             
             const g = document.getElementById('gallery-grid'); 
@@ -1132,6 +1201,11 @@
                     window.scrollTo({top: y, behavior: 'smooth'}); 
                 } 
             }, 200); 
+        }
+
+        function filterSubcategory(parentCategory, subcategory) {
+            // La subcategoría nunca cambia de categoría padre.
+            filterGallery(parentCategory, subcategory);
         }
 
         function openModalById(id) {
@@ -1184,6 +1258,7 @@
             const p = new URLSearchParams(window.location.search); 
             const id = p.get('producto'); 
             const cat = p.get('categoria'); 
+            const sub = p.get('subcategoria');
             
             if(id) {
                 openModalById(id); 
@@ -1193,7 +1268,8 @@
                 
                 // MODIFICACIÓN QUIRÚRGICA: Lógica simple e inteligente para restaurar el filtro al volver atrás
                 const targetCat = cat || 'all';
-                currentCategory = targetCat; 
+                currentCategory = targetCat;
+                currentSubcategory = targetCat === 'all' ? 'all' : (sub || 'all');
                 renderFilters(); 
                 renderGallery(); 
                 showSection('catalogo', true); 

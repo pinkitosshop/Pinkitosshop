@@ -239,6 +239,12 @@
                             <h3 class="text-dark text-lg font-bold flex items-center gap-2 shrink-0"><i class="fas fa-search text-primary"></i> Catálogo Rápido</h3>
                             <div class="flex items-center gap-2 w-full sm:w-auto">
                                 <input type="text" id="pos-search" oninput="posCurrentPage=1; renderPosInventory();" placeholder="Buscar producto o SKU..." class="admin-input flex-1 sm:w-64 rounded-xl bg-white">
+                                <select id="pos-filter-cat" onchange="posCurrentPage=1; renderPosSubcategoryFilter(); renderPosInventory();" class="admin-input w-auto min-w-[140px] rounded-xl bg-white text-xs">
+                                    <option value="all">Todas las Categorías</option>
+                                </select>
+                                <select id="pos-filter-subcat" onchange="posCurrentPage=1; renderPosInventory();" class="admin-input w-auto min-w-[140px] rounded-xl bg-white text-xs">
+                                    <option value="all">Todas las Subcategorías</option>
+                                </select>
                                 <div class="flex bg-light rounded-xl border border-border overflow-hidden shrink-0">
                                     <button onclick="changePosView('grid')" id="pos-view-grid" class="px-4 py-2.5 text-primary bg-white transition-colors" title="Cuadrícula"><i class="fas fa-th-large"></i></button>
                                     <button onclick="changePosView('list')" id="pos-view-list" class="px-4 py-2.5 text-muted hover:text-dark transition-colors" title="Lista"><i class="fas fa-list"></i></button>
@@ -481,7 +487,7 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                                 <div>
                                     <label class="text-xs font-bold text-muted mb-2 block">Nombre de Producto <span class="text-promo">*</span></label>
                                     <input type="text" id="new-title" class="admin-input bg-white" required>
@@ -492,7 +498,13 @@
                                 </div>
                                 <div>
                                     <label class="text-xs font-bold text-muted mb-2 block">Categoría <span class="text-promo">*</span></label>
-                                    <select id="new-cat" class="admin-input cursor-pointer bg-white" required></select>
+                                    <select id="new-cat" onchange="renderSubcategoryInput('');" class="admin-input cursor-pointer bg-white" required></select>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-muted mb-2 block">Subcategoría</label>
+                                    <select id="new-subcat" class="admin-input cursor-pointer bg-white">
+                                        <option value="">Sin subcategoría</option>
+                                    </select>
                                 </div>
                             </div>
                             
@@ -841,7 +853,7 @@
         const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000, background: '#FFFFFF', color: '#2C2421', iconColor: '#B88645', customClass: { popup: 'border border-[#E5E7EB] rounded-xl shadow-float !py-3 !px-5', title: '!text-sm !font-bold' }});
         const DarkAlert = Swal.mixin({ background: '#FFFFFF', color: '#2C2421', confirmButtonColor: '#B88645', cancelButtonColor: '#E63946', customClass: { popup: 'border border-[#E5E7EB] rounded-3xl shadow-float', confirmButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm', cancelButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm' } });
 
-        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", categories: ["figuras"], lobbyCategoryLimit: 4, categoryImages: {}, heroTitle: "", heroSubtitle: "", heroImage: "", heroImages: [], heroLinks: [], logoUrl: "", heroActive: true, invoiceHeader: "", invoiceFooter: "", shareText: "", currency: "$", posTimeout: "0", taxEnabled: false, taxRate: 15, posPin: "", globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false };
+        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", categories: ["figuras"], subcategories: {}, lobbyCategoryLimit: 4, categoryImages: {}, heroTitle: "", heroSubtitle: "", heroImage: "", heroImages: [], heroLinks: [], logoUrl: "", heroActive: true, invoiceHeader: "", invoiceFooter: "", shareText: "", currency: "$", posTimeout: "0", taxEnabled: false, taxRate: 15, posPin: "", globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false };
         const DEFAULT_MEASURES = { "Pequeño": { medida: "" }, "Mediano": { medida: "" }, "Grande": { medida: "" } };
 
         let inventario = []; 
@@ -862,6 +874,9 @@
         
         let posViewMode = 'grid'; 
         let posCurrentPage = 1; let posItemsPerPage = 10;
+        // Filtros independientes del buscador textual del POS.
+        let posSelectedCategory = 'all';
+        let posSelectedSubcategory = 'all';
         let pedCurrentPage = 1; let pedItemsPerPage = 10;
         let facCurrentPage = 1; let facItemsPerPage = 10;
         let invCurrentPage = 1; let invItemsPerPage = 20;
@@ -1011,7 +1026,17 @@
 
         function renderPosInventory() {
             const container = document.getElementById('pos-inventory-container'); const term = (document.getElementById('pos-search').value || "").toLowerCase();
-            const filt = inventario.filter(p => !esPreventaActiva(p) && ((p.titulo || "").toLowerCase().includes(term) || (p.sku || "").toLowerCase().includes(term)));
+            const category = document.getElementById('pos-filter-cat') ? document.getElementById('pos-filter-cat').value : posSelectedCategory;
+            const subcategory = document.getElementById('pos-filter-subcat') ? document.getElementById('pos-filter-subcat').value : posSelectedSubcategory;
+            posSelectedCategory = category || 'all';
+            posSelectedSubcategory = subcategory || 'all';
+            const filt = inventario.filter(p => {
+                if (esPreventaActiva(p)) return false;
+                const matchCategory = posSelectedCategory === 'all' || p.categoria === posSelectedCategory;
+                const matchSubcategory = posSelectedSubcategory === 'all' || p.subcategoria === posSelectedSubcategory;
+                const searchable = `${p.titulo || ''} ${p.sku || ''} ${p.categoria || ''} ${p.subcategoria || ''}`.toLowerCase();
+                return matchCategory && matchSubcategory && searchable.includes(term);
+            });
             
             const totalPages = Math.ceil(filt.length / posItemsPerPage) || 1;
             if(posCurrentPage > totalPages) posCurrentPage = totalPages; if(posCurrentPage < 1) posCurrentPage = 1;
@@ -1029,6 +1054,29 @@
             } else {
                 container.className = "flex flex-col gap-3 pb-4"; container.innerHTML = slice.map(p => _createPosCard(p, false)).join('');
             }
+        }
+
+        function renderPosSubcategoryFilter() {
+            const catSelect = document.getElementById('pos-filter-cat');
+            const subSelect = document.getElementById('pos-filter-subcat');
+            if (!catSelect || !subSelect) return;
+            posSelectedCategory = catSelect.value || 'all';
+            const subs = posSelectedCategory === 'all' ? [] : ((config.subcategories || {})[posSelectedCategory] || []);
+            const current = posSelectedSubcategory;
+            subSelect.innerHTML = '<option value="all">Todas las Subcategorías</option>' + subs.map(s => `<option value="${escapeHTML(s)}">${escapeHTML(s)}</option>`).join('');
+            subSelect.value = subs.includes(current) ? current : 'all';
+            posSelectedSubcategory = subSelect.value;
+        }
+
+        function renderPosCategoryFilters() {
+            const catSelect = document.getElementById('pos-filter-cat');
+            if (!catSelect) return;
+            const current = catSelect.value || posSelectedCategory || 'all';
+            const cats = config.categories || [];
+            catSelect.innerHTML = '<option value="all">Todas las Categorías</option>' + cats.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c).toUpperCase()}</option>`).join('');
+            catSelect.value = cats.includes(current) ? current : 'all';
+            posSelectedCategory = catSelect.value;
+            renderPosSubcategoryFilter();
         }
 
         // INICIO MEJORA: Refactorización Tarjetas POS para solucionar bug de imágenes deformadas
@@ -1386,7 +1434,10 @@
             document.getElementById('admin-form-title').innerHTML = '<i class="fas fa-pen text-primary"></i> Editando Producto';
             
             document.getElementById('new-title').value = p.titulo || ""; document.getElementById('new-sku').value = p.sku || ""; document.getElementById('new-desc').value = p.descripcion || ""; 
-            if (p.categoria) document.getElementById('new-cat').value = p.categoria;
+            if (p.categoria) {
+                document.getElementById('new-cat').value = p.categoria;
+                renderSubcategoryInput(p.subcategoria || '');
+            }
             const pPrice = p.precio || "0"; const match = String(pPrice).match(/^([^0-9.]+)?([0-9.]+)/); if(match) { document.getElementById('new-price').value = parseFloat(match[2]); } else { document.getElementById('new-price').value = 0; }
             const pCompare = p.precioOriginal || "0"; const matchCmp = String(pCompare).match(/^([^0-9.]+)?([0-9.]+)/); if(matchCmp) { document.getElementById('new-price-compare').value = parseFloat(matchCmp[2]); } else { document.getElementById('new-price-compare').value = ""; }
             calcDiscount('compare');
@@ -1409,7 +1460,7 @@
         function cancelEdit() {
             const wasEditing = !!editId; editId = null; document.getElementById('admin-form-container').classList.remove('editing-mode'); document.getElementById('btn-cancel-edit').classList.add('hidden');
             document.getElementById('admin-form-title').innerHTML = '<i class="fas fa-box-open text-primary"></i> Crear / Editar Producto';
-            document.getElementById('new-title').value = ""; document.getElementById('new-sku').value = ""; document.getElementById('new-price').value = ""; document.getElementById('new-desc').value = ""; document.getElementById('new-stock').value = "0"; document.getElementById('toggle-presale').checked = false; document.getElementById('toggle-scarcity').checked = false; document.getElementById('new-price-compare').value = ""; document.getElementById('new-discount-percent').value = ""; document.getElementById('new-release-date').value = ""; document.getElementById('new-promo-type').value = 'normal'; document.getElementById('new-offer-start').value = ''; document.getElementById('new-offer-end').value = ''; document.getElementById('toggle-taxable').checked = !!config.taxEnabled; document.getElementById('toggle-pinned').checked = false; document.getElementById('toggle-measures').checked = true; toggleMeasuresVisibility();
+            document.getElementById('new-title').value = ""; document.getElementById('new-sku').value = ""; document.getElementById('new-price').value = ""; document.getElementById('new-desc').value = ""; document.getElementById('new-cat').value = ""; renderSubcategoryInput(''); document.getElementById('new-stock').value = "0"; document.getElementById('toggle-presale').checked = false; document.getElementById('toggle-scarcity').checked = false; document.getElementById('new-price-compare').value = ""; document.getElementById('new-discount-percent').value = ""; document.getElementById('new-release-date').value = ""; document.getElementById('new-promo-type').value = 'normal'; document.getElementById('new-offer-start').value = ''; document.getElementById('new-offer-end').value = ''; document.getElementById('toggle-taxable').checked = !!config.taxEnabled; document.getElementById('toggle-pinned').checked = false; document.getElementById('toggle-measures').checked = true; toggleMeasuresVisibility();
             document.getElementById('new-rating').value = ""; document.getElementById('new-review-count').value = "";
             selectedBase64Imgs = []; renderThumbnails(); currentFormSizes = ["Pequeño", "Mediano", "Grande"]; currentFormColumns = ["Medida"]; renderMedidasForm();
             if (wasEditing) showAdminTab('inventario');
@@ -1433,7 +1484,7 @@
         }
 
         async function addProduct() {
-            const title = document.getElementById('new-title').value.trim(); const skuVal = document.getElementById('new-sku').value.trim().toUpperCase(); const catVal = document.getElementById('new-cat').value; const priceVal = parseFloat(document.getElementById('new-price').value); const comparePriceVal = parseFloat(document.getElementById('new-price-compare').value); const globalCurrency = config.currency || '$';
+            const title = document.getElementById('new-title').value.trim(); const skuVal = document.getElementById('new-sku').value.trim().toUpperCase(); const catVal = document.getElementById('new-cat').value; const subcatVal = document.getElementById('new-subcat').value.trim(); const priceVal = parseFloat(document.getElementById('new-price').value); const comparePriceVal = parseFloat(document.getElementById('new-price-compare').value); const globalCurrency = config.currency || '$';
             if(!title || !skuVal || !catVal || isNaN(priceVal) || priceVal < 0) return Toast.fire({ icon: 'warning', title: 'Campos requeridos (*)' });
             const finalPrice = `${globalCurrency}${priceVal.toFixed(2)}`; let finalComparePrice = null; if (!isNaN(comparePriceVal) && comparePriceVal > priceVal) finalComparePrice = `${globalCurrency}${comparePriceVal.toFixed(2)}`;
             
@@ -1445,7 +1496,7 @@
                 if(hasMeasures) { currentFormSizes.forEach(t => { const safeT = t.replace(/[^a-zA-Z0-9_-]/g, ''); const checkbox = document.getElementById(`t-${safeT}`); if(checkbox && checkbox.checked) { tallas.push(t); medidas[t] = {}; currentFormColumns.forEach(c => { const safeC = c.replace(/[^a-zA-Z0-9_-]/g, ''); const inputEl = document.getElementById(`measure-${safeT}-${safeC}`); medidas[t][c] = inputEl ? inputEl.value : ""; }); } }); }
                 
                 const productData = { 
-                    sku: skuVal, categoria: catVal, titulo: title, descripcion: document.getElementById('new-desc').value.trim() || "", 
+                    sku: skuVal, categoria: catVal, subcategoria: subcatVal || null, titulo: title, descripcion: document.getElementById('new-desc').value.trim() || "", 
                     precio: finalPrice, precioOriginal: finalComparePrice, fechaLanzamiento: document.getElementById('new-release-date').value || null, 
                     promoType: document.getElementById('new-promo-type').value, ofertaInicio: document.getElementById('new-offer-start').value || null, 
                     ofertaFin: document.getElementById('new-offer-end').value || null, stock: parseInt(document.getElementById('new-stock').value) || 0, 
@@ -1491,10 +1542,35 @@
             const sel = document.getElementById('new-cat'); 
             const filterSel = document.getElementById('inv-filter-cat');
             if(config.categories) {
-                const options = config.categories.map(c => `<option value="${c}">${escapeHTML(c).toUpperCase()}</option>`).join('');
-                if(sel) sel.innerHTML = '<option value="" disabled selected>Seleccione...</option>' + options;
-                if(filterSel) filterSel.innerHTML = '<option value="all">Todas las Categorías</option>' + options;
+                const currentCat = sel ? sel.value : '';
+                const options = config.categories.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c).toUpperCase()}</option>`).join('');
+                if(sel) {
+                    sel.innerHTML = '<option value="" disabled>Seleccione...</option>' + options;
+                    sel.value = config.categories.includes(currentCat) ? currentCat : '';
+                    renderSubcategoryInput();
+                }
+                if(filterSel) {
+                    const currentFilter = filterSel.value || 'all';
+                    filterSel.innerHTML = '<option value="all">Todas las Categorías</option>' + options;
+                    filterSel.value = config.categories.includes(currentFilter) ? currentFilter : 'all';
+                }
+                renderPosCategoryFilters();
             }
+        }
+
+        function renderSubcategoryInput(preserveValue = null) {
+            const catSelect = document.getElementById('new-cat');
+            const subSelect = document.getElementById('new-subcat');
+            if (!catSelect || !subSelect) return;
+            const category = catSelect.value;
+            const configured = category && config.subcategories && Array.isArray(config.subcategories[category]) ? config.subcategories[category] : [];
+            const previous = preserveValue !== null ? preserveValue : (category ? subSelect.value : '');
+            let html = '<option value="">Sin subcategoría</option>' + configured.map(s => `<option value="${escapeHTML(s)}">${escapeHTML(s)}</option>`).join('');
+            if (previous && !configured.includes(previous)) {
+                html += `<option value="${escapeHTML(previous)}">${escapeHTML(previous)}</option>`;
+            }
+            subSelect.innerHTML = html;
+            subSelect.value = previous && (configured.includes(previous) || previous !== '') ? previous : '';
         }
 
         function renderCategoriesManager() { 
@@ -1522,6 +1598,7 @@
                                 <button onclick="moveCategoryOrder(${index}, 1)" ${isLast ? 'disabled class="opacity-30 cursor-not-allowed text-muted"' : 'class="text-primary hover:text-dark transition-colors"'}><i class="fas fa-chevron-right text-xs"></i></button>
                             </div>
                             <input type="file" id="img-cat-${index}" class="hidden" accept="image/png, image/jpeg, image/webp" onchange="uploadCatImage('${c}', this)">
+                            <button onclick="manageSubcategories('${c}')" class="text-[9px] font-bold uppercase tracking-wider bg-light text-secondary px-2 py-1 rounded hover:bg-secondary/10 transition-colors"><i class="fas fa-sitemap mr-1"></i> Subcategorías</button>
                             <button onclick="document.getElementById('img-cat-${index}').click()" class="text-[9px] font-bold uppercase tracking-wider bg-light text-primary px-2 py-1 rounded hover:bg-primary/10 transition-colors"><i class="fas fa-upload mr-1"></i> Logo</button>
                         </div>
                     </div>`; 
@@ -1556,11 +1633,45 @@
         }
 
         function moveCategoryOrder(index, direction) { if (!config.categories) return; const newIndex = index + direction; if (newIndex < 0 || newIndex >= config.categories.length) return; const cats = [...config.categories]; const temp = cats[index]; cats[index] = cats[newIndex]; cats[newIndex] = temp; db.collection("config").doc("global").set({ categories: cats }, { merge: true }).then(() => Toast.fire({ icon: 'success', title: 'Orden guardado' })); }
-        function addNewCategory() { const input = document.getElementById('new-category-name'); const name = input.value.trim().toLowerCase(); if(!name || (config.categories||[]).includes(name)) return; db.collection("config").doc("global").set({ categories: [...(config.categories||[]), name] }, { merge: true }).then(() => input.value = ""); }
+        function addNewCategory() { const input = document.getElementById('new-category-name'); const name = input.value.trim().toLowerCase(); if(!name || (config.categories||[]).includes(name)) return; const subcategories = { ...(config.subcategories || {}), [name]: [] }; db.collection("config").doc("global").set({ categories: [...(config.categories||[]), name], subcategories }, { merge: true }).then(() => input.value = ""); }
+
+        async function manageSubcategories(category) {
+            const current = getAdminSubcategories(category);
+            const { value: raw } = await Swal.fire({
+                title: `Subcategorías de ${category}`,
+                input: 'textarea',
+                inputValue: current.join('\n'),
+                inputPlaceholder: 'Una subcategoría por línea',
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                background: '#FFFFFF', color: '#2C2421', confirmButtonColor: '#B88645',
+                customClass: { popup: 'rounded-3xl border border-border shadow-float', input: 'border border-border rounded-xl text-left' }
+            });
+            if (raw === undefined) return;
+            const cleaned = [...new Set(String(raw).split(/\r?\n/).map(v => v.trim().toLowerCase()).filter(Boolean))];
+            const subcategories = { ...(config.subcategories || {}), [category]: cleaned };
+            try {
+                await db.collection("config").doc("global").set({ subcategories }, { merge: true });
+                Toast.fire({ icon: 'success', title: 'Subcategorías actualizadas' });
+            } catch (error) {
+                DarkAlert.fire({ icon: 'error', title: 'Error al guardar', text: error.message });
+            }
+        }
+
+        function getAdminSubcategories(category) {
+            const map = config.subcategories || {};
+            return Array.isArray(map[category]) ? map[category] : [];
+        }
         
         function removeCategory(cat) { 
             if((config.categories||[]).length <= 1) return Toast.fire({ icon: 'warning', title: 'Mínimo una categoría' }); 
             let updateData = { categories: config.categories.filter(c => c !== cat) };
+            if (config.subcategories && config.subcategories[cat]) {
+                const subcategories = { ...config.subcategories };
+                delete subcategories[cat];
+                updateData.subcategories = subcategories;
+            }
             if (config.categoryImages && config.categoryImages[cat]) {
                 const images = { ...config.categoryImages };
                 delete images[cat]; updateData.categoryImages = images;
@@ -1582,6 +1693,12 @@
                     snapshot.forEach(doc => { batch.update(doc.ref, { categoria: newCatClean }); });
                     
                     let updateData = { categories: newCats };
+                    if (config.subcategories && config.subcategories[oldCat]) {
+                        const subcategories = { ...config.subcategories };
+                        subcategories[newCatClean] = subcategories[oldCat];
+                        delete subcategories[oldCat];
+                        updateData.subcategories = subcategories;
+                    }
                     if (config.categoryImages && config.categoryImages[oldCat]) {
                         const images = { ...config.categoryImages };
                         images[newCatClean] = images[oldCat]; delete images[oldCat];
