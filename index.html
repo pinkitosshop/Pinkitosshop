@@ -599,17 +599,8 @@
                 return map[catName.toLowerCase()] || 'fas fa-box-open';
             };
 
-            const allCatalogCard = `
-                <div onclick="filterGallery('all')" class="bg-white rounded-[2rem] p-6 md:p-8 shadow-[0_8px_30px_rgba(44,36,33,0.06)] border-b-[6px] border-border hover:border-primary transform hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(184,134,69,0.15)] active:translate-y-1 active:border-b-2 active:shadow-sm transition-all duration-300 flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div class="w-24 h-24 md:w-32 md:h-32 bg-light group-hover:bg-primary/10 rounded-full flex items-center justify-center text-4xl md:text-5xl text-muted group-hover:text-primary transition-all duration-300 mb-4 md:mb-6 relative z-10 shadow-inner group-hover:shadow-sm">
-                        <i class="fas fa-shapes group-hover:scale-110 transition-transform duration-500"></i>
-                    </div>
-                    <h3 class="text-dark font-bold text-lg md:text-xl capitalize relative z-10 group-hover:text-primary transition-colors text-center leading-tight tracking-tight">Todo el Catálogo</h3>
-                    <div class="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 relative z-10">
-                        <span class="bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full shadow-md flex items-center gap-2">Explorar <i class="fas fa-arrow-right text-[9px]"></i></span>
-                    </div>
-                </div>`;
+            // 'Todo el Catálogo' se mantiene como estado interno, pero no se expone en la interfaz de categorías.
+            const allCatalogCard = '';
 
             const limit = config.lobbyCategoryLimit || 4;
             const visibleCats = cats.slice(0, limit);
@@ -824,10 +815,10 @@
         function renderFilters() {
             const cats = config.categories || []; 
             const dT = document.getElementById('desktop-nav-categories');
-            if(dT) dT.innerHTML = `<button onclick="filterGallery('all')" class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors">Todo el catálogo</button>` + cats.map(c => `<button onclick='filterGallery(${JSON.stringify(c)})' class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors capitalize">${escapeHTML(c)}</button>`).join('');
+            if(dT) dT.innerHTML = cats.map(c => `<button onclick='filterGallery(${JSON.stringify(c)})' class="w-full text-left px-5 py-2.5 text-sm font-semibold text-dark hover:bg-light transition-colors capitalize">${escapeHTML(c)}</button>`).join('');
             
             const mT = document.getElementById('mobile-nav-categories');
-            if(mT) mT.innerHTML = `<button onclick="filterGallery('all'); toggleMobileCategories();" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-xl transition-all ${currentCategory === 'all' ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-light'}">Todos los artículos</button>` + cats.map(c => renderCategoryNavigation(c, true)).join('');
+            if(mT) mT.innerHTML = cats.map(c => renderCategoryNavigation(c, true)).join('');
             renderSubcategoryFilters();
             renderLobby();
         }
