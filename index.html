@@ -650,11 +650,47 @@
                 return matchCategory && matchSubcategory && matchTerm;
             });
 
-            // Orden de conversión: agotados al final, preservando el orden actual del resto.
+            // Orden quirúrgico del catálogo:
+            // 1) Agotados siempre al final.
+            // 2) Dentro de productos disponibles, los fijados conservan prioridad máxima.
+            // 3) Al navegar una categoría padre, respetamos estrictamente el orden
+            //    de sus subcategorías configurado desde el panel (Premium, Básicos, etc.).
+            // 4) Dentro de cada subcategoría conservamos la lógica existente de preventas
+            //    y, finalmente, el orden original recibido desde Firestore.
+            const inventoryOrder = new Map(inventario.map((item, index) => [item.id, index]));
+            const subcategoryOrder = currentCategory !== 'all'
+                ? new Map(getSubcategoriesForCategory(currentCategory).map((sub, index) => [String(sub).trim().toLowerCase(), index]))
+                : null;
+
             filt.sort((a, b) => {
                 const aOut = a.stock !== undefined && a.stock <= 0;
                 const bOut = b.stock !== undefined && b.stock <= 0;
-                return Number(aOut) - Number(bOut);
+
+                if (aOut !== bOut) return Number(aOut) - Number(bOut);
+
+                // Los productos fijados siguen siendo siempre prioritarios.
+                const aPinned = !!a.isPinned;
+                const bPinned = !!b.isPinned;
+                if (aPinned !== bPinned) return aPinned ? -1 : 1;
+
+                // Solo en una categoría padre aplicamos el orden configurado
+                // de subcategorías. El filtro "Todos" conserva el orden global actual.
+                if (subcategoryOrder) {
+                    const aSub = a.subcategoria == null ? '' : String(a.subcategoria).trim().toLowerCase();
+                    const bSub = b.subcategoria == null ? '' : String(b.subcategoria).trim().toLowerCase();
+                    const aRank = subcategoryOrder.has(aSub) ? subcategoryOrder.get(aSub) : Number.MAX_SAFE_INTEGER;
+                    const bRank = subcategoryOrder.has(bSub) ? subcategoryOrder.get(bSub) : Number.MAX_SAFE_INTEGER;
+
+                    if (aRank !== bRank) return aRank - bRank;
+                }
+
+                // Dentro del grupo respetamos la prioridad actual de preventa.
+                const aPrev = esPreventaActiva(a);
+                const bPrev = esPreventaActiva(b);
+                if (aPrev !== bPrev) return aPrev ? -1 : 1;
+
+                // Desempate estable: conserva el orden original de Firestore.
+                return (inventoryOrder.get(a.id) ?? 0) - (inventoryOrder.get(b.id) ?? 0);
             });
             
             if(filt.length === 0) return grid.innerHTML = `<div class="col-span-full text-center py-20"><div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center text-muted mb-4 border border-border shadow-sm"><i class="fas fa-search text-2xl"></i></div><p class="text-muted font-semibold text-sm">No encontramos artículos</p></div>`;
