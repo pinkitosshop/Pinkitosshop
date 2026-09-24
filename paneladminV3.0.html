@@ -727,6 +727,19 @@
                             <label class="text-xs font-bold text-primary mb-2 block">Tasa de Impuesto (%)</label>
                             <input type="number" id="config-tax-rate" step="0.1" min="0" placeholder="Ej. 15" class="admin-input bg-white">
                         </div>
+                        <div class="lg:col-span-2">
+                            <label class="text-xs font-bold text-primary mb-2 block">Visibilidad del Catálogo General</label>
+                            <div class="bg-white border border-border px-4 py-[11px] rounded-xl flex items-center justify-between shadow-sm">
+                                <div>
+                                    <span class="text-xs text-dark font-bold">Mostrar “Todo el Catálogo”</span>
+                                    <p class="text-[10px] text-muted mt-0.5">Permite al cliente ver el catálogo completo además de las categorías.</p>
+                                </div>
+                                <label class="switch shrink-0 ml-4">
+                                    <input type="checkbox" id="config-show-all-catalog">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
                         <div class="md:col-span-2 lg:col-span-4 mt-2">
                             <button onclick="saveSystemConfig()" class="w-full bg-white border border-primary text-primary py-3 font-bold text-sm hover:bg-primary hover:text-white transition-all shadow-sm rounded-xl">Guardar Preferencias del Sistema</button>
                         </div>
@@ -868,7 +881,7 @@
         const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000, background: '#FFFFFF', color: '#2C2421', iconColor: '#B88645', customClass: { popup: 'border border-[#E5E7EB] rounded-xl shadow-float !py-3 !px-5', title: '!text-sm !font-bold' }});
         const DarkAlert = Swal.mixin({ background: '#FFFFFF', color: '#2C2421', confirmButtonColor: '#B88645', cancelButtonColor: '#E63946', customClass: { popup: 'border border-[#E5E7EB] rounded-3xl shadow-float', confirmButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm', cancelButton: 'text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm' } });
 
-        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", categories: ["figuras"], subcategories: {}, lobbyCategoryLimit: 4, categoryImages: {}, heroTitle: "", heroSubtitle: "", heroImage: "", heroImages: [], heroLinks: [], logoUrl: "", heroActive: true, invoiceHeader: "", invoiceFooter: "", shareText: "", currency: "$", posTimeout: "0", taxEnabled: false, taxRate: 15, posPin: "", globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false };
+        const DEFAULT_CONFIG = { slogan: "", aboutTitle: "", aboutDesc: "", whatsapp: "", instagram: "#", facebook: "#", tiktok: "#", categories: ["figuras"], subcategories: {}, lobbyCategoryLimit: 4, categoryImages: {}, showAllCatalog: false, heroTitle: "", heroSubtitle: "", heroImage: "", heroImages: [], heroLinks: [], logoUrl: "", heroActive: true, invoiceHeader: "", invoiceFooter: "", shareText: "", currency: "$", posTimeout: "0", taxEnabled: false, taxRate: 15, posPin: "", globalDiscountActivo: false, globalDiscountValue: 0, globalScarcityActivo: false };
         const DEFAULT_MEASURES = { "Pequeño": { medida: "" }, "Mediano": { medida: "" }, "Grande": { medida: "" } };
 
         let inventario = []; 
@@ -2039,7 +2052,15 @@
         // =====================================================================
         function saveBrandTexts() { db.collection("config").doc("global").set({ slogan: document.getElementById('config-slogan').value, aboutTitle: document.getElementById('config-about-title').value, aboutDesc: document.getElementById('config-about-desc').value, invoiceHeader: document.getElementById('config-invoice-header').value, invoiceFooter: document.getElementById('config-invoice-footer').value }, { merge: true }).then(()=> Toast.fire({ icon:'success', title:'Textos Guardadas' })); }
         function saveSocials() { db.collection("config").doc("global").set({ whatsapp: document.getElementById('config-whatsapp').value, instagram: document.getElementById('config-instagram').value, facebook: document.getElementById('config-facebook').value, tiktok: document.getElementById('config-tiktok').value, shareText: document.getElementById('config-share-text').value }, { merge: true }).then(()=> Toast.fire({ icon:'success', title:'Redes Guardadas' })); }
-        function saveSystemConfig() { db.collection("config").doc("global").set({ currency: document.getElementById('config-currency').value, posTimeout: document.getElementById('config-pos-timeout').value, taxEnabled: document.getElementById('config-tax-enabled').checked, taxRate: parseFloat(document.getElementById('config-tax-rate').value) || 0 }, { merge: true }).then(()=> { Toast.fire({ icon:'success', title:'Sistema Actualizado' }); resetIdleTimer(); }); }
+        function saveSystemConfig() {
+            db.collection("config").doc("global").set({
+                currency: document.getElementById('config-currency').value,
+                posTimeout: document.getElementById('config-pos-timeout').value,
+                taxEnabled: document.getElementById('config-tax-enabled').checked,
+                taxRate: parseFloat(document.getElementById('config-tax-rate').value) || 0,
+                showAllCatalog: document.getElementById('config-show-all-catalog').checked
+            }, { merge: true }).then(()=> { Toast.fire({ icon:'success', title:'Sistema Actualizado' }); resetIdleTimer(); });
+        }
         function saveGlobalPromo() { const activo = document.getElementById('global-promo-active').checked; const val = parseFloat(document.getElementById('global-promo-val').value) || 0; const scarcityActivo = document.getElementById('global-scarcity-active').checked; db.collection("config").doc("global").set({ globalDiscountActivo: activo, globalDiscountValue: val, globalScarcityActivo: scarcityActivo }, {merge:true}).then(()=>Toast.fire({icon:'success', title:'Preferencias Guardadas'})); }
 
         function saveSecurity() { 
@@ -2211,6 +2232,7 @@
             document.getElementById('config-tax-enabled').checked = !!config.taxEnabled; 
             document.getElementById('config-tax-rate').value = config.taxRate || 15; 
             document.getElementById('config-pin').value = config.posPin || "";
+            if(document.getElementById('config-show-all-catalog')) document.getElementById('config-show-all-catalog').checked = config.showAllCatalog === true;
             
             if(document.getElementById('global-promo-active')) { 
                 document.getElementById('global-promo-active').checked = config.globalDiscountActivo || false; 
