@@ -716,7 +716,7 @@
                     badgesHTML += `<div class="bg-accent text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider"><i class="fas fa-clock"></i> Pronto</div>`;
                     btnQuickAddHTML = `<button disabled class="bg-light text-muted w-9 h-9 rounded-xl flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-clock"></i></button>`;
                 } else if (isOut) {
-                    badgesHTML += `<div class="bg-promo text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider">Agotado</div>`;
+                    badgesHTML += `<div class="bg-gray-500 text-white px-2 py-0.5 text-[9px] font-bold uppercase rounded shadow-sm w-max tracking-wider">Agotado</div>`;
                     btnQuickAddHTML = `<button disabled class="bg-light text-muted w-9 h-9 rounded-xl flex items-center justify-center cursor-not-allowed border border-border"><i class="fas fa-ban"></i></button>`;
                 } else {
                     btnQuickAddHTML = `<button onclick="quickAdd('${prod.id}', event)" class="bg-primary text-white w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[#A6763A] hover:scale-105 active:scale-95 shadow-md hover:shadow-lg transition-all duration-300 z-20"><i class="fas fa-shopping-bag text-sm"></i></button>`;
@@ -1288,7 +1288,7 @@
             badge.className = 'px-3 py-1 text-[10px] font-bold uppercase rounded-full hidden';
             
             if (esPreventaActiva(p)) { badge.classList.remove('hidden'); badge.classList.add('bg-accent/10', 'text-accent'); badge.innerHTML = p.fechaLanzamiento ? `Próximamente: ${p.fechaLanzamiento}` : `Próximamente`; btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "No disponible aún"; } 
-            else if (p.stock !== undefined && p.stock <= 0) { badge.classList.remove('hidden'); badge.classList.add('bg-promo', 'text-white'); badge.innerText = "Agotado"; btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "Fuera de Stock"; } 
+            else if (p.stock !== undefined && p.stock <= 0) { badge.classList.remove('hidden'); badge.classList.add('bg-gray-500', 'text-white'); badge.innerText = "Agotado"; btnAddCart.classList.add('hidden'); msgDisabled.classList.remove('hidden'); qtyContainer.classList.add('hidden', 'sm:hidden'); msgDisabled.innerText = "Fuera de Stock"; } 
             else { btnAddCart.classList.remove('hidden'); msgDisabled.classList.add('hidden'); qtyContainer.classList.remove('hidden'); qtyContainer.classList.add('flex'); }
             
             const measuresC = document.getElementById('modal-measures-container'); const tallaC = document.getElementById('modal-talla-select-container');
